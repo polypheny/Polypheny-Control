@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>Polypheny-DB Control</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="/font-awesome/5.10.1/css/all.css">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+<div class="main">
+    <h1 class="heading">Polypheny-DB Control</h1>
+
+    <div id="dashboardContent">
+        <table width="80%" class="dashboard" border="0">
+            <tr>
+                <td width="14.3%" height="350px;">
+                    <div class="circle" id="btn-start" style="display: none"><i class="fa fa-play fa-5x"></i></div>
+                    <div class="circle" id="btn-stop"><i class="fa fa-stop fa-5x"></i></div>
+                </td>
+                <td width="14.2%"></td>
+                <td width="14.3%">
+                    <div class="circle" id="btn-restart"><i class="fa fa-redo fa-5x"></i></div>
+                </td>
+                <td width="14.2%"></td>
+                <td width="14.3%">
+                    <div class="circle" id="btn-log"><i class="fa fa-bullhorn fa-5x"></i></div>
+                </td>
+                <td width="14.2%"></td>
+                <td width="14.3%">
+                    <div class="circle" id="btn-update"><i class="fa fa-sync fa-5x"></i></div>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td height="200px">
+                    <div class="circle" id="btn-webui"><a href="/webapp" style="color:black"><i class="fa fa-window-maximize fa-5x"></i></a></div>
+                </td>
+                <td></td>
+                <td>
+                    <div class="circle" id="btn-config"><i class="fa fa-wrench fa-5x"></i></div>
+                </td>
+                <td></td>
+                <td>
+                    <div class="circle" id="btn-settings"><i class="fa fa-cog fa-5x"></i></div>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="updateContent" class="content" style="display: none;">
+        <h1>Updating...</h1>
+        <pre class="output" id="updateOutput"></pre>
+        <button type="button" class="btn-back">OK</button>
+    </div>
+
+    <div id="logContent" class="content" style="display: none;">
+        <h1>Watch the log...</h1>
+        <pre class="output" id="logOutput"></pre>
+        <button type="button" class="btn-back">OK</button>
+    </div>
+
+    <form id="configs" name="configs">
+
+        <div id="configContent" class="content" style="display: none;">
+            <h1>Configuration</h1>
+
+            <button type="button" class="btn-back">OK</button>
+        </div>
+
+        <div id="settingsContent" class="content" style="display: none;">
+            <h1>Settings</h1>
+            <table class="configuration-table">
+                <tr>
+                    <th>Setting</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Log Level</td>
+                    <td>
+                        <select name="polypheny-db.log_level">
+                            <!-- <option value="" selected></option> -->
+                            <option value="trace">Trace</option>
+                            <option value="debug" selected>Debug</option>
+                            <option value="info">Info</option>
+                            <option value="warn">Warn</option>
+                            <option value="error">Error</option>
+                            <option value="fatal">Fatal</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Polypheny-DB Branch</td>
+                    <td><input name="pcrtl.pdbms.branch" value="master"></td>
+                </tr>
+                <tr>
+                    <td>Polypheny-DB UI Branch</td>
+                    <td><input name="pcrtl.ui.branch" value="master"></td>
+                </tr>
+            </table>
+            <button type="button" class="btn-back" id="saveSettings">OK</button>
+        </div>
+    </form>
+</div>
+
+<script src="/jquery/3.4.1/jquery.js"></script>
+<script src="/jquery-serializejson/2.9.0/jquery.serializejson.min.js"></script>
+<script src="/script.js"></script>
+</body>
+
+</html>

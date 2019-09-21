@@ -1,2 +1,2 @@
 # Polypheny-DB-Control
-Tool for deploying and managing Polypheny-DB
+A tool for deploying and managing Polypheny-DB.
