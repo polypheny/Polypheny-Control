@@ -139,7 +139,7 @@ public class ServiceManager {
     public static boolean start( final ClientCommunicationStream clientCommunicationStream, final boolean startTailers ) {
         val configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
-            restorePolyphenyDbProcess();
+            //restorePolyphenyDbProcess();
 
             if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
                 if ( clientCommunicationStream != null ) {
@@ -255,7 +255,7 @@ public class ServiceManager {
     public static boolean stop( final ClientCommunicationStream clientCommunicationStream ) {
         val configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
-            restorePolyphenyDbProcess();
+            //restorePolyphenyDbProcess();
 
             if ( polyphenyDbProcess == null ) {
                 // NO-OP if there is no process running
@@ -322,7 +322,7 @@ public class ServiceManager {
     public static boolean update( final ClientCommunicationStream clientCommunicationStream ) {
         val configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
-            restorePolyphenyDbProcess();
+            //restorePolyphenyDbProcess();
 
             if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
                 // polypheny-db process running
@@ -335,7 +335,6 @@ public class ServiceManager {
 
             val workingDir = configuration.getString( "pcrtl.workingdir" );
             val builddir = configuration.getString( "pcrtl.builddir" );
-            val pdbmsJar = configuration.getString( "pcrtl.pdbms.jarfile" );
 
             if ( new File( workingDir ).exists() == false ) {
                 if ( new File( workingDir ).mkdirs() == false ) {
@@ -395,7 +394,7 @@ public class ServiceManager {
         val pdbBuildDir = new File( buildDir, "pdb" );
 
         // Delete DBMS Jar
-        val jar = new File( new File( workingDir ), "polypheny-db.jar" );
+        val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( jar.exists() ) {
             jar.delete();
         }
@@ -446,7 +445,7 @@ public class ServiceManager {
         // Move jar to working dir
         val dbmsJar = new File( pdbBuildDir, "dbms" + File.separator + "build" + File.separator + "libs" + File.separator + "dbms-1.0-SNAPSHOT.jar" );
         if ( dbmsJar.exists() ) {
-            if ( !dbmsJar.renameTo( new File( new File( workingDir ), "polypheny-db.jar" ) ) ) {
+            if ( !dbmsJar.renameTo( jar ) ) {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Unable to move JAR file" );
                 }
@@ -463,7 +462,6 @@ public class ServiceManager {
 
     private static void installUi( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
 
-        val workingDir = configuration.getString( "pcrtl.workingdir" );
         val buildDir = configuration.getString( "pcrtl.builddir" );
         val repo = configuration.getString( "pcrtl.ui.repo" );
         val branch = configuration.getString( "pcrtl.ui.branch" );
