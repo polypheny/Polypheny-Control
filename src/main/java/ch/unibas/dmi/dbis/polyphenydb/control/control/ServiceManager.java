@@ -175,7 +175,7 @@ public class ServiceManager {
                 throw new RuntimeException( "The java executable seems not to exist... How did you start this application?!" );
             }
 
-            if ( new File( new File( workingDir ), pdbmsJar ).exists() == false ) {
+            if ( new File( pdbmsJar ).exists() == false ) {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> There is no Polypheny-DB jar file. Trigger an update first." );
                 }
@@ -201,7 +201,7 @@ public class ServiceManager {
                         .withJavaExecutable( new File( javaExecutable ) )
                         .withJavaOptions( javaOptionsFull.toArray( new String[javaOptionsFull.size()] ) )
                         .withClassPath(
-                                new File( new File( workingDir ), pdbmsJar ).getAbsolutePath()
+                                new File( pdbmsJar ).getAbsolutePath()
                                 //new File( new File( workingDir ), "config" ).getAbsolutePath() + File.separator + "*",
                                 //new File( new File( workingDir ), "plugins" ).getAbsolutePath() + File.separator + "*"
                         )
