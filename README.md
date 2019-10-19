@@ -22,11 +22,13 @@ The interface can now be accessed on port 8070. This port can be changed using t
 java -jar polyphenydb-control.jar control -p 8070
 ```
 
-We recommend not to use port 8080, 8081 and 8082 because these are the default ports of services offered by Polypheny-DB.
+We strongly recommend not to use port 8080, 8081 and 8082 because these are the default ports of services offered by Polypheny-DB.
 
 ## Roadmap ##
 See the [open issues](https://github.com/polypheny-db/Polypheny-DB-Control/issues) for a list of proposed features (and known issues).
 
+## Acknowledgements
+The Polypheny-DB project is supported by the Swiss National Science Foundation (SNSF) under the contract no. 200021_172763.
+
 ## License ##
 The MIT License (MIT)
-
