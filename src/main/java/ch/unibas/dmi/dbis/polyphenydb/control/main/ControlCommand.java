@@ -30,14 +30,10 @@ import ch.unibas.dmi.dbis.polyphenydb.control.control.Control;
 import ch.unibas.dmi.dbis.polyphenydb.control.httpinterface.Server;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
-@Command(name = "control", description = "Start Polypheny-DB Control")
+@Command(name = "control", description = "Start Polypheny Control")
 public class ControlCommand extends AbstractCommand {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger( ControlCommand.class );
 
     @Option(name = { "-p", "--port" }, description = "Port")
     private int port = -1;

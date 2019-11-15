@@ -49,7 +49,7 @@ import spark.Response;
 public class Control {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( Control.class );
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
 
     public synchronized String getCurrentConfigAsJson( final Request request, final Response response ) {
@@ -58,7 +58,7 @@ public class Control {
 
 
     public synchronized boolean setConfig( final Request request, final Response response ) {
-        getClientCommuncationStream( request, "currentConfig" );
+        getClientCommunicationStream( request, "currentConfig" );
 
         val json = request.queryMap( "config" ).value();
 
@@ -102,22 +102,22 @@ public class Control {
 
 
     public boolean start( final Request request, final Response response ) {
-        return ServiceManager.start( getClientCommuncationStream( request, "logOutput" ) );
+        return ServiceManager.start( getClientCommunicationStream( request, "logOutput" ) );
     }
 
 
     public boolean stop( final Request request, final Response response ) {
-        return ServiceManager.stop( getClientCommuncationStream( request, "logOutput" ) );
+        return ServiceManager.stop( getClientCommunicationStream( request, "logOutput" ) );
     }
 
 
     public boolean restart( final Request request, final Response response ) {
-        return ServiceManager.restart( getClientCommuncationStream( request, "logOutput" ) );
+        return ServiceManager.restart( getClientCommunicationStream( request, "logOutput" ) );
     }
 
 
     public boolean update( final Request request, final Response response ) {
-        return ServiceManager.update( getClientCommuncationStream( request, "updateOutput" ) );
+        return ServiceManager.update( getClientCommunicationStream( request, "updateOutput" ) );
     }
 
 
@@ -131,7 +131,7 @@ public class Control {
     }
 
 
-    private ClientCommunicationStream getClientCommuncationStream( @NonNull final Request request, @NonNull final String topic ) {
+    private ClientCommunicationStream getClientCommunicationStream( @NonNull final Request request, @NonNull final String topic ) {
         if ( request.queryParams().contains( "clientId" ) ) {
             val cid = Integer.parseInt( request.queryParams( "clientId" ) );
             return new ClientCommunicationStream( cid, topic );

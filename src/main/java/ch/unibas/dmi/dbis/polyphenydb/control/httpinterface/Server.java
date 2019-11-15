@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public class Server {
 
     private static final Logger logger = LoggerFactory.getLogger( Server.class );
-    private static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
 
     public Server( Control control, int port ) {

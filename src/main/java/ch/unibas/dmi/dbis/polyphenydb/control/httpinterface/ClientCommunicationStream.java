@@ -27,8 +27,8 @@ package ch.unibas.dmi.dbis.polyphenydb.control.httpinterface;
 
 public class ClientCommunicationStream {
 
-    private int clientId;
-    private String topic;
+    private final int clientId;
+    private final String topic;
 
 
     public ClientCommunicationStream( int clientId, String topic ) {

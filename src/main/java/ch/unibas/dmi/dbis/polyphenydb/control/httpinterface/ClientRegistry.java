@@ -38,17 +38,15 @@ import org.slf4j.LoggerFactory;
 class ClientRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger( ClientRegistry.class );
-    private static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
-    private static Map<Session, Integer> clientMap = new ConcurrentHashMap<>();
-    private static Map<Integer, Session> reverseClientMap = new ConcurrentHashMap<>();
+    private static final Map<Session, Integer> clientMap = new ConcurrentHashMap<>();
+    private static final Map<Integer, Session> reverseClientMap = new ConcurrentHashMap<>();
     private static int nextClientNumber = 1;
 
 
     static void broadcast( String topic, String message ) {
-        clientMap.keySet().stream().filter( Session::isOpen ).forEach( session -> {
-            sendMessage( session, topic, message );
-        } );
+        clientMap.keySet().stream().filter( Session::isOpen ).forEach( session -> sendMessage( session, topic, message ) );
     }
 
 

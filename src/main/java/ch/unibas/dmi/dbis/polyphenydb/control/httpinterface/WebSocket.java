@@ -35,7 +35,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 public class WebSocket {
 
     @OnWebSocketConnect
-    public void onConnect( Session user ) throws Exception {
+    public void onConnect( Session user ) {
         ClientRegistry.addClient( user );
     }
 

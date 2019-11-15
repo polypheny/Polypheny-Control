@@ -22,4 +22,4 @@
  * SOFTWARE.
  */
 
-rootProject.name = 'polyphenydb-control'
+rootProject.name = 'polypheny-control'

@@ -199,14 +199,14 @@ public class ServiceManager {
                 polyphenyDbProcess = PolyphenyDbProcessBuilder.builder()
                         .withWorkingDir( new File( workingDir ) )
                         .withJavaExecutable( new File( javaExecutable ) )
-                        .withJavaOptions( javaOptionsFull.toArray( new String[javaOptionsFull.size()] ) )
+                        .withJavaOptions( javaOptionsFull.toArray( new String[0] ) )
                         .withClassPath(
                                 new File( pdbmsJar ).getAbsolutePath()
                                 //new File( new File( workingDir ), "config" ).getAbsolutePath() + File.separator + "*",
                                 //new File( new File( workingDir ), "plugins" ).getAbsolutePath() + File.separator + "*"
                         )
                         .withMainClass( pdbmsMainClass )
-                        .withArguments( pdbArguments.toArray( new String[pdbArguments.size()] ) )
+                        .withArguments( pdbArguments.toArray( new String[0] ) )
                         .withLogFile( new File( logFile ), false )
                         .withErrFile( new File( errFile ), false )
                         .start();
@@ -377,7 +377,9 @@ public class ServiceManager {
 
             if ( clientCommunicationStream != null ) {
                 LOGGER.info( "> Updating Polypheny-DB ... finished." );
-                clientCommunicationStream.send( "> Updating Polypheny-DB ... finished." );
+                clientCommunicationStream.send( "*****************************************" );
+                clientCommunicationStream.send( "    Successfully builded Polypheny-DB" );
+                clientCommunicationStream.send( "*****************************************" );
             }
             return true;
         }
@@ -396,7 +398,12 @@ public class ServiceManager {
         // Delete DBMS Jar
         val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( jar.exists() ) {
-            jar.delete();
+            if ( jar.delete() ) {
+                LOGGER.info( "> Unable to delete the jar file." );
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Unable to delete the jar file." );
+                }
+            }
         }
 
         // Clone the repository
@@ -404,9 +411,8 @@ public class ServiceManager {
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Cloning Polypheny-DB repository ..." );
         }
-        final Git git;
         try {
-            git = Git.cloneRepository()
+            final Git git = Git.cloneRepository()
                     .setURI( repo )
                     .setDirectory( pdbBuildDir )
                     .setBranch( branch )
@@ -469,13 +475,12 @@ public class ServiceManager {
         val uiBuildDir = new File( buildDir, "ui" );
 
         // Clone the repository
-        LOGGER.info( "> Cloning Polypheny-DB UI repository ..." );
+        LOGGER.info( "> Cloning Polypheny UI repository ..." );
         if ( clientCommunicationStream != null ) {
-            clientCommunicationStream.send( "> Cloning Polypheny-DB UI repository ..." );
+            clientCommunicationStream.send( "> Cloning Polypheny UI repository ..." );
         }
-        final Git git;
         try {
-            git = Git.cloneRepository()
+            final Git git = Git.cloneRepository()
                     .setURI( repo )
                     .setDirectory( uiBuildDir )
                     .setBranch( branch )
@@ -483,15 +488,15 @@ public class ServiceManager {
         } catch ( GitAPIException e ) {
             throw new RuntimeException( e );
         }
-        LOGGER.info( "> Cloning Polypheny-DB UI repository ... finished." );
+        LOGGER.info( "> Cloning Polypheny UI repository ... finished." );
         if ( clientCommunicationStream != null ) {
-            clientCommunicationStream.send( "> Cloning Polypheny-DB UI repository ... finished." );
+            clientCommunicationStream.send( "> Cloning Polypheny UI repository ... finished." );
         }
 
         // Build
-        LOGGER.info( "> Installing Polypheny-DB UI ..." );
+        LOGGER.info( "> Installing Polypheny UI ..." );
         if ( clientCommunicationStream != null ) {
-            clientCommunicationStream.send( "> Installing Polypheny-DB ..." );
+            clientCommunicationStream.send( "> Installing Polypheny UI ..." );
         }
         try ( ProjectConnection connection = GradleConnector.newConnector()
                 .forProjectDirectory( uiBuildDir )
@@ -503,9 +508,9 @@ public class ServiceManager {
                     .addProgressListener( event -> clientCommunicationStream.send( event.getDisplayName() ), OperationType.TASK )
                     .run();
         }
-        LOGGER.info( "> Installing Polypheny-DB UI ... finished." );
+        LOGGER.info( "> Installing Polypheny UI ... finished." );
         if ( clientCommunicationStream != null ) {
-            clientCommunicationStream.send( "> Installing Polypheny-DB UI ... finished." );
+            clientCommunicationStream.send( "> Installing Polypheny UI ... finished." );
         }
     }
 
