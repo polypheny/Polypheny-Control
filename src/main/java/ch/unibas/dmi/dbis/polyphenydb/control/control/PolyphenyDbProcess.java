@@ -33,17 +33,15 @@ import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.SystemUtils;
 import org.jvnet.winp.WinProcess;
 import org.jvnet.winp.WinpException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
+@Slf4j
 public abstract class PolyphenyDbProcess {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger( PolyphenyDbProcess.class );
 
 
     public static PolyphenyDbProcess createFromPid( final int pid ) {
@@ -169,9 +167,9 @@ public abstract class PolyphenyDbProcess {
                 killForcibly();
 
             } catch ( IOException e ) {
-                LOGGER.error( "Exception while trying to kill <<me:" + getPid() + ">> via PID on Unix.", e );
+                log.error( "Exception while trying to kill <<me:" + getPid() + ">> via PID on Unix.", e );
             } catch ( InterruptedException e ) {
-                LOGGER.warn( "Interrupted while waiting for kill to finish." );
+                log.warn( "Interrupted while waiting for kill to finish." );
             }
         }
 
@@ -223,7 +221,7 @@ public abstract class PolyphenyDbProcess {
                 } );
 
             } catch ( NoSuchFieldException | IllegalAccessException e ) {
-                LOGGER.error( "Exception while extracting the PID from java.lang.Process.", e );
+                log.error( "Exception while extracting the PID from java.lang.Process.", e );
                 pid = -1;
             } finally {
                 this.pid = (int) pid;
@@ -255,7 +253,7 @@ public abstract class PolyphenyDbProcess {
 
                     return false;
                 } catch ( IOException e ) {
-                    LOGGER.warn( "IOException while checking if " + pid + " is still alive.", e );
+                    log.warn( "IOException while checking if " + pid + " is still alive.", e );
                     return false;
                 }
             } else {
@@ -279,9 +277,9 @@ public abstract class PolyphenyDbProcess {
                 killForcibly();
 
             } catch ( IOException e ) {
-                LOGGER.error( "Exception while trying to kill <<me:" + pid + ">> via PID on Unix.", e );
+                log.error( "Exception while trying to kill <<me:" + pid + ">> via PID on Unix.", e );
             } catch ( InterruptedException e ) {
-                LOGGER.warn( "Interrupted while waiting for kill to finish." );
+                log.warn( "Interrupted while waiting for kill to finish." );
             }
         }
 
@@ -300,12 +298,12 @@ public abstract class PolyphenyDbProcess {
                         }
                     }
 
-                    LOGGER.warn( "Could not kill {}", pid );
+                    log.warn( "Could not kill {}", pid );
 
                 } catch ( IOException e ) {
-                    LOGGER.error( "Exception while trying to kill <<me:" + pid + ">> via PID on Unix.", e );
+                    log.error( "Exception while trying to kill <<me:" + pid + ">> via PID on Unix.", e );
                 } catch ( InterruptedException e ) {
-                    LOGGER.warn( "Interrupted while waiting for kill to finish." );
+                    log.warn( "Interrupted while waiting for kill to finish." );
                 }
 
             } else {

@@ -35,15 +35,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
+@Slf4j
 public class ConfigManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger( ConfigManager.class );
 
     private static Config currentConfig = null;
 
@@ -96,7 +94,7 @@ public class ConfigManager {
         ) {
             bw.write( configuration.root().render( configRenderOptions ) );
         } catch ( IOException e ) {
-            LOGGER.error( "Exception while writing configuration file", e );
+            log.error( "Exception while writing configuration file", e );
         }
         loadConfigFile();
     }

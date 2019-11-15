@@ -39,13 +39,12 @@ import com.google.gson.Gson;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 public class Server {
 
-    private static final Logger logger = LoggerFactory.getLogger( Server.class );
     private static final Gson gson = new Gson();
 
 
@@ -56,7 +55,7 @@ public class Server {
         webSocket( "/socket", WebSocket.class );
 
         path( "/", () -> {
-            before( ( q, a ) -> logger.info( "Received api call" ) );
+            before( ( q, a ) -> log.info( "Received api call" ) );
             path( "/config", () -> {
                 get( "/get", control::getCurrentConfigAsJson );
                 post( "/set", control::setConfig, gson::toJson );

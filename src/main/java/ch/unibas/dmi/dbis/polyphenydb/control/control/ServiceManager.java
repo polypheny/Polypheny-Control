@@ -45,6 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.Tailer;
@@ -60,13 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-/**
- *
- */
+@Slf4j
 public class ServiceManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger( ServiceManager.class );
-    private static final Logger PDB_LOGGER = LoggerFactory.getLogger( "PDB" );
 
     private static final Object MUTEX = new Object();
     private static PolyphenyDbProcess polyphenyDbProcess = null; // ! Shared over multiple stateless requests
@@ -92,7 +88,7 @@ public class ServiceManager {
                 try {
                     Files.setAttribute( workingDir.toPath(), "dos:hidden", true );
                 } catch ( IOException e ) {
-                    LOGGER.info( "IOException while setting the hidden flag on the working directory.", e );
+                    log.info( "IOException while setting the hidden flag on the working directory.", e );
                 }
             }
         }
@@ -110,9 +106,9 @@ public class ServiceManager {
                         polyphenyDbProcess = PolyphenyDbProcess.createFromPid( Integer.parseInt( line ) );
                     }
                 } catch ( FileNotFoundException e ) {
-                    LOGGER.error( "File exists but not found?!", e );
+                    log.error( "File exists but not found?!", e );
                 } catch ( IOException e ) {
-                    LOGGER.error( "IOException while recovering the PID.", e );
+                    log.error( "IOException while recovering the PID.", e );
                 }
 
                 if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() == false ) {
@@ -121,12 +117,12 @@ public class ServiceManager {
                         pidWriter.append( "" );
                         pidWriter.flush();
                     } catch ( IOException e ) {
-                        LOGGER.error( "IOException while deleting the stored PID of a dead process.", e );
+                        log.error( "IOException while deleting the stored PID of a dead process.", e );
                     }
                 }
             }
         } catch ( IOException e ) {
-            LOGGER.error( "IOException while touching the PID file.", e );
+            log.error( "IOException while touching the PID file.", e );
         }
     }
 
@@ -145,7 +141,7 @@ public class ServiceManager {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Polypheny-DB is already running. Stop it first or use the restart function." );
                 }
-                LOGGER.warn( "> Polypheny-DB is already running. Stop it first or use the restart function." );
+                log.warn( "> Polypheny-DB is already running. Stop it first or use the restart function." );
                 return false;
             }
 
@@ -179,7 +175,7 @@ public class ServiceManager {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> There is no Polypheny-DB jar file. Trigger an update first." );
                 }
-                LOGGER.warn( "> There is no Polypheny-DB jar file. Trigger an update first." );
+                log.warn( "> There is no Polypheny-DB jar file. Trigger an update first." );
                 return false;
             }
 
@@ -191,7 +187,7 @@ public class ServiceManager {
 
             try ( val pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile, false ), StandardCharsets.UTF_8 ) ) {
 
-                LOGGER.info( "> Starting Polypheny-DB" );
+                log.info( "> Starting Polypheny-DB" );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Starting Polypheny-DB" );
                 }
@@ -215,10 +211,13 @@ public class ServiceManager {
                 pidWriter.append( String.valueOf( polyphenyDbProcessId ) );
                 pidWriter.flush();
 
-                LOGGER.info( "> PID = {}", polyphenyDbProcessId );
+                log.info( "> PID = {}", polyphenyDbProcessId );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> PID = " + polyphenyDbProcessId );
                 }
+
+                // Create logger
+                final Logger PDB_LOGGER = LoggerFactory.getLogger( "PDB" );
 
                 if ( logTailer != null ) {
                     logTailer.stop();
@@ -245,7 +244,7 @@ public class ServiceManager {
 
                 return true;
             } catch ( IOException ex ) {
-                LOGGER.error( "Caught exception while starting Polypheny-DB", ex );
+                log.error( "Caught exception while starting Polypheny-DB", ex );
                 return false;
             }
         }
@@ -261,7 +260,7 @@ public class ServiceManager {
                 // NO-OP if there is no process running
                 return true;
             } else if ( polyphenyDbProcess.isAlive() ) {
-                LOGGER.info( "> Stopping Polypheny-DB ..." );
+                log.info( "> Stopping Polypheny-DB ..." );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Stopping Polypheny-DB ..." );
                 }
@@ -291,12 +290,12 @@ public class ServiceManager {
                     pidWriter.append( "" );
                     pidWriter.flush();
                 } catch ( IOException e ) {
-                    LOGGER.error( "Could not delete the PID.", e );
+                    log.error( "Could not delete the PID.", e );
                 }
             }
             // delete or emptying was successful
 
-            LOGGER.info( "> ... done." );
+            log.info( "> ... done." );
             if ( clientCommunicationStream != null ) {
                 clientCommunicationStream.send( "> ... done." );
             }
@@ -326,7 +325,7 @@ public class ServiceManager {
 
             if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
                 // polypheny-db process running
-                LOGGER.info( "> Stop Polypheny-DB first before updating it." );
+                log.info( "> Stop Polypheny-DB first before updating it." );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Stop Polypheny-DB first before updating it." );
                 }
@@ -336,38 +335,38 @@ public class ServiceManager {
             val workingDir = configuration.getString( "pcrtl.workingdir" );
             val builddir = configuration.getString( "pcrtl.builddir" );
 
-            if ( new File( workingDir ).exists() == false ) {
-                if ( new File( workingDir ).mkdirs() == false ) {
+            if ( !new File( workingDir ).exists() ) {
+                if ( !new File( workingDir ).mkdirs() ) {
                     throw new RuntimeException( "Could not create the folders for " + new File( workingDir ).getAbsolutePath() );
                 }
             }
 
-            LOGGER.info( "> Deleting build folder ..." );
+            log.info( "> Deleting build folder ..." );
             if ( clientCommunicationStream != null ) {
                 clientCommunicationStream.send( "> Deleting build folder ..." );
             }
 
             try {
                 FileUtils.deleteDirectory( new File( builddir ) );
-                LOGGER.info( "> Deleting build folder ... Done." );
+                log.info( "> Deleting build folder ... Done." );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Deleting build folder ... Done." );
                 }
             } catch ( IOException e ) {
-                LOGGER.warn( "Could not delete build folder!", e );
+                log.warn( "Could not delete build folder!", e );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Deleting build folder ... Could not delete the build directory." );
                     throw new RuntimeException( "Could not delete build folder " + new File( builddir ).getAbsolutePath() );
                 }
             }
 
-            if ( new File( builddir ).exists() == false ) {
-                if ( new File( builddir ).mkdirs() == false ) {
+            if ( !new File( builddir ).exists() ) {
+                if ( !new File( builddir ).mkdirs() ) {
                     throw new RuntimeException( "Could not create the folders for " + new File( builddir ).getAbsolutePath() );
                 }
             }
 
-            LOGGER.info( "> Updating Polypheny-DB ..." );
+            log.info( "> Updating Polypheny-DB ..." );
             if ( clientCommunicationStream != null ) {
                 clientCommunicationStream.send( "> Updating Polypheny-DB ..." );
             }
@@ -376,10 +375,10 @@ public class ServiceManager {
             buildPdb( clientCommunicationStream, configuration );
 
             if ( clientCommunicationStream != null ) {
-                LOGGER.info( "> Updating Polypheny-DB ... finished." );
-                clientCommunicationStream.send( "*****************************************" );
-                clientCommunicationStream.send( "    Successfully builded Polypheny-DB" );
-                clientCommunicationStream.send( "*****************************************" );
+                log.info( "> Updating Polypheny-DB ... finished." );
+                clientCommunicationStream.send( "********************************************************" );
+                clientCommunicationStream.send( "        Polypheny has successfully been builded!" );
+                clientCommunicationStream.send( "********************************************************" );
             }
             return true;
         }
@@ -399,7 +398,7 @@ public class ServiceManager {
         val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( jar.exists() ) {
             if ( jar.delete() ) {
-                LOGGER.info( "> Unable to delete the jar file." );
+                log.info( "> Unable to delete the jar file." );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Unable to delete the jar file." );
                 }
@@ -407,7 +406,7 @@ public class ServiceManager {
         }
 
         // Clone the repository
-        LOGGER.info( "> Cloning Polypheny-DB repository ..." );
+        log.info( "> Cloning Polypheny-DB repository ..." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Cloning Polypheny-DB repository ..." );
         }
@@ -420,19 +419,17 @@ public class ServiceManager {
         } catch ( GitAPIException e ) {
             throw new RuntimeException( e );
         }
-        LOGGER.info( "> Cloning Polypheny-DB repository ... finished." );
+        log.info( "> Cloning Polypheny-DB repository ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Cloning Polypheny-DB repository ... finished." );
         }
 
         // Build
-        LOGGER.info( "> Building Polypheny-DB ..." );
+        log.info( "> Building Polypheny-DB ..." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Building Polypheny-DB ..." );
         }
-        try ( ProjectConnection connection = GradleConnector.newConnector()
-                .forProjectDirectory( pdbBuildDir )
-                .connect() ) {
+        try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( pdbBuildDir ).connect() ) {
             BuildLauncher buildLauncher = connection.newBuild()
                     .setStandardOutput( System.out )
                     .forTasks( "build" )
@@ -443,14 +440,28 @@ public class ServiceManager {
             }
             buildLauncher.run();
         }
-        LOGGER.info( "> Building Polypheny-DB ... finished." );
+        log.info( "> Building Polypheny-DB ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Building Polypheny-DB ... finished." );
         }
 
         // Move jar to working dir
-        val dbmsJar = new File( pdbBuildDir, "dbms" + File.separator + "build" + File.separator + "libs" + File.separator + "dbms-1.0-SNAPSHOT.jar" );
-        if ( dbmsJar.exists() ) {
+        val dbmsJarFolder = new File( pdbBuildDir, "dbms" + File.separator + "build" + File.separator + "libs" );
+        File[] files = dbmsJarFolder.listFiles( ( dir, name ) -> name.startsWith( "dbms-" ) );
+
+        File dbmsJar = null;
+        if ( files != null ) {
+            for ( File f : files ) {
+                if ( !f.getName().contains( "javadoc" ) && !f.getName().contains( "sources" ) ) {
+                    dbmsJar = f;
+                    break;
+                }
+            }
+        } else {
+            throw new RuntimeException( "JAR file not found!" );
+        }
+
+        if ( dbmsJar != null && dbmsJar.exists() ) {
             if ( !dbmsJar.renameTo( jar ) ) {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Unable to move JAR file" );
@@ -459,9 +470,9 @@ public class ServiceManager {
             }
         } else {
             if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Jar file does not exist!" );
+                clientCommunicationStream.send( "> JAR file does not exist!" );
             }
-            throw new RuntimeException( "Jar file does not exist!" );
+            throw new RuntimeException( "JAR file does not exist!" );
         }
     }
 
@@ -475,7 +486,7 @@ public class ServiceManager {
         val uiBuildDir = new File( buildDir, "ui" );
 
         // Clone the repository
-        LOGGER.info( "> Cloning Polypheny UI repository ..." );
+        log.info( "> Cloning Polypheny UI repository ..." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Cloning Polypheny UI repository ..." );
         }
@@ -488,19 +499,17 @@ public class ServiceManager {
         } catch ( GitAPIException e ) {
             throw new RuntimeException( e );
         }
-        LOGGER.info( "> Cloning Polypheny UI repository ... finished." );
+        log.info( "> Cloning Polypheny UI repository ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Cloning Polypheny UI repository ... finished." );
         }
 
         // Build
-        LOGGER.info( "> Installing Polypheny UI ..." );
+        log.info( "> Installing Polypheny UI ..." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Installing Polypheny UI ..." );
         }
-        try ( ProjectConnection connection = GradleConnector.newConnector()
-                .forProjectDirectory( uiBuildDir )
-                .connect() ) {
+        try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( uiBuildDir ).connect() ) {
             connection.newBuild()
                     .setStandardOutput( System.out )
                     .forTasks( "install" )
@@ -508,7 +517,7 @@ public class ServiceManager {
                     .addProgressListener( event -> clientCommunicationStream.send( event.getDisplayName() ), OperationType.TASK )
                     .run();
         }
-        LOGGER.info( "> Installing Polypheny UI ... finished." );
+        log.info( "> Installing Polypheny UI ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Installing Polypheny UI ... finished." );
         }
@@ -516,7 +525,7 @@ public class ServiceManager {
 
 
     public static Object getVersion() {
-        // ToDo
+        // TODO
         final LinkedList<String> list = new LinkedList<>();
         list.add( "version" );
         return null;
@@ -524,7 +533,7 @@ public class ServiceManager {
 
 
     public static Object getStatus() {
-        // ToDo
+        // TODO
         //synchronized ( MUTEX ) {
             if ( polyphenyDbProcess == null ) {
                 return false;

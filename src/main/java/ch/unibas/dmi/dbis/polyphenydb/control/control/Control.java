@@ -40,15 +40,12 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import lombok.NonNull;
 import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
 
 public class Control {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( Control.class );
     private final Gson gson = new Gson();
 
 

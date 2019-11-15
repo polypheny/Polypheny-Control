@@ -30,14 +30,13 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
+@Slf4j
 class ClientRegistry {
 
-    private static final Logger logger = LoggerFactory.getLogger( ClientRegistry.class );
     private static final Gson gson = new Gson();
 
     private static final Map<Session, Integer> clientMap = new ConcurrentHashMap<>();
@@ -61,10 +60,10 @@ class ClientRegistry {
         Map<String, String> map = new HashMap<>();
         map.put( topic, message );
         try {
-            logger.debug( "Send message to client " + clientId + ": topic: " + topic + " | message: " + message );
+            log.debug( "Send message to client " + clientId + ": topic: " + topic + " | message: " + message );
             session.getRemote().sendString( String.valueOf( gson.toJson( map ) ) );
         } catch ( Exception e ) {
-            logger.debug( "Exception thrown while sending message to client " + clientId, e );
+            log.debug( "Exception thrown while sending message to client " + clientId, e );
         }
     }
 
@@ -74,7 +73,7 @@ class ClientRegistry {
         clientMap.put( session, cid );
         reverseClientMap.put( cid, session );
         sendMessage( cid, "clientId", "" + cid );
-        logger.info( "Registered client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Registered client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
         sendMessage( cid, "status", "" + ServiceManager.getStatus() );
     }
 
@@ -82,7 +81,7 @@ class ClientRegistry {
     static void removeClient( Session session, int statusCode, String reason ) {
         int cid = clientMap.remove( session );
         reverseClientMap.remove( cid );
-        logger.info( "Removed client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Removed client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
     }
 
 }

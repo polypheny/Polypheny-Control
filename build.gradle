@@ -2,8 +2,8 @@
 group "ch.unibas.dmi.dbis.polyphenydb"
 
 
-def versionMajor = 1
-def versionMinor = 0
+def versionMajor = 0
+def versionMinor = 3
 def versionQualifier = "SNAPSHOT"
 version = versionMajor + "." + versionMinor + "-" + versionQualifier
 

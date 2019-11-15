@@ -30,13 +30,11 @@ import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 import java.util.LinkedList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 public class PolyphenyDbProcessBuilder {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger( PolyphenyDbProcessBuilder.class );
 
     private File workingDir;
     private File javaExecutable;
@@ -148,7 +146,7 @@ public class PolyphenyDbProcessBuilder {
         }
         command.addAll( Arrays.asList( arguments ) );
 
-        LOGGER.info( "> Executing \"{}\"", String.join( " ", command ) );
+        log.info( "> Executing \"{}\"", String.join( " ", command ) );
 
         ProcessBuilder builder = new ProcessBuilder();
         if ( logFile == null ) {
