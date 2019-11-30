@@ -71,6 +71,11 @@ public class Main {
 
                 while ( !exit ) {
                     Thread.yield();
+                    try {
+                        Thread.sleep(1000);
+                    } catch ( InterruptedException e ) {
+                        // ignore
+                    }
                 }
 
                 return 0;

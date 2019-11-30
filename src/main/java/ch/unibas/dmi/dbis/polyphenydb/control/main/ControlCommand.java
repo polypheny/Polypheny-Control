@@ -55,6 +55,11 @@ public class ControlCommand extends AbstractCommand {
 
         while ( running ) {
             Thread.yield();
+            try {
+                Thread.sleep(1000);
+            } catch ( InterruptedException e ) {
+                // ignore
+            }
         }
 
         return 0;
