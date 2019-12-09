@@ -27,6 +27,8 @@ var clientId = 0;
 
 var debug = false;
 
+var ansi_up = new AnsiUp;
+
 webSocket.onmessage = function (msg) {
     if (debug) {
         console.log("Received message: " + msg.data);
@@ -69,9 +71,9 @@ webSocket.onclose = function () {
 };
 
 function appendOutput(box, text) {
-    var lines = box.text().split("\n");
+    var lines = box.html().split("\n");
     var str = lines.slice(-10000).join("\n");
-    box.text(str + "\n" + text);
+    box.html(str + "\n" + ansi_up.ansi_to_html(text));
     box.scrollTop(box[0].scrollHeight);
 }
 

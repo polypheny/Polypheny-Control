@@ -87,7 +87,11 @@ body {
     border: solid black thin;
     margin: 0 15px 20px 15px;
     padding: 10px;
+    white-space: pre;
+    display: block;
 }
+
+
 
 .configuration-table {
     border-collapse: collapse;

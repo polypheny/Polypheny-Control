@@ -71,11 +71,10 @@ configurations {
 
 dependencies {
     // Log4J
-    compile group: "org.slf4j", name: "slf4j-api", version: "1.7.22"    // License: MIT
-    compile group: "org.apache.logging.log4j", name: "log4j-slf4j-impl", version: "2.7" // License: Apache 2.0
-    compile group: "org.apache.logging.log4j", name: "log4j-core", version: "2.7"   // License: Apache 2.0
-    compile group: "org.apache.logging.log4j", name: "log4j-1.2-api", version: "2.7"
-    compile group: "org.apache.logging.log4j", name: "log4j-api", version: "2.7"
+    compile group: "org.slf4j", name: "slf4j-api", version: "1.7.26"    // License: MIT
+    compile group: "org.apache.logging.log4j", name: "log4j-slf4j-impl", version: "2.12.1" // License: Apache 2.0
+    compile group: "org.apache.logging.log4j", name: "log4j-core", version: "2.12.1"   // License: Apache 2.0
+    compile group: "org.apache.logging.log4j", name: "log4j-api", version: "2.12.1"
 
     ////// CONFIGURATION MANAGEMENT
     compile group: "com.typesafe", name: "config", version: "1.3.2" // Apache 2.0
@@ -101,7 +100,7 @@ dependencies {
     webjars group: "org.webjars", name: "font-awesome", version: "5.10.1"
     webjars group: "org.webjars", name: "jquery", version: "3.4.1"
     webjars group: 'org.webjars.npm', name: 'jquery-serializejson', version: '2.9.0'
-
+    webjars group: 'org.webjars.npm', name: 'ansi_up', version: '2.0.2'
 
     //compile(group: "org.jfrog.artifactory.client", name: "artifactory-java-client-services", version: "+")
 
