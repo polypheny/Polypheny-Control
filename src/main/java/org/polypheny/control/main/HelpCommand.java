@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.main;
+package org.polypheny.control.main;
 
 
 import com.github.rvesse.airline.annotations.Arguments;

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2019 Databases and Information Systems Research Group, University of Basel, Switzerland
+ * Copyright (c) 2018-2019 Databases and Information Systems Research Group, University of Basel, Switzerland
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,34 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.httpinterface;
+package org.polypheny.control.main;
 
 
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import com.github.rvesse.airline.HelpOption;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.OptionType;
+import java.io.File;
+import javax.inject.Inject;
+import org.polypheny.control.control.ConfigManager;
 
 
-@org.eclipse.jetty.websocket.api.annotations.WebSocket
-public class WebSocket {
+public abstract class AbstractCommand implements CliRunnable {
 
-    @OnWebSocketConnect
-    public void onConnect( Session user ) {
-        ClientRegistry.addClient( user );
+    @Inject
+    protected HelpOption<ControlCommand> help;
+
+    @Option(name = { "-c", "--config" }, description = "Path to the configuration file.", type = OptionType.GLOBAL)
+    protected String applicationConfPath;// ConfigManager.CONFIG_FILE.getAbsolutePath();
+
+
+    @Override
+    public final int run() {
+        if ( applicationConfPath != null ) {
+            ConfigManager.setApplicationConfFile( new File( applicationConfPath ) );
+        }
+        return _run_();
     }
 
 
-    @OnWebSocketClose
-    public void onClose( Session user, int statusCode, String reason ) {
-        ClientRegistry.removeClient( user, statusCode, reason );
-    }
-
-
-    @OnWebSocketMessage
-    public void onMessage( Session user, String message ) {
-    }
+    protected abstract int _run_();
 }

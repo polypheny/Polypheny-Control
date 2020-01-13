@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.main;
+package org.polypheny.control.main;
 
 
-import ch.unibas.dmi.dbis.polyphenydb.control.control.ServiceManager;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
 import java.util.List;
+import org.polypheny.control.control.ServiceManager;
 
 
 public class Main {

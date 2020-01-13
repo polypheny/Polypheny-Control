@@ -1,11 +1,11 @@
 
-group "ch.unibas.dmi.dbis.polyphenydb"
+group "org.polypheny"
 
 
 def versionMajor = 0
 def versionMinor = 3
-def versionQualifier = "SNAPSHOT"
-version = versionMajor + "." + versionMinor + "-" + versionQualifier
+def versionQualifier = "-SNAPSHOT"
+version = versionMajor + "." + versionMinor + versionQualifier
 
 
 buildscript {
@@ -51,7 +51,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "nebula.ospackage-application"
 
 
-mainClassName = "ch.unibas.dmi.dbis.polyphenydb.control.main.Main"
+mainClassName = "org.polypheny.control.main.Main"
 
 
 tasks.withType(JavaCompile) {

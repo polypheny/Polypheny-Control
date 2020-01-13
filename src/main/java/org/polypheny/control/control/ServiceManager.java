@@ -22,10 +22,9 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.control;
+package org.polypheny.control.control;
 
 
-import ch.unibas.dmi.dbis.polyphenydb.control.httpinterface.ClientCommunicationStream;
 import com.typesafe.config.Config;
 import java.io.BufferedReader;
 import java.io.File;
@@ -57,6 +56,7 @@ import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.events.OperationType;
+import org.polypheny.control.httpinterface.ClientCommunicationStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,7 +397,7 @@ public class ServiceManager {
         // Delete DBMS Jar
         val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( jar.exists() ) {
-            if ( jar.delete() ) {
+            if ( !jar.delete() ) {
                 log.info( "> Unable to delete the jar file." );
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Unable to delete the jar file." );

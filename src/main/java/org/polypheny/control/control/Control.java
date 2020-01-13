@@ -22,10 +22,9 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.control;
+package org.polypheny.control.control;
 
 
-import ch.unibas.dmi.dbis.polyphenydb.control.httpinterface.ClientCommunicationStream;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,6 +39,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import lombok.NonNull;
 import lombok.val;
+import org.polypheny.control.httpinterface.ClientCommunicationStream;
 import spark.Request;
 import spark.Response;
 

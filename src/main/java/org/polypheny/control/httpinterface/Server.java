@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.httpinterface;
+package org.polypheny.control.httpinterface;
 
 
 import static spark.Spark.before;
@@ -33,13 +33,13 @@ import static spark.Spark.post;
 import static spark.Spark.staticFileLocation;
 import static spark.Spark.webSocket;
 
-import ch.unibas.dmi.dbis.polyphenydb.control.control.Control;
-import ch.unibas.dmi.dbis.polyphenydb.control.control.ServiceManager;
 import com.google.gson.Gson;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.polypheny.control.control.Control;
+import org.polypheny.control.control.ServiceManager;
 
 
 @Slf4j

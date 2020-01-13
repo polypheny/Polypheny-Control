@@ -22,47 +22,29 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.main;
+package org.polypheny.control.httpinterface;
 
 
-import ch.unibas.dmi.dbis.polyphenydb.control.control.ConfigManager;
-import ch.unibas.dmi.dbis.polyphenydb.control.control.Control;
-import ch.unibas.dmi.dbis.polyphenydb.control.httpinterface.Server;
-import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
+public class ClientCommunicationStream {
+
+    private final int clientId;
+    private final String topic;
 
 
-@Command(name = "control", description = "Start Polypheny Control")
-public class ControlCommand extends AbstractCommand {
-
-    @Option(name = { "-p", "--port" }, description = "Port")
-    private int port = -1;
-
-    private volatile boolean running = true;
-
-
-    @Override
-    public int _run_() {
-        Control control = new Control();
-        final Server server;
-        if ( port > 0 ) {
-            server = new Server( control, port );
-        } else {
-            server = new Server( control, ConfigManager.getConfig().getInt( "pcrtl.control.port" ) );
-        }
-
-        Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
-
-        while ( running ) {
-            Thread.yield();
-            try {
-                Thread.sleep(1000);
-            } catch ( InterruptedException e ) {
-                // ignore
-            }
-        }
-
-        return 0;
+    public ClientCommunicationStream( int clientId, String topic ) {
+        this.clientId = clientId;
+        this.topic = topic;
     }
 
+
+    public ClientCommunicationStream send( CharSequence csq ) {
+        if ( csq == null ) {
+            //ClientRegistry.sendMessage( clientId, topic, "null" );
+            ClientRegistry.broadcast( topic, "null" );
+        } else {
+            //ClientRegistry.sendMessage( clientId, topic, csq.toString() );
+            ClientRegistry.broadcast( topic, csq.toString() );
+        }
+        return this;
+    }
 }

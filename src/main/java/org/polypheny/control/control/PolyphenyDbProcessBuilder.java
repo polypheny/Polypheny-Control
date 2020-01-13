@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.control;
+package org.polypheny.control.control;
 
 
 import java.io.File;

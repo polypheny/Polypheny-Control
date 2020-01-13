@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.httpinterface;
+package org.polypheny.control.httpinterface;
 
 
-import ch.unibas.dmi.dbis.polyphenydb.control.control.ServiceManager;
 import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
+import org.polypheny.control.control.ServiceManager;
 
 
 @Slf4j

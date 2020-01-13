@@ -22,29 +22,47 @@
  * SOFTWARE.
  */
 
-package ch.unibas.dmi.dbis.polyphenydb.control.httpinterface;
+package org.polypheny.control.main;
 
 
-public class ClientCommunicationStream {
-
-    private final int clientId;
-    private final String topic;
-
-
-    public ClientCommunicationStream( int clientId, String topic ) {
-        this.clientId = clientId;
-        this.topic = topic;
-    }
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
+import org.polypheny.control.control.ConfigManager;
+import org.polypheny.control.control.Control;
+import org.polypheny.control.httpinterface.Server;
 
 
-    public ClientCommunicationStream send( CharSequence csq ) {
-        if ( csq == null ) {
-            //ClientRegistry.sendMessage( clientId, topic, "null" );
-            ClientRegistry.broadcast( topic, "null" );
+@Command(name = "control", description = "Start Polypheny Control")
+public class ControlCommand extends AbstractCommand {
+
+    @Option(name = { "-p", "--port" }, description = "Port")
+    private int port = -1;
+
+    private volatile boolean running = true;
+
+
+    @Override
+    public int _run_() {
+        Control control = new Control();
+        final Server server;
+        if ( port > 0 ) {
+            server = new Server( control, port );
         } else {
-            //ClientRegistry.sendMessage( clientId, topic, csq.toString() );
-            ClientRegistry.broadcast( topic, csq.toString() );
+            server = new Server( control, ConfigManager.getConfig().getInt( "pcrtl.control.port" ) );
         }
-        return this;
+
+        Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
+
+        while ( running ) {
+            Thread.yield();
+            try {
+                Thread.sleep(1000);
+            } catch ( InterruptedException e ) {
+                // ignore
+            }
+        }
+
+        return 0;
     }
+
 }
