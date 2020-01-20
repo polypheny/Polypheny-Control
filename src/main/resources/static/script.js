@@ -72,7 +72,7 @@ webSocket.onclose = function () {
 
 function appendOutput(box, text) {
     var lines = box.html().split("\n");
-    var str = lines.slice(-10000).join("\n");
+    var str = lines.slice(-1000).join("\n");
     box.html(str + "\n" + ansi_up.ansi_to_html(text));
     box.scrollTop(box[0].scrollHeight);
 }
