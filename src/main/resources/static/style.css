@@ -63,7 +63,7 @@ body {
 
 .heading {
     text-align: center;
-    font-family: 'Consolas', serif;
+    font-family: sans-serif;
     font-size: 500%;
     margin-bottom: 30px;
 }
@@ -80,7 +80,7 @@ body {
 }
 
 .output {
-    font-family: Consolas, serif;
+    font-family: Consolas, Monaco, monospace;
     text-align: left;
     height: 340px;
     overflow: auto;
