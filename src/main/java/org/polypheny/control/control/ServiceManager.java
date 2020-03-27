@@ -50,8 +50,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
 import org.apache.commons.lang3.SystemUtils;
+import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
@@ -425,8 +427,17 @@ public class ServiceManager {
                 clientCommunicationStream.send( "> Pulling Polypheny-DB repository ..." );
             }
             try {
-                Git.open( pdbBuildDir ).checkout().setName( branch ).call();
-                Git.open( pdbBuildDir ).pull().call();
+                Git git = Git.open( pdbBuildDir );
+                if ( !existisLocalBranchWithName( git, branch ) ) {
+                    git.branchCreate()
+                            .setName( branch )
+                            .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
+                            .setStartPoint( "origin/" + branch )
+                            .setForce( true )
+                            .call();
+                }
+                git.checkout().setName( branch ).call();
+                git.pull().call();
             } catch ( GitAPIException | IOException e ) {
                 throw new RuntimeException( e );
             }
@@ -523,8 +534,17 @@ public class ServiceManager {
                 clientCommunicationStream.send( "> Pulling Polypheny-UI repository ..." );
             }
             try {
-                Git.open( uiBuildDir ).checkout().setName( branch ).call();
-                Git.open( uiBuildDir ).pull().call();
+                Git git = Git.open( uiBuildDir );
+                if ( !existisLocalBranchWithName( git, branch ) ) {
+                    git.branchCreate()
+                            .setName( branch )
+                            .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
+                            .setStartPoint( "origin/" + branch )
+                            .setForce( true )
+                            .call();
+                }
+                git.checkout().setName( branch ).call();
+                git.pull().call();
             } catch ( GitAPIException | IOException e ) {
                 throw new RuntimeException( e );
             }
@@ -589,6 +609,17 @@ public class ServiceManager {
         } else {
             return "idling";
         }
+    }
+
+
+    private static boolean existisLocalBranchWithName( Git git, String branchName ) throws GitAPIException {
+        List<Ref> branches = git.branchList().call();
+        for ( Ref ref : branches ) {
+            if ( ref.getName().equals( "refs/heads/" + branchName ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
