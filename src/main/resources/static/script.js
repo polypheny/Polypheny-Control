@@ -41,12 +41,15 @@ webSocket.onmessage = function (msg) {
         }
     }
     if (data.hasOwnProperty("status")) { // Periodically sent by server to keep the connection open
-        if (data["status"] === "true") {
-            $('#btn-start').hide();
-            $('#btn-stop').show();
-        } else {
-            $('#btn-stop').hide();
-            $('#btn-start').show();
+        if ( data["status"] === "running" ) {
+            $( '#btn-start' ).hide();
+            $( '#btn-stop' ).show();
+        } else if ( data["status"] === "idling" ) {
+            $( '#btn-stop' ).hide();
+            $( '#btn-start' ).show();
+        } else { // updating
+            $( '#dashboardContent' ).hide();
+            $( '#updateContent' ).show();
         }
     }
     if (data.hasOwnProperty("startOutput")) {

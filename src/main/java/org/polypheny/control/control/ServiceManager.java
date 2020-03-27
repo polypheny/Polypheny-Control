@@ -71,10 +71,12 @@ public class ServiceManager {
     private static Tailer logTailer = null; // ! Shared over multiple stateless requests
     private static Tailer errTailer = null; // ! Shared over multiple stateless requests
 
+    private static boolean currentlyUpdating = false;
+
 
     /**
      * This block restores the PolyphenyDbProcess on startup by checking the PID file. It will create a PolyphenyDbProcess from the PID if the file contains a PID number. Then it will check if the process is still alive.
-     *
+     * <p>
      * TODO: This is maybe not required since we start a child process. By the termination of this process usually the child processes are terminated too. However, if later on there is another way of creating the polypheny-db process this static block would be more relevant (I guess).
      */
     private static void restorePolyphenyDbProcess() {
@@ -321,74 +323,78 @@ public class ServiceManager {
     public static boolean update( final ClientCommunicationStream clientCommunicationStream ) {
         val configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
-            //restorePolyphenyDbProcess();
-
-            if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
-                // polypheny-db process running
-                log.info( "> Stop Polypheny-DB first before updating it." );
-                if ( clientCommunicationStream != null ) {
-                    clientCommunicationStream.send( "> Stop Polypheny-DB first before updating it." );
-                }
-                return false;
-            }
-
-            val workingDir = configuration.getString( "pcrtl.workingdir" );
-            val builddir = configuration.getString( "pcrtl.builddir" );
-
-            if ( !new File( workingDir ).exists() ) {
-                if ( !new File( workingDir ).mkdirs() ) {
-                    throw new RuntimeException( "Could not create the folders for " + new File( workingDir ).getAbsolutePath() );
-                }
-            }
-
-            val clean = configuration.getString( "pcrtl.clean" );
-            if ( clean.equals( "delete" ) ) {
-                log.info( "> Deleting build folder ..." );
-                if ( clientCommunicationStream != null ) {
-                    clientCommunicationStream.send( "> Deleting build folder ..." );
-                }
-
-                try {
-                    FileUtils.deleteDirectory( new File( builddir ) );
-                    log.info( "> Deleting build folder ... Done." );
+            try {
+                currentlyUpdating = true;
+                //restorePolyphenyDbProcess();
+                if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
+                    // polypheny-db process running
+                    log.info( "> Stop Polypheny-DB first before updating it." );
                     if ( clientCommunicationStream != null ) {
-                        clientCommunicationStream.send( "> Deleting build folder ... Done." );
+                        clientCommunicationStream.send( "> Stop Polypheny-DB first before updating it." );
                     }
-                } catch ( IOException e ) {
-                    log.warn( "Could not delete build folder!", e );
-                    if ( clientCommunicationStream != null ) {
-                        clientCommunicationStream.send( "> Deleting build folder ... Could not delete the build directory." );
-                        throw new RuntimeException( "Could not delete build folder " + new File( builddir ).getAbsolutePath() );
+                    return false;
+                }
+
+                val workingDir = configuration.getString( "pcrtl.workingdir" );
+                val builddir = configuration.getString( "pcrtl.builddir" );
+
+                if ( !new File( workingDir ).exists() ) {
+                    if ( !new File( workingDir ).mkdirs() ) {
+                        throw new RuntimeException( "Could not create the folders for " + new File( workingDir ).getAbsolutePath() );
                     }
                 }
-            }
 
-            if ( !new File( builddir ).exists() ) {
-                if ( !new File( builddir ).mkdirs() ) {
-                    throw new RuntimeException( "Could not create the folders for " + new File( builddir ).getAbsolutePath() );
+                val clean = configuration.getString( "pcrtl.clean" );
+                if ( clean.equals( "delete" ) ) {
+                    log.info( "> Deleting build folder ..." );
+                    if ( clientCommunicationStream != null ) {
+                        clientCommunicationStream.send( "> Deleting build folder ..." );
+                    }
+
+                    try {
+                        FileUtils.deleteDirectory( new File( builddir ) );
+                        log.info( "> Deleting build folder ... Done." );
+                        if ( clientCommunicationStream != null ) {
+                            clientCommunicationStream.send( "> Deleting build folder ... Done." );
+                        }
+                    } catch ( IOException e ) {
+                        log.warn( "Could not delete build folder!", e );
+                        if ( clientCommunicationStream != null ) {
+                            clientCommunicationStream.send( "> Deleting build folder ... Could not delete the build directory." );
+                            throw new RuntimeException( "Could not delete build folder " + new File( builddir ).getAbsolutePath() );
+                        }
+                    }
                 }
-            }
 
-            log.info( "> Updating Polypheny ..." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Updating Polypheny-DB ..." );
-            }
+                if ( !new File( builddir ).exists() ) {
+                    if ( !new File( builddir ).mkdirs() ) {
+                        throw new RuntimeException( "Could not create the folders for " + new File( builddir ).getAbsolutePath() );
+                    }
+                }
 
-            val buildMode = configuration.getString( "pcrtl.buildmode" );
-            if ( buildMode.equals( "both" ) || buildMode.equals( "pui" ) ) {
-                installUi( clientCommunicationStream, configuration );
-            }
-            if ( buildMode.equals( "both" ) || buildMode.equals( "pdb" ) ) {
-                buildPdb( clientCommunicationStream, configuration );
-            }
+                log.info( "> Updating Polypheny ..." );
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Updating Polypheny-DB ..." );
+                }
 
-            if ( clientCommunicationStream != null ) {
-                log.info( "> Updating Polypheny ... finished." );
-                clientCommunicationStream.send( "********************************************************" );
-                clientCommunicationStream.send( "        Polypheny has successfully been builded!" );
-                clientCommunicationStream.send( "********************************************************" );
+                val buildMode = configuration.getString( "pcrtl.buildmode" );
+                if ( buildMode.equals( "both" ) || buildMode.equals( "pui" ) ) {
+                    installUi( clientCommunicationStream, configuration );
+                }
+                if ( buildMode.equals( "both" ) || buildMode.equals( "pdb" ) ) {
+                    buildPdb( clientCommunicationStream, configuration );
+                }
+
+                if ( clientCommunicationStream != null ) {
+                    log.info( "> Updating Polypheny ... finished." );
+                    clientCommunicationStream.send( "********************************************************" );
+                    clientCommunicationStream.send( "        Polypheny has successfully been builded!" );
+                    clientCommunicationStream.send( "********************************************************" );
+                }
+                return true;
+            } finally {
+                currentlyUpdating = false;
             }
-            return true;
         }
     }
 
@@ -576,14 +582,13 @@ public class ServiceManager {
 
 
     public static Object getStatus() {
-        // TODO
-        //synchronized ( MUTEX ) {
-            if ( polyphenyDbProcess == null ) {
-                return false;
-            } else {
-                return polyphenyDbProcess.isAlive();
-            }
-        //}
+        if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
+            return "running";
+        } else if ( currentlyUpdating ) {
+            return "updating";
+        } else {
+            return "idling";
+        }
     }
 
 
