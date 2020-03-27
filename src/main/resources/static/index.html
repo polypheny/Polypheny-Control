@@ -104,6 +104,25 @@
                     <td>Polypheny UI Branch</td>
                     <td><input name="pcrtl.ui.branch" value="master"></td>
                 </tr>
+                <tr>
+                    <td>Build mode</td>
+                    <td>
+                        <select name="pcrtl.buildmode">
+                            <option value="both">Polypheny-DB & Polypheny-UI</option>
+                            <option value="pdb">Polypheny-DB only</option>
+                            <option value="pui">Polypheny-UI only</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Clean mode</td>
+                    <td>
+                        <select name="pcrtl.clean">
+                            <option value="keep">Keep</option>
+                            <option value="delete">Delete build folder</option>
+                        </select>
+                    </td>
+                </tr>
             </table>
             <button type="button" class="btn-back" id="saveSettings">OK</button>
         </div>
