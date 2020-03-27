@@ -4,7 +4,7 @@ group "org.polypheny"
 
 def versionMajor = 0
 def versionMinor = 6
-def versionQualifier = "SNAPSHOT"
+def versionQualifier = "-SNAPSHOT"
 version = versionMajor + "." + versionMinor + versionQualifier
 
 
@@ -56,6 +56,8 @@ mainClassName = "org.polypheny.control.main.Main"
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 }
 
 configurations.all {
