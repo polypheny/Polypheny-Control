@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="/font-awesome/5.10.1/css/all.css">
     <link rel="stylesheet" href="/style.css">
+    <script>
+        function setHref() {
+            document.getElementById( 'webui-link' ).href = window.location.protocol + "//" + window.location.hostname + ":8080/";
+        }
+    </script>
 </head>
 
-<body>
+<body onload="setHref()">
 <div class="main">
     <h1 class="heading">Polypheny Control</h1>
 
@@ -35,7 +40,7 @@
             <tr>
                 <td></td>
                 <td height="200px">
-                    <div class="circle" id="btn-webui"><a href="/webapp" style="color:black"><i class="fa fa-window-maximize fa-5x"></i></a></div>
+                    <div class="circle" id="btn-webui"><a href="/" id="webui-link" style="color:black"><i class="fa fa-window-maximize fa-5x"></i></a></div>
                 </td>
                 <td></td>
                 <td>
