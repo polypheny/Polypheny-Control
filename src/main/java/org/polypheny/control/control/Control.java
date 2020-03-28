@@ -128,6 +128,15 @@ public class Control {
     }
 
 
+    public Object getControlVersion( final Request request, final Response response ) {
+        String v = Control.class.getPackage().getImplementationVersion();
+        if ( v == null ) {
+            return "Unknown";
+        }
+        return v;
+    }
+
+
     private ClientCommunicationStream getClientCommunicationStream( @NonNull final Request request, @NonNull final String topic ) {
         if ( request.queryParams().contains( "clientId" ) ) {
             val cid = Integer.parseInt( request.queryParams( "clientId" ) );

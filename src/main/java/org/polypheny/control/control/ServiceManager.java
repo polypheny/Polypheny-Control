@@ -77,9 +77,12 @@ public class ServiceManager {
 
 
     /**
-     * This block restores the PolyphenyDbProcess on startup by checking the PID file. It will create a PolyphenyDbProcess from the PID if the file contains a PID number. Then it will check if the process is still alive.
+     * This block restores the PolyphenyDbProcess on startup by checking the PID file. It will create a PolyphenyDbProcess
+     * from the PID if the file contains a PID number. Then it will check if the process is still alive.
      * <p>
-     * TODO: This is maybe not required since we start a child process. By the termination of this process usually the child processes are terminated too. However, if later on there is another way of creating the polypheny-db process this static block would be more relevant (I guess).
+     * TODO: This is maybe not required since we start a child process. By the termination of this process usually the child
+     * processes are terminated too. However, if later on there is another way of creating the polypheny-db process this
+     * static block would be more relevant (I guess).
      */
     private static void restorePolyphenyDbProcess() {
         val configuration = ConfigManager.getConfig();
@@ -244,6 +247,11 @@ public class ServiceManager {
                 if ( startTailers ) {
                     PROCESS_OUTPUT_REDIRECTOR_EXECUTOR.submit( logTailer );
                     PROCESS_OUTPUT_REDIRECTOR_EXECUTOR.submit( errTailer );
+                }
+
+                log.info( "> ... done." );
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> ... done." );
                 }
 
                 return true;

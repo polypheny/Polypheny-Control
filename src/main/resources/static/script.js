@@ -51,6 +51,7 @@ webSocket.onmessage = function (msg) {
             $( '#dashboardContent' ).hide();
             $( '#updateContent' ).show();
         }
+        $( '#footer-status' ).text( "Status: " + data["status"] );
     }
     if (data.hasOwnProperty("startOutput")) {
         appendOutput($('#startOutput'), data["startOutput"]);
@@ -201,32 +202,53 @@ function saveConfigs() {
     $.ajax({
         type: "POST",
         error: function (data) {
-            console.log("Error");
-            console.log(data);
+            console.log( "Error" );
+            console.log( data );
         },
-        success: function (data) {
+        success: function ( data ) {
 
         },
         url: "config/set",
         data: data
-    });
+    } );
 }
 
-$(document).on("mouseenter", ".circle", function () {
-    $(this).css("background-color", "lightgray");
-});
-$(document).on("mouseleave", ".circle", function () {
-    $(this).css("background-color", "white");
-});
+function getControlVersion() {
+    var data = {
+        "clientId": clientId
+    };
+    $.ajax( {
+        type: "GET",
+        error: function ( data ) {
+            console.log( "Error" );
+            console.log( data );
+        },
+        success: function ( data ) {
+            $( '#footer-version' ).text( "v" + data );
+        },
+        url: "control/controlVersion",
+        data: data
+    } );
+}
+
+$( document ).on( "mouseenter", ".circle", function () {
+    $( this ).css( "background-color", "lightgray" );
+} );
+$( document ).on( "mouseleave", ".circle", function () {
+    $( this ).css( "background-color", "white" );
+} );
+
+// Update version
+getControlVersion();
 
 // Change bg color
-$(document).on('keyup', function (e) {
-    if (debug) {
-        console.log($("body").css("background-color"));
+$( document ).on( 'keyup', function ( e ) {
+    if ( debug ) {
+        console.log( $( "body" ).css( "background-color" ) );
     }
-    if (e.which === 112 && $("body").css("background-color") !== "rgb(128, 128, 128)") {
-        if ($("body").css("background-color") === "rgb(165, 215, 210)") {
-            $('body').css('background-color', "#3B83C8");
+    if ( e.which === 112 && $( "body" ).css( "background-color" ) !== "rgb(128, 128, 128)" ) {
+        if ( $( "body" ).css( "background-color" ) === "rgb(165, 215, 210)" ) {
+            $( 'body' ).css( 'background-color', "#3B83C8" );
         } else {
             $('body').css('background-color', "#A5D7D2");
         }

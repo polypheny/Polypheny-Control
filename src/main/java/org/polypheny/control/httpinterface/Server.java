@@ -66,6 +66,7 @@ public class Server {
                 post( "/restart", control::restart, gson::toJson );
                 post( "/update", control::update, gson::toJson );
                 get( "/version", control::getVersion );
+                get( "/controlVersion", control::getControlVersion );
                 get( "/status", control::getStatus, gson::toJson );
             } );
         } );
