@@ -4,7 +4,7 @@ group "org.polypheny"
 
 def versionMajor = 0
 def versionMinor = 6
-def versionQualifier = "-SNAPSHOT"
+def versionQualifier = ""
 version = versionMajor + "." + versionMinor + versionQualifier
 
 
@@ -141,7 +141,7 @@ sourceSets {
 jar {
     manifest {
         attributes "Manifest-Version": "1.0"
-        attributes "Copyright": "Databases and Information Systems Group, Department Mathematics and Computer Science, University of Basel, Switzerland"
+        attributes "Copyright": "The Polypheny Project (polypheny.org)"
         attributes "Implementation-Version": "$version"
     }
 }
