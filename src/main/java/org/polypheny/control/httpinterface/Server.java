@@ -74,6 +74,9 @@ public class Server {
         // Periodically sent status to all clients to keep the connection open
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
         exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "status", "" + ServiceManager.getStatus() ), 0, 5, TimeUnit.SECONDS );
+
+        // Periodically sent versions to clients
+        exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "version", ServiceManager.getVersion() ), 0, 20, TimeUnit.SECONDS );
     }
 
 }

@@ -49,9 +49,20 @@ class ClientRegistry {
     }
 
 
+    static void broadcast( String topic, Map<String, String> map ) {
+        clientMap.keySet().stream().filter( Session::isOpen ).forEach( session -> sendMessage( session, topic, map ) );
+    }
+
+
     static void sendMessage( int clientId, String topic, String message ) {
         Session session = reverseClientMap.get( clientId );
         sendMessage( session, topic, message );
+    }
+
+
+    static void sendMessage( int clientId, String topic, Map<String, String> msgMap ) {
+        Session session = reverseClientMap.get( clientId );
+        sendMessage( session, topic, msgMap );
     }
 
 
@@ -68,6 +79,19 @@ class ClientRegistry {
     }
 
 
+    private static void sendMessage( Session session, String topic, Map<String, String> msgMap ) {
+        int clientId = clientMap.get( session );
+        Map<String, Map<String, String>> map = new HashMap<>();
+        map.put( topic, msgMap );
+        try {
+            log.debug( "Send message to client " + clientId + ": topic: " + topic + " | message: (MAP)" );
+            session.getRemote().sendString( String.valueOf( gson.toJson( map ) ) );
+        } catch ( Exception e ) {
+            log.debug( "Exception thrown while sending message to client " + clientId, e );
+        }
+    }
+
+
     static synchronized void addClient( Session session ) {
         int cid = nextClientNumber++;
         clientMap.put( session, cid );
@@ -75,6 +99,8 @@ class ClientRegistry {
         sendMessage( cid, "clientId", "" + cid );
         log.info( "Registered client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
         sendMessage( cid, "status", "" + ServiceManager.getStatus() );
+        sendMessage( cid, "version", ServiceManager.getVersion() );
+
     }
 
 

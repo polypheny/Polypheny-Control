@@ -118,8 +118,8 @@ public class Control {
     }
 
 
-    public boolean getStatus( final Request request, final Response response ) {
-        return false;
+    public Object getStatus( final Request request, final Response response ) {
+        return ServiceManager.getStatus();
     }
 
 

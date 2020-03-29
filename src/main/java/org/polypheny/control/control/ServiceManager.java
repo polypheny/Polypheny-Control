@@ -38,8 +38,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -601,11 +603,33 @@ public class ServiceManager {
     }
 
 
-    public static Object getVersion() {
-        // TODO
-        final LinkedList<String> list = new LinkedList<>();
-        list.add( "version" );
-        return null;
+    public static Map<String, String> getVersion() {
+        val configuration = ConfigManager.getConfig();
+        val buildDir = configuration.getString( "pcrtl.builddir" );
+        val pdbBuildDir = new File( buildDir, "pdb" );
+        val puiBuildDir = new File( buildDir, "ui" );
+
+        Map<String, String> map = new HashMap<>();
+
+        // Get PDB branch and commit
+        try {
+            Git git = Git.open( pdbBuildDir );
+            map.put( "pdb-branch", git.getRepository().getBranch() );
+            map.put( "pdb-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+
+        // Get PUI branch and commit
+        try {
+            Git git = Git.open( puiBuildDir );
+            map.put( "pui-branch", git.getRepository().getBranch() );
+            map.put( "pui-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+
+        return map;
     }
 
 

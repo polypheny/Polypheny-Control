@@ -51,16 +51,20 @@ webSocket.onmessage = function (msg) {
             $( '#dashboardContent' ).hide();
             $( '#updateContent' ).show();
         }
-        $( '#footer-status' ).text( "Status: " + data["status"] );
+        $( '#footer-right' ).text( "Status: " + data["status"] );
     }
-    if (data.hasOwnProperty("startOutput")) {
-        appendOutput($('#startOutput'), data["startOutput"]);
+    if ( data.hasOwnProperty( "version" ) ) { // Periodically sent by server to keep the connection open
+        $( '#footer-middle' ).html( "PDB: " + data["version"]["pdb-branch"] + " @ " + data["version"]["pdb-commit"].substring( 0, 7 ) + " <br> "
+                + "PUI: " + data["version"]["pui-branch"] + " @ " + data["version"]["pui-commit"].substring( 0, 7 ) );
     }
-    if (data.hasOwnProperty("stopOutput")) {
-        appendOutput($('#stopOutput'), data["stopOutput"]);
+    if ( data.hasOwnProperty( "startOutput" ) ) {
+        appendOutput( $( '#startOutput' ), data["startOutput"] );
     }
-    if (data.hasOwnProperty("restartOutput")) {
-        appendOutput($('#restartOutput'), data["restartOutput"]);
+    if ( data.hasOwnProperty( "stopOutput" ) ) {
+        appendOutput( $( '#stopOutput' ), data["stopOutput"] );
+    }
+    if ( data.hasOwnProperty( "restartOutput" ) ) {
+        appendOutput( $( '#restartOutput' ), data["restartOutput"] );
     }
     if (data.hasOwnProperty("updateOutput")) {
         appendOutput($('#updateOutput'), data["updateOutput"]);
@@ -224,7 +228,7 @@ function getControlVersion() {
             console.log( data );
         },
         success: function ( data ) {
-            $( '#footer-version' ).text( "v" + data );
+            $( '#footer-left' ).text( "v" + data );
         },
         url: "control/controlVersion",
         data: data
