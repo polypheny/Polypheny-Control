@@ -41,7 +41,7 @@ html {
 
 .footer-table {
     width: 100%;
-    font-weight: 900;
+    font-weight: 400;
     table-layout: fixed;
 }
 
@@ -55,7 +55,6 @@ html {
     text-align: center;
     padding: 2px 0 0 0;
     width: 50%;
-    font-weight: 400;
     line-height: 20px;
     size: 1em;
 }

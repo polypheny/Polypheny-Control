@@ -615,20 +615,22 @@ public class ServiceManager {
         // Get PDB branch and commit
         try {
             Git git = Git.open( pdbBuildDir );
+            git.fetch().call();
             map.put( "pdb-branch", git.getRepository().getBranch() );
             map.put( "pdb-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
             map.put( "pdb-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
-        } catch ( IOException e ) {
+        } catch ( IOException | GitAPIException e ) {
             log.error( "Error while retrieving pdb version", e );
         }
 
         // Get PUI branch and commit
         try {
             Git git = Git.open( puiBuildDir );
+            git.fetch().call();
             map.put( "pui-branch", git.getRepository().getBranch() );
             map.put( "pui-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
             map.put( "pui-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
-        } catch ( IOException e ) {
+        } catch ( IOException | GitAPIException e ) {
             log.error( "Error while retrieving pui version", e );
         }
 
