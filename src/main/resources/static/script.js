@@ -54,8 +54,15 @@ webSocket.onmessage = function (msg) {
         $( '#footer-right' ).text( "Status: " + data["status"] );
     }
     if ( data.hasOwnProperty( "version" ) ) { // Periodically sent by server to keep the connection open
-        $( '#footer-middle' ).html( "PDB: " + data["version"]["pdb-branch"] + " @ " + data["version"]["pdb-commit"].substring( 0, 7 ) + " <br> "
-                + "PUI: " + data["version"]["pui-branch"] + " @ " + data["version"]["pui-commit"].substring( 0, 7 ) );
+        var pdbString = "PDB: " + data["version"]["pdb-branch"] + " @ " + data["version"]["pdb-commit"].substring( 0, 7 );
+        var puiString = "PUI: " + data["version"]["pui-branch"] + " @ " + data["version"]["pui-commit"].substring( 0, 7 );
+        if ( data["version"]["pdb-behind"] > 0 ) {
+            pdbString = "<span style='color: #a90005; font-weight: 900'>" + pdbString + "</span>";
+        }
+        if ( data["version"]["pui-behind"] > 0 ) {
+            puiString = "<span style='color: #a90005; font-weight: 900'>" + puiString + "</span>";
+        }
+        $( '#footer-middle' ).html( pdbString + " <br> " + puiString );
     }
     if ( data.hasOwnProperty( "startOutput" ) ) {
         appendOutput( $( '#startOutput' ), data["startOutput"] );

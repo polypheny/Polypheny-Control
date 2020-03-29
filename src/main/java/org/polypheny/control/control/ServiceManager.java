@@ -55,6 +55,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.BranchTrackingStatus;
 import org.eclipse.jgit.lib.Ref;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
@@ -616,8 +617,9 @@ public class ServiceManager {
             Git git = Git.open( pdbBuildDir );
             map.put( "pdb-branch", git.getRepository().getBranch() );
             map.put( "pdb-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
+            map.put( "pdb-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
         } catch ( IOException e ) {
-            e.printStackTrace();
+            log.error( "Error while retrieving pdb version", e );
         }
 
         // Get PUI branch and commit
@@ -625,8 +627,9 @@ public class ServiceManager {
             Git git = Git.open( puiBuildDir );
             map.put( "pui-branch", git.getRepository().getBranch() );
             map.put( "pui-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
+            map.put( "pui-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
         } catch ( IOException e ) {
-            e.printStackTrace();
+            log.error( "Error while retrieving pui version", e );
         }
 
         return map;
