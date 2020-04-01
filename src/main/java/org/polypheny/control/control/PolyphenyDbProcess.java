@@ -163,11 +163,9 @@ public abstract class PolyphenyDbProcess {
                         return;
                     }
                 }
-
                 killForcibly();
-
             } catch ( IOException e ) {
-                log.error( "Exception while trying to kill <<me:" + getPid() + ">> via PID on Unix.", e );
+                log.error( "Exception while trying to kill <<me:{}>> via PID on Unix.", getPid(), e );
             } catch ( InterruptedException e ) {
                 log.warn( "Interrupted while waiting for kill to finish." );
             }
@@ -241,7 +239,6 @@ public abstract class PolyphenyDbProcess {
                 // "PID Mode"
                 try {
                     val process = Runtime.getRuntime().exec( "ps -p " + pid );
-
                     try ( val input = new BufferedReader( new InputStreamReader( process.getInputStream() ) ) ) {
                         String line;
                         while ( (line = input.readLine()) != null ) {
@@ -250,10 +247,9 @@ public abstract class PolyphenyDbProcess {
                             }
                         }
                     }
-
                     return false;
                 } catch ( IOException e ) {
-                    log.warn( "IOException while checking if " + pid + " is still alive.", e );
+                    log.warn( "IOException while checking if {} is still alive.", pid, e );
                     return false;
                 }
             } else {
@@ -273,11 +269,9 @@ public abstract class PolyphenyDbProcess {
                         return;
                     }
                 }
-
                 killForcibly();
-
             } catch ( IOException e ) {
-                log.error( "Exception while trying to kill <<me:" + pid + ">> via PID on Unix.", e );
+                log.error( "Exception while trying to kill <<me:{}>> via PID on Unix.", pid, e );
             } catch ( InterruptedException e ) {
                 log.warn( "Interrupted while waiting for kill to finish." );
             }
@@ -290,18 +284,15 @@ public abstract class PolyphenyDbProcess {
                 // "PID Mode"
                 try {
                     val kill = Runtime.getRuntime().exec( "kill -9 " + pid ); // SIGKILL
-
                     if ( kill.waitFor( 1, TimeUnit.SECONDS ) ) {
                         // terminated within the time
                         if ( kill.exitValue() == 0 ) {
                             return;
                         }
                     }
-
                     log.warn( "Could not kill {}", pid );
-
                 } catch ( IOException e ) {
-                    log.error( "Exception while trying to kill <<me:" + pid + ">> via PID on Unix.", e );
+                    log.error( "Exception while trying to kill <<me:{}>> via PID on Unix.", pid, e );
                 } catch ( InterruptedException e ) {
                     log.warn( "Interrupted while waiting for kill to finish." );
                 }

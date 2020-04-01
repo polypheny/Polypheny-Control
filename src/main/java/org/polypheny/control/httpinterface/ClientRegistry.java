@@ -75,10 +75,10 @@ class ClientRegistry {
         Map<String, String> map = new HashMap<>();
         map.put( topic, message );
         try {
-            log.debug( "Send message to client " + client.getClientId() + ": topic: " + topic + " | message: " + message );
+            log.debug( "Send message to client {}: topic: {} | message: {}", client.getClientId(), topic, message );
             session.getRemote().sendString( String.valueOf( gson.toJson( map ) ) );
         } catch ( Exception e ) {
-            log.debug( "Exception thrown while sending message to client " + client.getClientId(), e );
+            log.debug( "Exception thrown while sending message to client {}", client.getClientId(), e );
         }
     }
 
@@ -88,10 +88,10 @@ class ClientRegistry {
         Map<String, Map<String, String>> map = new HashMap<>();
         map.put( topic, msgMap );
         try {
-            log.debug( "Send message to client " + client.getClientId() + ": topic: " + topic + " | message: (MAP)" );
+            log.debug( "Send message to client {}: topic: {} | message: (MAP)", client.getClientId(), topic );
             session.getRemote().sendString( String.valueOf( gson.toJson( map ) ) );
         } catch ( Exception e ) {
-            log.debug( "Exception thrown while sending message to client " + client.getClientId(), e );
+            log.debug( "Exception thrown while sending message to client {}", client.getClientId(), e );
         }
     }
 
@@ -102,7 +102,7 @@ class ClientRegistry {
         clientMap.put( session, client );
         reverseClientMap.put( cid, client );
         sendMessage( cid, "clientId", "" + cid );
-        log.info( "Registered client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Registered client {} from IP {}", cid, session.getRemoteAddress().getAddress().getHostAddress() );
         sendMessage( cid, "status", "" + ServiceManager.getStatus() );
         sendMessage( cid, "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() );
         sendMessage( cid, "version", ServiceManager.getVersion() );
@@ -112,7 +112,7 @@ class ClientRegistry {
     static void removeClient( Session session, int statusCode, String reason ) {
         Client client = clientMap.remove( session );
         reverseClientMap.remove( client.clientId );
-        log.info( "Removed client " + client.clientId + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Removed client {} from IP {}", client.clientId, session.getRemoteAddress().getAddress().getHostAddress() );
     }
 
 
@@ -123,12 +123,12 @@ class ClientRegistry {
             if ( reverseClientMap.containsKey( cid ) ) {
                 if ( type.equalsIgnoreCase( ClientType.BROWSER.name() ) ) {
                     reverseClientMap.get( cid ).setClientType( ClientType.BROWSER );
-                    log.info( "Set client type: " + ClientType.BROWSER.name() );
+                    log.info( "Set client type: {}", ClientType.BROWSER.name() );
                 } else if ( type.equalsIgnoreCase( ClientType.BENCHMARKER.name() ) ) {
                     reverseClientMap.get( cid ).setClientType( ClientType.BENCHMARKER );
-                    log.info( "Set client type: " + ClientType.BENCHMARKER.name() );
+                    log.info( "Set client type: {}", ClientType.BENCHMARKER.name() );
                 } else {
-                    log.error( "Unknown client type: " + type );
+                    log.error( "Unknown client type: {}", type );
                 }
             } else {
                 log.error( "Unknown client id: {}", cid );

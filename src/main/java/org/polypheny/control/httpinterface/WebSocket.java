@@ -34,18 +34,21 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 @org.eclipse.jetty.websocket.api.annotations.WebSocket
 public class WebSocket {
 
+    @SuppressWarnings("unused")
     @OnWebSocketConnect
     public void onConnect( Session user ) {
         ClientRegistry.addClient( user );
     }
 
 
+    @SuppressWarnings("unused")
     @OnWebSocketClose
     public void onClose( Session user, int statusCode, String reason ) {
         ClientRegistry.removeClient( user, statusCode, reason );
     }
 
 
+    @SuppressWarnings("unused")
     @OnWebSocketMessage
     public void onMessage( Session user, String message ) {
     }

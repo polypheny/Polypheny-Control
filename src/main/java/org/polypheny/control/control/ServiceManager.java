@@ -417,12 +417,9 @@ public class ServiceManager {
 
     private static void buildPdb( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
 
-        val workingDir = configuration.getString( "pcrtl.workingdir" );
-        val buildDir = configuration.getString( "pcrtl.builddir" );
+        val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
         val repo = configuration.getString( "pcrtl.pdbms.repo" );
         val branch = configuration.getString( "pcrtl.pdbms.branch" );
-
-        val pdbBuildDir = new File( buildDir, "pdb" );
 
         // Delete DBMS Jar
         val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
@@ -593,12 +590,15 @@ public class ServiceManager {
             clientCommunicationStream.send( "> Installing Polypheny-UI ..." );
         }
         try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( uiBuildDir ).connect() ) {
-            connection.newBuild()
+            BuildLauncher buildLauncher = connection.newBuild()
                     .setStandardOutput( System.out )
                     .forTasks( "install" )
-                    .withArguments( "-x", "test" )
-                    .addProgressListener( event -> clientCommunicationStream.send( event.getDisplayName() ), OperationType.TASK )
-                    .run();
+                    .withArguments( "-x", "test" );
+
+            if ( clientCommunicationStream != null ) {
+                buildLauncher.addProgressListener( event -> clientCommunicationStream.send( event.getDisplayName() ), OperationType.TASK );
+            }
+            buildLauncher.run();
         }
         log.info( "> Installing Polypheny-UI ... finished." );
         if ( clientCommunicationStream != null ) {

@@ -37,7 +37,7 @@ public class ClientCommunicationStream {
     }
 
 
-    public ClientCommunicationStream send( CharSequence csq ) {
+    public void send( CharSequence csq ) {
         if ( csq == null ) {
             //ClientRegistry.sendMessage( clientId, topic, "null" );
             ClientRegistry.broadcast( topic, "null" );
@@ -45,6 +45,5 @@ public class ClientCommunicationStream {
             //ClientRegistry.sendMessage( clientId, topic, csq.toString() );
             ClientRegistry.broadcast( topic, csq.toString() );
         }
-        return this;
     }
 }

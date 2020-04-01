@@ -26,25 +26,23 @@ package org.polypheny.control.main;
 
 
 import com.github.rvesse.airline.Cli;
-import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
-import java.util.List;
 import org.polypheny.control.control.ServiceManager;
 
 
 public class Main {
 
     public static void main( String[] args ) {
-        final CliBuilder<CliRunnable> builder = Cli.builder( "PolyControl" );
+        final CliBuilder<CliRunnable> builder = Cli.builder( "Polypheny Control" );
         builder.withDescription( "Polypheny-DB" );
 
         // define top level commands
         builder.withCommand( HelpCommand.class );
         builder.withCommand( ControlCommand.class );
+        //noinspection unchecked
         builder.withCommands( StartCommand.class, StopCommand.class, RestartCommand.class, UpdateCommand.class );
-        builder.withGroup( "config" ).withCommands( GetConfigCommand.class, SetConfigCommand.class, DeleteConfigCommand.class );
         builder.withDefaultCommand( HelpCommand.class );
 
         final CliRunnable cmd = builder.build().parse( args );
@@ -115,73 +113,4 @@ public class Main {
         }
     }
 
-
-    @Command(name = "get", description = "Gets a (web) Config value")
-    public static class GetConfigCommand extends AbstractCommand {
-
-        @Arguments(title = { "key" }, description = "Key of the configuration parameter.")
-        private String key;
-
-        @Override
-        public int _run_() {
-//            if ( key == null ) {
-//                for ( final Enumeration propertyNames = config.propertyNames(); propertyNames.hasMoreElements(); ) {
-//                    val key = propertyNames.nextElement().toString();
-//                    System.out.println( key + "=" + config.getProperty( key ) );
-//                }
-//            } else {
-//                System.out.println( key + "=" + config.getProperty( key ) );
-//            }
-//            return 0;
-            return 1;
-        }
-    }
-
-
-    @Command(name = "set", description = "Set a (web) Config value")
-    public static class SetConfigCommand extends AbstractCommand {
-
-        @Arguments(title = { "key=value" }, description = "Key=Value configuration pair to set.")
-        private List<String> configurationEntry;
-
-        @Override
-        public int _run_() {
-//            if ( configurationEntry == null ) {
-//                return 1;
-//            }
-//
-//            Properties toSet = new Properties();
-//            try {
-//                toSet.load( new StringReader( StringUtils.join( configurationEntry.listIterator(), '\n' ) ) );
-//
-//                for ( val entry : toSet.entrySet() ) {
-//                    config.setProperty( entry.getKey().toString(), entry.getValue().toString() );
-//                }
-//
-//                return ConfigManager.writeConfiguration( config ) ? 0 : 1;
-//            } catch ( IOException e ) {
-//                LOGGER.error( "Could not parse the given argument.", e );
-//                return 2;
-//            }
-            return 1;
-        }
-    }
-
-
-    @Command(name = "delete", description = "Deletes a (web) Config value")
-    public static class DeleteConfigCommand extends AbstractCommand {
-
-        @Arguments(title = { "key" }, description = "Key of the configuration parameter.")
-        private String key;
-
-        @Override
-        public int _run_() {
-//            if ( key == null ) {
-//                return 1;
-//            }
-//            config.remove( key );
-//            return ConfigManager.writeConfiguration( config ) ? 0 : 1;
-            return 1;
-        }
-    }
 }
