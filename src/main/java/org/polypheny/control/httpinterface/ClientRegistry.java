@@ -29,9 +29,13 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Data;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.polypheny.control.control.ServiceManager;
+import spark.Request;
+import spark.Response;
 
 
 @Slf4j
@@ -39,8 +43,8 @@ class ClientRegistry {
 
     private static final Gson gson = new Gson();
 
-    private static final Map<Session, Integer> clientMap = new ConcurrentHashMap<>();
-    private static final Map<Integer, Session> reverseClientMap = new ConcurrentHashMap<>();
+    private static final Map<Session, Client> clientMap = new ConcurrentHashMap<>();
+    private static final Map<Integer, Client> reverseClientMap = new ConcurrentHashMap<>();
     private static int nextClientNumber = 1;
 
 
@@ -55,59 +59,117 @@ class ClientRegistry {
 
 
     static void sendMessage( int clientId, String topic, String message ) {
-        Session session = reverseClientMap.get( clientId );
+        Session session = reverseClientMap.get( clientId ).getSession();
         sendMessage( session, topic, message );
     }
 
 
     static void sendMessage( int clientId, String topic, Map<String, String> msgMap ) {
-        Session session = reverseClientMap.get( clientId );
+        Session session = reverseClientMap.get( clientId ).getSession();
         sendMessage( session, topic, msgMap );
     }
 
 
     private static void sendMessage( Session session, String topic, String message ) {
-        int clientId = clientMap.get( session );
+        Client client = clientMap.get( session );
         Map<String, String> map = new HashMap<>();
         map.put( topic, message );
         try {
-            log.debug( "Send message to client " + clientId + ": topic: " + topic + " | message: " + message );
+            log.debug( "Send message to client " + client.getClientId() + ": topic: " + topic + " | message: " + message );
             session.getRemote().sendString( String.valueOf( gson.toJson( map ) ) );
         } catch ( Exception e ) {
-            log.debug( "Exception thrown while sending message to client " + clientId, e );
+            log.debug( "Exception thrown while sending message to client " + client.getClientId(), e );
         }
     }
 
 
     private static void sendMessage( Session session, String topic, Map<String, String> msgMap ) {
-        int clientId = clientMap.get( session );
+        Client client = clientMap.get( session );
         Map<String, Map<String, String>> map = new HashMap<>();
         map.put( topic, msgMap );
         try {
-            log.debug( "Send message to client " + clientId + ": topic: " + topic + " | message: (MAP)" );
+            log.debug( "Send message to client " + client.getClientId() + ": topic: " + topic + " | message: (MAP)" );
             session.getRemote().sendString( String.valueOf( gson.toJson( map ) ) );
         } catch ( Exception e ) {
-            log.debug( "Exception thrown while sending message to client " + clientId, e );
+            log.debug( "Exception thrown while sending message to client " + client.getClientId(), e );
         }
     }
 
 
     static synchronized void addClient( Session session ) {
         int cid = nextClientNumber++;
-        clientMap.put( session, cid );
-        reverseClientMap.put( cid, session );
+        Client client = new Client( session, cid );
+        clientMap.put( session, client );
+        reverseClientMap.put( cid, client );
         sendMessage( cid, "clientId", "" + cid );
         log.info( "Registered client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
         sendMessage( cid, "status", "" + ServiceManager.getStatus() );
+        sendMessage( cid, "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() );
         sendMessage( cid, "version", ServiceManager.getVersion() );
-
     }
 
 
     static void removeClient( Session session, int statusCode, String reason ) {
-        int cid = clientMap.remove( session );
-        reverseClientMap.remove( cid );
-        log.info( "Removed client " + cid + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
+        Client client = clientMap.remove( session );
+        reverseClientMap.remove( client.clientId );
+        log.info( "Removed client " + client.clientId + " from IP " + session.getRemoteAddress().getAddress().getHostAddress() );
+    }
+
+
+    public static Object setClientType( Request request, Response response ) {
+        if ( request.queryParams().contains( "clientType" ) && request.queryParams().contains( "clientId" ) ) {
+            String type = request.queryParams( "clientType" );
+            int cid = Integer.parseInt( request.queryParams( "clientId" ) );
+            if ( reverseClientMap.containsKey( cid ) ) {
+                if ( type.equalsIgnoreCase( ClientType.BROWSER.name() ) ) {
+                    reverseClientMap.get( cid ).setClientType( ClientType.BROWSER );
+                    log.info( "Set client type: " + ClientType.BROWSER.name() );
+                } else if ( type.equalsIgnoreCase( ClientType.BENCHMARKER.name() ) ) {
+                    reverseClientMap.get( cid ).setClientType( ClientType.BENCHMARKER );
+                    log.info( "Set client type: " + ClientType.BENCHMARKER.name() );
+                } else {
+                    log.error( "Unknown client type: " + type );
+                }
+            } else {
+                log.error( "Unknown client id: {}", cid );
+            }
+        } else {
+            log.error( "Illegal request for setting client type" );
+        }
+        return null;
+    }
+
+
+    public static Object getBenchmarkerConnected() {
+        for ( Client client : clientMap.values() ) {
+            if ( client.getClientType() == ClientType.BENCHMARKER ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Data
+    static class Client {
+
+        private final Session session;
+        private final int clientId;
+        @Setter
+        private ClientType clientType;
+
+
+        Client( Session session, int clientId ) {
+            this.session = session;
+            this.clientId = clientId;
+            this.clientType = ClientType.UNKNOWN;
+        }
+
+    }
+
+
+    enum ClientType {
+        UNKNOWN, BROWSER, BENCHMARKER
     }
 
 }

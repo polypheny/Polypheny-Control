@@ -39,6 +39,7 @@ webSocket.onmessage = function (msg) {
         if (debug) {
             console.log("Received Client ID: " + clientId);
         }
+        setClientType();
     }
     if (data.hasOwnProperty("status")) { // Periodically sent by server to keep the connection open
         if ( data["status"] === "running" ) {
@@ -52,6 +53,13 @@ webSocket.onmessage = function (msg) {
             $( '#updateContent' ).show();
         }
         $( '#footer-right' ).text( "Status: " + data["status"] );
+    }
+    if ( data.hasOwnProperty( "benchmarkerConnected" ) ) { // Periodically sent by server to keep the connection open
+        if ( data["benchmarkerConnected"] == "true" ) {
+            $( "body" ).css( "background-color", "#e5983d" );
+        } else {
+            $( "body" ).css( "background-color", "#3B83C8" );
+        }
     }
     if ( data.hasOwnProperty( "version" ) ) { // Periodically sent by server to keep the connection open
         var pdbString = "PDB: " + data["version"]["pdb-branch"] + " @ " + data["version"]["pdb-commit"].substring( 0, 7 );
@@ -238,6 +246,25 @@ function getControlVersion() {
             $( '#footer-left' ).text( "v" + data );
         },
         url: "control/controlVersion",
+        data: data
+    } );
+}
+
+function setClientType() {
+    var data = {
+        "clientId": clientId,
+        "clientType": "BROWSER"
+    };
+    $.ajax( {
+        type: "POST",
+        error: function ( data ) {
+            console.log( "Error" );
+            console.log( data );
+        },
+        success: function ( data ) {
+
+        },
+        url: "client/type",
         data: data
     } );
 }

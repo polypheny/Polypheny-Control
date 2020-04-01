@@ -69,11 +69,17 @@ public class Server {
                 get( "/controlVersion", control::getControlVersion );
                 get( "/status", control::getStatus, gson::toJson );
             } );
+            path( "/client", () -> {
+                post( "/type", ClientRegistry::setClientType, gson::toJson );
+            } );
         } );
 
         // Periodically sent status to all clients to keep the connection open
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
         exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "status", "" + ServiceManager.getStatus() ), 0, 5, TimeUnit.SECONDS );
+
+        // For switching background color when a benchmarking client is connected
+        exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() ), 0, 5, TimeUnit.SECONDS );
 
         // Periodically sent versions to clients
         exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "version", ServiceManager.getVersion() ), 0, 20, TimeUnit.SECONDS );
