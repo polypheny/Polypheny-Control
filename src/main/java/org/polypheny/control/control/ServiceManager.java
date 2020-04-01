@@ -37,6 +37,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -163,6 +164,7 @@ public class ServiceManager {
             val javaMaximumHeapSize = configuration.getString( "pcrtl.java.heap" );
             val pdbmsJar = configuration.getString( "pcrtl.pdbms.jarfile" );
             val pdbmsMainClass = configuration.getString( "pcrtl.pdbms.mainclass" );
+            val pdbmsArgs = configuration.getString( "pcrtl.pdbms.args" );
             val logFile = new File( new File( logsDir ), new SimpleDateFormat( "'polypheny-db_'yyyy.MM.dd_HH-mm-ss.SSS'.log'" ).format( new Date() ) ).getAbsolutePath();
             val errFile = logFile.substring( 0, logFile.lastIndexOf( '.' ) ) + ".err.log";
             //
@@ -176,8 +178,7 @@ public class ServiceManager {
             javaOptionsFull.addFirst( "-Xmx" + javaMaximumHeapSize + "G" );
 
             // Build list of arguments
-            List<String> pdbArguments = new LinkedList<>();
-            //pdbArguments.add( "run" );
+            List<String> pdbArguments = new LinkedList<>( Arrays.asList( pdbmsArgs.split( " " ) ) );
 
             if ( new File( javaExecutable ).exists() == false ) {
                 throw new RuntimeException( "The java executable seems not to exist... How did you start this application?!" );
