@@ -160,6 +160,7 @@ public class ServiceManager {
             val logsDir = configuration.getString( "pcrtl.logsdir" );
             val javaExecutable = configuration.getString( "pcrtl.java.executable" ) + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
             val javaOptions = configuration.getStringList( "pcrtl.java.options" );
+            val javaMaximumHeapSize = configuration.getString( "pcrtl.java.heap" );
             val pdbmsJar = configuration.getString( "pcrtl.pdbms.jarfile" );
             val pdbmsMainClass = configuration.getString( "pcrtl.pdbms.mainclass" );
             val logFile = new File( new File( logsDir ), new SimpleDateFormat( "'polypheny-db_'yyyy.MM.dd_HH-mm-ss.SSS'.log'" ).format( new Date() ) ).getAbsolutePath();
@@ -172,6 +173,7 @@ public class ServiceManager {
             if ( new File( applicationConfFileName ).exists() ) {
                 javaOptionsFull.addFirst( "-Dconfig.file=" + applicationConfFileName );
             }
+            javaOptionsFull.addFirst( "-Xmx" + javaMaximumHeapSize + "G" );
 
             // Build list of arguments
             List<String> pdbArguments = new LinkedList<>();

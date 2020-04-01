@@ -55,7 +55,7 @@ webSocket.onmessage = function (msg) {
         $( '#footer-right' ).text( "Status: " + data["status"] );
     }
     if ( data.hasOwnProperty( "benchmarkerConnected" ) ) { // Periodically sent by server to keep the connection open
-        if ( data["benchmarkerConnected"] == "true" ) {
+        if ( data["benchmarkerConnected"] === "true" ) {
             $( "body" ).css( "background-color", "#e5983d" );
         } else {
             $( "body" ).css( "background-color", "#3B83C8" );
