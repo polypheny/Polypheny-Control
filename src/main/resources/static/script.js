@@ -49,6 +49,9 @@ webSocket.onmessage = function (msg) {
             $( '#btn-stop' ).hide();
             $( '#btn-start' ).show();
         } else { // updating
+            $( '#logContent' ).hide();
+            $( '#configContent' ).hide();
+            $( '#settingsContent' ).hide();
             $( '#dashboardContent' ).hide();
             $( '#updateContent' ).show();
         }
