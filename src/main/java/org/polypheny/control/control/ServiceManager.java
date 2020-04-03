@@ -404,7 +404,7 @@ public class ServiceManager {
                 if ( clientCommunicationStream != null ) {
                     log.info( "> Updating Polypheny ... finished." );
                     clientCommunicationStream.send( "********************************************************" );
-                    clientCommunicationStream.send( "        Polypheny has successfully been builded!" );
+                    clientCommunicationStream.send( "         Polypheny has successfully been built!" );
                     clientCommunicationStream.send( "********************************************************" );
                 }
                 return true;
