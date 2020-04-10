@@ -33,6 +33,7 @@ import com.google.gson.JsonParser;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
+import io.javalin.http.Context;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,8 +41,6 @@ import java.util.NoSuchElementException;
 import lombok.NonNull;
 import lombok.val;
 import org.polypheny.control.httpinterface.ClientCommunicationStream;
-import spark.Request;
-import spark.Response;
 
 
 public class Control {
@@ -49,18 +48,17 @@ public class Control {
     private final Gson gson = new Gson();
 
 
-    public synchronized String getCurrentConfigAsJson( final Request request, final Response response ) {
-        return gson.toJson( ConfigManager.convertToProperties( ConfigManager.getConfig() ) );
+    public synchronized void getCurrentConfigAsJson( Context ctx ) {
+        ctx.result( gson.toJson( ConfigManager.convertToProperties( ConfigManager.getConfig() ) ) );
     }
 
 
-    public synchronized boolean setConfig( final Request request, final Response response ) {
-        getClientCommunicationStream( request, "currentConfig" );
+    public synchronized void setConfig( Context ctx ) {
+        getClientCommunicationStream( ctx, "currentConfig" );
 
-        val json = request.queryMap( "config" ).value();
+        val json = ctx.formParam( "config" );
 
-        JsonParser parser = new JsonParser();
-        JsonObject object = parser.parse( json ).getAsJsonObject();
+        JsonObject object = JsonParser.parseString( json ).getAsJsonObject();
 
         Config newConfig = ConfigFactory.empty();
         for ( Map.Entry<String, JsonElement> entry : object.entrySet() ) {
@@ -94,52 +92,54 @@ public class Control {
         }
         ConfigManager.writeConfiguration( newConfig );
 
-        return true;
+        ctx.result( gson.toJson( true ) );
     }
 
 
-    public boolean start( final Request request, final Response response ) {
-        return ServiceManager.start( getClientCommunicationStream( request, "logOutput" ) );
+    public void start( Context ctx ) {
+        ctx.result( gson.toJson( ServiceManager.start( getClientCommunicationStream( ctx, "logOutput" ) ) ) );
     }
 
 
-    public boolean stop( final Request request, final Response response ) {
-        return ServiceManager.stop( getClientCommunicationStream( request, "logOutput" ) );
+    public void stop( Context ctx ) {
+        ctx.result( gson.toJson( ServiceManager.stop( getClientCommunicationStream( ctx, "logOutput" ) ) ) );
     }
 
 
-    public boolean restart( final Request request, final Response response ) {
-        return ServiceManager.restart( getClientCommunicationStream( request, "logOutput" ) );
+    public void restart( Context ctx ) {
+        ctx.result( gson.toJson( ServiceManager.restart( getClientCommunicationStream( ctx, "logOutput" ) ) ) );
     }
 
 
-    public boolean update( final Request request, final Response response ) {
-        return ServiceManager.update( getClientCommunicationStream( request, "updateOutput" ) );
+    public void update( Context ctx ) {
+        ctx.result( gson.toJson( ServiceManager.update( getClientCommunicationStream( ctx, "updateOutput" ) ) ) );
     }
 
 
-    public Object getStatus( final Request request, final Response response ) {
-        return ServiceManager.getStatus();
+    public void getStatus( Context ctx ) {
+        ctx.result( gson.toJson( ServiceManager.getStatus() ) );
     }
 
 
-    public Object getVersion( final Request request, final Response response ) {
-        return ServiceManager.getVersion();
+    public void getVersion( Context ctx ) {
+        ctx.result( gson.toJson( ServiceManager.getVersion() ) );
     }
 
 
-    public Object getControlVersion( final Request request, final Response response ) {
+    public void getControlVersion( Context ctx ) {
         String v = Control.class.getPackage().getImplementationVersion();
         if ( v == null ) {
-            return "Unknown";
+            ctx.result( "Unknown" );
+        } else {
+            ctx.result( v );
         }
-        return v;
     }
 
 
-    private ClientCommunicationStream getClientCommunicationStream( @NonNull final Request request, @NonNull final String topic ) {
-        if ( request.queryParams().contains( "clientId" ) ) {
-            val cid = Integer.parseInt( request.queryParams( "clientId" ) );
+    private ClientCommunicationStream getClientCommunicationStream( @NonNull final Context context, @NonNull final String topic ) {
+        String str = context.formParam( "clientId" );
+        if ( str != null ) {
+            val cid = Integer.parseInt( str );
             return new ClientCommunicationStream( cid, topic );
         }
         throw new NoSuchElementException( "The request does not contain a client identifier (clientId)" );

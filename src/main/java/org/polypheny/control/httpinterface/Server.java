@@ -25,15 +25,8 @@
 package org.polypheny.control.httpinterface;
 
 
-import static spark.Spark.before;
-import static spark.Spark.get;
-import static spark.Spark.path;
-import static spark.Spark.port;
-import static spark.Spark.post;
-import static spark.Spark.staticFileLocation;
-import static spark.Spark.webSocket;
-
 import com.google.gson.Gson;
+import io.javalin.Javalin;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -49,40 +42,54 @@ public class Server {
 
 
     public Server( Control control, int port ) {
-        port( port );
+        Javalin javalin = Javalin.create( config -> config.addStaticFiles( "/static" ) ).start( port );
 
-        staticFileLocation( "/static" );
-        webSocket( "/socket", WebSocket.class );
-
-        path( "/", () -> {
-            before( ( q, a ) -> log.info( "Received api call" ) );
-            path( "/config", () -> {
-                get( "/get", control::getCurrentConfigAsJson );
-                post( "/set", control::setConfig, gson::toJson );
-            } );
-            path( "/control", () -> {
-                post( "/start", control::start, gson::toJson );
-                post( "/stop", control::stop, gson::toJson );
-                post( "/restart", control::restart, gson::toJson );
-                post( "/update", control::update, gson::toJson );
-                get( "/version", control::getVersion );
-                get( "/controlVersion", control::getControlVersion );
-                get( "/status", control::getStatus, gson::toJson );
-            } );
-            path( "/client", () -> {
-                post( "/type", ClientRegistry::setClientType, gson::toJson );
-            } );
+        javalin.ws( "/socket/", ws -> {
+            ws.onConnect( ClientRegistry::addClient );
+            ws.onClose( ClientRegistry::removeClient );
         } );
+
+        javalin.before( ctx -> {
+            log.debug( "Received api call: {}", ctx.path() );
+        } );
+
+        // /config
+        javalin.get( "/config/get", control::getCurrentConfigAsJson );
+        javalin.post( "/config/set", control::setConfig );
+
+        // /control
+        javalin.post( "/control/start", control::start );
+        javalin.post( "/control/stop", control::stop );
+        javalin.post( "/control/restart", control::restart );
+        javalin.post( "/control/update", control::update );
+        javalin.get( "/control/version", control::getVersion );
+        javalin.get( "/control/controlVersion", control::getControlVersion );
+        javalin.get( "/control/status", control::getStatus );
+
+        // Client
+        javalin.post( "/client/type", ClientRegistry::setClientType );
 
         // Periodically sent status to all clients to keep the connection open
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-        exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "status", "" + ServiceManager.getStatus() ), 0, 5, TimeUnit.SECONDS );
+        exec.scheduleAtFixedRate(
+                () -> ClientRegistry.broadcast( "status", "" + ServiceManager.getStatus() ),
+                0,
+                2,
+                TimeUnit.SECONDS );
 
         // For switching background color when a benchmarking client is connected
-        exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() ), 0, 5, TimeUnit.SECONDS );
+        exec.scheduleAtFixedRate(
+                () -> ClientRegistry.broadcast( "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() ),
+                0,
+                5,
+                TimeUnit.SECONDS );
 
         // Periodically sent versions to clients
-        exec.scheduleAtFixedRate( () -> ClientRegistry.broadcast( "version", ServiceManager.getVersion() ), 0, 20, TimeUnit.SECONDS );
+        exec.scheduleAtFixedRate(
+                () -> ClientRegistry.broadcast( "version", ServiceManager.getVersion() ),
+                0,
+                20,
+                TimeUnit.SECONDS );
     }
 
 }

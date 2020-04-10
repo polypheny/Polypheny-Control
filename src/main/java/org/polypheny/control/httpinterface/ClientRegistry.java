@@ -26,6 +26,9 @@ package org.polypheny.control.httpinterface;
 
 
 import com.google.gson.Gson;
+import io.javalin.http.Context;
+import io.javalin.websocket.WsCloseContext;
+import io.javalin.websocket.WsConnectContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,8 +37,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.polypheny.control.control.ServiceManager;
-import spark.Request;
-import spark.Response;
 
 
 @Slf4j
@@ -96,30 +97,31 @@ class ClientRegistry {
     }
 
 
-    static synchronized void addClient( Session session ) {
+    static synchronized void addClient( WsConnectContext ctx ) {
         int cid = nextClientNumber++;
-        Client client = new Client( session, cid );
-        clientMap.put( session, client );
+        Client client = new Client( ctx.session, cid );
+        clientMap.put( ctx.session, client );
         reverseClientMap.put( cid, client );
         sendMessage( cid, "clientId", "" + cid );
-        log.info( "Registered client {} from IP {}", cid, session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Registered client {} from IP {}", cid, ctx.session.getRemoteAddress().getAddress().getHostAddress() );
         sendMessage( cid, "status", "" + ServiceManager.getStatus() );
         sendMessage( cid, "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() );
         sendMessage( cid, "version", ServiceManager.getVersion() );
     }
 
 
-    static void removeClient( Session session, int statusCode, String reason ) {
-        Client client = clientMap.remove( session );
+    static void removeClient( WsCloseContext closeContext ) {
+        Client client = clientMap.remove( closeContext.session );
         reverseClientMap.remove( client.clientId );
-        log.info( "Removed client {} from IP {}", client.clientId, session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Removed client {} from IP {}", client.clientId, closeContext.session.getRemoteAddress().getAddress().getHostAddress() );
     }
 
 
-    public static Object setClientType( Request request, Response response ) {
-        if ( request.queryParams().contains( "clientType" ) && request.queryParams().contains( "clientId" ) ) {
-            String type = request.queryParams( "clientType" );
-            int cid = Integer.parseInt( request.queryParams( "clientId" ) );
+    public static void setClientType( Context ctx ) {
+        String type = ctx.formParam( "clientType" );
+        String cidStr = ctx.formParam( "clientId" );
+        if ( type != null && cidStr != null ) {
+            int cid = Integer.parseInt( cidStr );
             if ( reverseClientMap.containsKey( cid ) ) {
                 if ( type.equalsIgnoreCase( ClientType.BROWSER.name() ) ) {
                     reverseClientMap.get( cid ).setClientType( ClientType.BROWSER );
@@ -136,7 +138,6 @@ class ClientRegistry {
         } else {
             log.error( "Illegal request for setting client type" );
         }
-        return null;
     }
 
 
