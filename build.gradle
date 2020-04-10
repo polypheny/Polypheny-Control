@@ -22,7 +22,7 @@ buildscript {
         // Lombok (https://plugins.gradle.org/plugin/io.freefair.lombok)
         classpath group: "io.freefair.gradle", name: "lombok-plugin", version: "4.1.6"
         //
-        classpath group: "com.netflix.nebula", name: "gradle-ospackage-plugin", version: "4.9.3"
+        classpath group: "com.netflix.nebula", name: "gradle-ospackage-plugin", version: "8.2.0"
     }
 }
 
@@ -73,41 +73,46 @@ configurations {
 
 dependencies {
     // Log4J
-    compile group: "org.slf4j", name: "slf4j-api", version: "1.7.26"    // License: MIT
+    compile group: "org.slf4j", name: "slf4j-api", version: "1.7.26" // License: MIT
     compile group: "org.apache.logging.log4j", name: "log4j-slf4j-impl", version: "2.12.1" // License: Apache 2.0
-    compile group: "org.apache.logging.log4j", name: "log4j-core", version: "2.12.1"   // License: Apache 2.0
-    compile group: "org.apache.logging.log4j", name: "log4j-api", version: "2.12.1"
+    compile group: "org.apache.logging.log4j", name: "log4j-core", version: "2.12.1" // License: Apache 2.0
+    compile group: "org.apache.logging.log4j", name: "log4j-api", version: "2.12.1" // License: Apache 2.0
 
-    ////// CONFIGURATION MANAGEMENT
+    // Configuration management
     compile group: "com.typesafe", name: "config", version: "1.3.2" // Apache 2.0
 
-    // Apache Stuff
+    // Apache Commons Stuff
     compile group: "org.apache.commons", name: "commons-lang3", version: "3.9" // Apache 2.0
     compile group: "commons-io", name: "commons-io", version: "2.6" // Apache 2.0
 
     compile group: "com.google.guava", name: "guava", version: "28.1-jre" // Apache 2.0
-    compile group: "com.github.rvesse", name: "airline", version: "2.7.2"
-    compile(group: "com.sparkjava", name: "spark-core", version: "2.5.5")
-    compile group: "com.google.code.gson", name: "gson", version: "2.8.5"
-    compile group: "com.googlecode.json-simple", name: "json-simple", version: "1.1.1"
 
+    // CLI Library
+    compile group: "com.github.rvesse", name: "airline", version: "2.7.2" // Apache 2.0
 
+    // HTTP Server
+    compile group: "com.sparkjava", name: "spark-core", version: "2.9.1" // Apache 2.0
+
+    // JSON libs
+    compile group: "com.google.code.gson", name: "gson", version: "2.8.6" // Apache 2.0
+    compile group: "com.googlecode.json-simple", name: "json-simple", version: "1.1.1" // Apache 2.0
+
+    // Kill process tree in Windows
     compile group: "org.jvnet.winp", name: "winp", version: "1.28" // MIT
 
-    compile group: "org.eclipse.jgit", name: "org.eclipse.jgit", version: "5.5.0.201909110433-r"
-    compile group: "org.gradle", name: "gradle-tooling-api", version: "5.6.2"
-
+    // Git and Gradle integration
+    compile group: "org.eclipse.jgit", name: "org.eclipse.jgit", version: "5.7.0.202003110725-r" // EDL
+    compile group: "org.gradle", name: "gradle-tooling-api", version: "5.6.3" // Apache 2.0
 
     // Webjar (JS libraries)
-    webjars group: "org.webjars", name: "font-awesome", version: "5.10.1"
-    webjars group: "org.webjars", name: "jquery", version: "3.4.1"
-    webjars group: 'org.webjars.npm', name: 'jquery-serializejson', version: '2.9.0'
-    webjars group: 'org.webjars.npm', name: 'ansi_up', version: '2.0.2'
+    webjars group: "org.webjars", name: "font-awesome", version: "5.10.1" // MIT, SIL OFL, and CC BY licenses
+    webjars group: "org.webjars", name: "jquery", version: "3.4.1" // MIT
+    webjars group: 'org.webjars.npm', name: 'jquery-serializejson', version: '2.9.0' // MIT
+    webjars group: 'org.webjars.npm', name: 'ansi_up', version: '2.0.2' // MIT
 
-    //compile(group: "org.jfrog.artifactory.client", name: "artifactory-java-client-services", version: "+")
 
-    //
-    testCompile group: "junit", name: "junit", version: "4.11"
+    // -- Testing --
+    testCompile group: "junit", name: "junit", version: "4.13"
 }
 
 sourceSets {
