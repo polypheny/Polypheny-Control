@@ -90,6 +90,8 @@ public class Server {
                 0,
                 20,
                 TimeUnit.SECONDS );
+
+        log.info( "Polypheny Control is running on port {}", port );
     }
 
 }

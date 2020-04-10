@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Configuration status="INFO">
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" disableAnsi="false"/>
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+        <Console name="PDBConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="Polypheny-DB> %m%n" disableAnsi="false"/>
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <logger name="org.polypheny.db" level="INFO" additivity="false">
+            <AppenderRef ref="PDBConsoleAppender"/>
+        </logger>
+        <logger name="org.polypheny.control" level="INFO" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+        </logger>
+        <Root level="WARN" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
