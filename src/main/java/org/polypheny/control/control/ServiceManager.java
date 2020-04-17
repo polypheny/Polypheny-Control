@@ -55,6 +55,7 @@ import org.apache.commons.io.input.TailerListener;
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.BranchTrackingStatus;
 import org.eclipse.jgit.lib.Ref;
@@ -439,7 +440,7 @@ public class ServiceManager {
             }
             try {
                 Git git = Git.open( pdbBuildDir );
-                if ( !existisLocalBranchWithName( git, branch ) ) {
+                if ( !existsLocalBranchWithName( git, branch ) ) {
                     git.branchCreate()
                             .setName( branch )
                             .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
@@ -546,7 +547,7 @@ public class ServiceManager {
             }
             try {
                 Git git = Git.open( uiBuildDir );
-                if ( !existisLocalBranchWithName( git, branch ) ) {
+                if ( !existsLocalBranchWithName( git, branch ) ) {
                     git.branchCreate()
                             .setName( branch )
                             .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
@@ -664,7 +665,7 @@ public class ServiceManager {
     }
 
 
-    private static boolean existisLocalBranchWithName( Git git, String branchName ) throws GitAPIException {
+    private static boolean existsLocalBranchWithName( Git git, String branchName ) throws GitAPIException {
         List<Ref> branches = git.branchList().call();
         for ( Ref ref : branches ) {
             if ( ref.getName().equals( "refs/heads/" + branchName ) ) {
@@ -672,6 +673,24 @@ public class ServiceManager {
             }
         }
         return false;
+    }
+
+
+    public static List<String> getAvailableBranches( File repo ) {
+        List<String> branches = new LinkedList<>();
+        try {
+            Git git = Git.open( repo );
+            List<Ref> branchRefs = git.branchList().setListMode( ListMode.REMOTE ).call();
+            for ( Ref ref : branchRefs ) {
+                String name = ref.getName();
+                // Remove "refs/remotes/origin/"
+                name = name.replace( "refs/remotes/origin/", "" );
+                branches.add( name );
+            }
+        } catch ( GitAPIException | IOException e ) {
+            log.error( "Exception while getting list of branches", e );
+        }
+        return branches;
     }
 
 

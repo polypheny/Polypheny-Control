@@ -34,7 +34,9 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigValueFactory;
 import io.javalin.http.Context;
+import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -133,6 +135,22 @@ public class Control {
         } else {
             ctx.result( v );
         }
+    }
+
+
+    public void getAvailablePdbBranches( Context ctx ) {
+        val configuration = ConfigManager.getConfig();
+        val pdbbuilddir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
+        List<String> list = ServiceManager.getAvailableBranches( pdbbuilddir );
+        ctx.result( gson.toJson( list ) );
+    }
+
+
+    public void getAvailablePuiBranches( Context ctx ) {
+        val configuration = ConfigManager.getConfig();
+        val puiBuildDir = new File( configuration.getString( "pcrtl.puibuilddir" ) );
+        List<String> list = ServiceManager.getAvailableBranches( puiBuildDir );
+        ctx.result( gson.toJson( list ) );
     }
 
 

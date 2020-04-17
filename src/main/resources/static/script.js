@@ -139,9 +139,11 @@ $('#btn-config').click(function () {
 });
 
 $('#btn-settings').click(function () {
+    updatePdbBranchList();
+    updatePuiBranchList();
     updateConfigsPage();
-    $('#dashboardContent').hide();
-    $('#settingsContent').show();
+    $( '#dashboardContent' ).hide();
+    $( '#settingsContent' ).show();
 });
 
 $('.btn-back').click(function () {
@@ -268,6 +270,50 @@ function setClientType() {
 
         },
         url: "client/type",
+        data: data
+    } );
+}
+
+function updatePdbBranchList() {
+    var data = {
+        "clientId": clientId
+    };
+    $.ajax( {
+        type: "GET",
+        error: function ( data ) {
+            console.log( "Error" );
+            console.log( data );
+        },
+        success: function ( data ) {
+            $( '#pdbBranches' ).empty();
+            var branches = JSON.parse( data );
+            branches.forEach( function ( value ) {
+                $( "#pdbBranches" ).append( new Option( value, value ) );
+            } );
+        },
+        url: "control/pdbBranches",
+        data: data
+    } );
+}
+
+function updatePuiBranchList() {
+    var data = {
+        "clientId": clientId
+    };
+    $.ajax( {
+        type: "GET",
+        error: function ( data ) {
+            console.log( "Error" );
+            console.log( data );
+        },
+        success: function ( data ) {
+            $( '#puiBranches' ).empty();
+            var branches = JSON.parse( data );
+            branches.forEach( function ( value ) {
+                $( "#puiBranches" ).append( new Option( value, value ) );
+            } );
+        },
+        url: "control/puiBranches",
         data: data
     } );
 }

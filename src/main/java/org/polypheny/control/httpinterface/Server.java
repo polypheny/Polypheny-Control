@@ -65,6 +65,8 @@ public class Server {
         javalin.get( "/control/version", control::getVersion );
         javalin.get( "/control/controlVersion", control::getControlVersion );
         javalin.get( "/control/status", control::getStatus );
+        javalin.get( "/control/pdbBranches", control::getAvailablePdbBranches );
+        javalin.get( "/control/puiBranches", control::getAvailablePuiBranches );
 
         // Client
         javalin.post( "/client/type", ClientRegistry::setClientType );
