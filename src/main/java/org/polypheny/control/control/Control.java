@@ -141,6 +141,9 @@ public class Control {
     public void getAvailablePdbBranches( Context ctx ) {
         val configuration = ConfigManager.getConfig();
         val pdbbuilddir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
+        if ( !pdbbuilddir.exists() ) {
+            ServiceManager.clonePdbRepository( null, configuration );
+        }
         List<String> list = ServiceManager.getAvailableBranches( pdbbuilddir );
         ctx.result( gson.toJson( list ) );
     }
@@ -149,6 +152,9 @@ public class Control {
     public void getAvailablePuiBranches( Context ctx ) {
         val configuration = ConfigManager.getConfig();
         val puiBuildDir = new File( configuration.getString( "pcrtl.puibuilddir" ) );
+        if ( !puiBuildDir.exists() ) {
+            ServiceManager.clonePuiRepository( null, configuration );
+        }
         List<String> list = ServiceManager.getAvailableBranches( puiBuildDir );
         ctx.result( gson.toJson( list ) );
     }

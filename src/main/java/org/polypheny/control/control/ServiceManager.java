@@ -361,8 +361,20 @@ public class ServiceManager {
                     }
                 }
 
-                val clean = configuration.getString( "pcrtl.clean" );
-                if ( clean.equals( "delete" ) ) {
+                val cleanMode = configuration.getString( "pcrtl.clean.mode" );
+                boolean clean = false;
+                if ( cleanMode.equals( "always" ) ) {
+                    clean = true;
+                } else if ( cleanMode.equals( "branchChange" ) ) {
+                    Map<String, String> versions = getVersion();
+                    if ( !versions.get( "pdb-branch" ).equals( configuration.getString( "pcrtl.pdbms.branch" ) ) ) {
+                        clean = true;
+                    }
+                    if ( !versions.get( "pui-branch" ).equals( configuration.getString( "pcrtl.ui.branch" ) ) ) {
+                        clean = true;
+                    }
+                }
+                if ( clean ) {
                     log.info( "> Deleting build folder ..." );
                     if ( clientCommunicationStream != null ) {
                         clientCommunicationStream.send( "> Deleting build folder ..." );
@@ -433,49 +445,33 @@ public class ServiceManager {
             }
         }
 
-        if ( pdbBuildDir.exists() ) {
-            log.info( "> Pulling Polypheny-DB repository ..." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Pulling Polypheny-DB repository ..." );
-            }
-            try {
-                Git git = Git.open( pdbBuildDir );
-                if ( !existsLocalBranchWithName( git, branch ) ) {
-                    git.branchCreate()
-                            .setName( branch )
-                            .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
-                            .setStartPoint( "origin/" + branch )
-                            .setForce( true )
-                            .call();
-                }
-                git.checkout().setName( branch ).call();
-                git.pull().call();
-            } catch ( GitAPIException | IOException e ) {
-                throw new RuntimeException( e );
-            }
-            log.info( "> Pulling Polypheny-DB repository ... finished." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Pulling Polypheny-DB repository ... finished." );
-            }
-        } else {
+        if ( !pdbBuildDir.exists() ) {
             // Clone the repository
-            log.info( "> Cloning Polypheny-DB repository ..." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Cloning Polypheny-DB repository ..." );
-            }
-            try {
-                final Git git = Git.cloneRepository()
-                        .setURI( repo )
-                        .setDirectory( pdbBuildDir )
-                        .setBranch( branch )
+            clonePdbRepository( clientCommunicationStream, configuration );
+        }
+
+        log.info( "> Pulling Polypheny-DB repository ..." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Pulling Polypheny-DB repository ..." );
+        }
+        try {
+            Git git = Git.open( pdbBuildDir );
+            if ( !existsLocalBranchWithName( git, branch ) ) {
+                git.branchCreate()
+                        .setName( branch )
+                        .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
+                        .setStartPoint( "origin/" + branch )
+                        .setForce( true )
                         .call();
-            } catch ( GitAPIException e ) {
-                throw new RuntimeException( e );
             }
-            log.info( "> Cloning Polypheny-DB repository ... finished." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Cloning Polypheny-DB repository ... finished." );
-            }
+            git.checkout().setName( branch ).call();
+            git.pull().call();
+        } catch ( GitAPIException | IOException e ) {
+            throw new RuntimeException( e );
+        }
+        log.info( "> Pulling Polypheny-DB repository ... finished." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Pulling Polypheny-DB repository ... finished." );
         }
 
         // Build
@@ -531,6 +527,31 @@ public class ServiceManager {
     }
 
 
+    public static void clonePdbRepository( ClientCommunicationStream clientCommunicationStream, Config configuration ) {
+        val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
+        val repo = configuration.getString( "pcrtl.pdbms.repo" );
+        val branch = configuration.getString( "pcrtl.pdbms.branch" );
+
+        log.info( "> Cloning Polypheny-DB repository ..." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Cloning Polypheny-DB repository ..." );
+        }
+        try {
+            final Git git = Git.cloneRepository()
+                    .setURI( repo )
+                    .setDirectory( pdbBuildDir )
+                    .setBranch( branch )
+                    .call();
+        } catch ( GitAPIException e ) {
+            throw new RuntimeException( e );
+        }
+        log.info( "> Cloning Polypheny-DB repository ... finished." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Cloning Polypheny-DB repository ... finished." );
+        }
+    }
+
+
     private static void installUi( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
 
         val buildDir = configuration.getString( "pcrtl.builddir" );
@@ -539,50 +560,33 @@ public class ServiceManager {
 
         val uiBuildDir = new File( buildDir, "ui" );
 
-        if ( uiBuildDir.exists() ) {
-            // Pull the repository
-            log.info( "> Pulling Polypheny-UI repository ..." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Pulling Polypheny-UI repository ..." );
-            }
-            try {
-                Git git = Git.open( uiBuildDir );
-                if ( !existsLocalBranchWithName( git, branch ) ) {
-                    git.branchCreate()
-                            .setName( branch )
-                            .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
-                            .setStartPoint( "origin/" + branch )
-                            .setForce( true )
-                            .call();
-                }
-                git.checkout().setName( branch ).call();
-                git.pull().call();
-            } catch ( GitAPIException | IOException e ) {
-                throw new RuntimeException( e );
-            }
-            log.info( "> Pulling Polypheny-UI repository ... finished." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Pulling Polypheny-UI repository ... finished." );
-            }
-        } else {
-            // Clone the repository
-            log.info( "> Cloning Polypheny-UI repository ..." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Cloning Polypheny-UI repository ..." );
-            }
-            try {
-                final Git git = Git.cloneRepository()
-                        .setURI( repo )
-                        .setDirectory( uiBuildDir )
-                        .setBranch( branch )
+        if ( !uiBuildDir.exists() ) {
+            clonePuiRepository( clientCommunicationStream, configuration );
+        }
+
+        // Pull the repository
+        log.info( "> Pulling Polypheny-UI repository ..." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Pulling Polypheny-UI repository ..." );
+        }
+        try {
+            Git git = Git.open( uiBuildDir );
+            if ( !existsLocalBranchWithName( git, branch ) ) {
+                git.branchCreate()
+                        .setName( branch )
+                        .setUpstreamMode( SetupUpstreamMode.SET_UPSTREAM )
+                        .setStartPoint( "origin/" + branch )
+                        .setForce( true )
                         .call();
-            } catch ( GitAPIException e ) {
-                throw new RuntimeException( e );
             }
-            log.info( "> Cloning Polypheny-UI repository ... finished." );
-            if ( clientCommunicationStream != null ) {
-                clientCommunicationStream.send( "> Cloning Polypheny-UI repository ... finished." );
-            }
+            git.checkout().setName( branch ).call();
+            git.pull().call();
+        } catch ( GitAPIException | IOException e ) {
+            throw new RuntimeException( e );
+        }
+        log.info( "> Pulling Polypheny-UI repository ... finished." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Pulling Polypheny-UI repository ... finished." );
         }
 
         // Build
@@ -604,6 +608,32 @@ public class ServiceManager {
         log.info( "> Installing Polypheny-UI ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Installing Polypheny-UI ... finished." );
+        }
+    }
+
+
+    public static void clonePuiRepository( ClientCommunicationStream clientCommunicationStream, Config configuration ) {
+        val buildDir = configuration.getString( "pcrtl.builddir" );
+        val repo = configuration.getString( "pcrtl.ui.repo" );
+        val branch = configuration.getString( "pcrtl.ui.branch" );
+        val uiBuildDir = new File( buildDir, "ui" );
+
+        log.info( "> Cloning Polypheny-UI repository ..." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Cloning Polypheny-UI repository ..." );
+        }
+        try {
+            final Git git = Git.cloneRepository()
+                    .setURI( repo )
+                    .setDirectory( uiBuildDir )
+                    .setBranch( branch )
+                    .call();
+        } catch ( GitAPIException e ) {
+            throw new RuntimeException( e );
+        }
+        log.info( "> Cloning Polypheny-UI repository ... finished." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Cloning Polypheny-UI repository ... finished." );
         }
     }
 

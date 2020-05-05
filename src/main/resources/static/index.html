@@ -113,9 +113,10 @@
                 <tr>
                     <td>Clean mode</td>
                     <td>
-                        <select name="pcrtl.clean">
-                            <option value="keep">Keep</option>
-                            <option value="delete">Delete build folder</option>
+                        <select name="pcrtl.clean.mode">
+                            <option value="never">Never</option>
+                            <option value="branchChange">When branch changes</option>
+                            <option value="always">Always</option>
                         </select>
                     </td>
                 </tr>
@@ -131,6 +132,14 @@
             <button type="button" class="btn-back" id="saveSettings">OK</button>
         </div>
     </form>
+
+
+    <div id="config-loading" class="content" style="display: none;">
+        <h1>Loading...</h1>
+        <div class="lds-dual-ring"></div>
+        <p>Cloning repositories. Please wait.</p>
+    </div>
+
 </div>
 
 <footer class="footer">

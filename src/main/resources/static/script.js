@@ -133,16 +133,22 @@ $('#btn-log').click(function () {
 });
 
 $('#btn-config').click(function () {
-    updateConfigsPage();
-    $('#dashboardContent').hide();
-    $('#configContent').show();
-});
-
-$('#btn-settings').click(function () {
+    $( '#dashboardContent' ).hide();
+    $( '#config-loading' ).show();
     updatePdbBranchList();
     updatePuiBranchList();
     updateConfigsPage();
+    $( '#config-loading' ).hide();
+    $( '#configContent' ).show();
+});
+
+$('#btn-settings').click(function () {
     $( '#dashboardContent' ).hide();
+    $( '#config-loading' ).show();
+    updatePdbBranchList();
+    updatePuiBranchList();
+    updateConfigsPage();
+    $( '#config-loading' ).hide();
     $( '#settingsContent' ).show();
 });
 
@@ -205,13 +211,14 @@ function updateConfigsPage() {
                         }
                     }
                 } else {
-                    var element = $("[name='" + key + "']");
-                    if (element.length) {
-                        element.val(configuration[key]);
+                    var element = $( "[name='" + key + "']" );
+                    if ( element.length ) {
+                        element.val( configuration[key] );
                     }
                 }
             }
         },
+        async: false,
         url: "config/get",
         data: data
     });
@@ -291,6 +298,7 @@ function updatePdbBranchList() {
                 $( "#pdbBranches" ).append( new Option( value, value ) );
             } );
         },
+        async: false,
         url: "control/pdbBranches",
         data: data
     } );
@@ -313,6 +321,7 @@ function updatePuiBranchList() {
                 $( "#puiBranches" ).append( new Option( value, value ) );
             } );
         },
+        async: false,
         url: "control/puiBranches",
         data: data
     } );
