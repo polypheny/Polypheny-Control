@@ -35,7 +35,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 
-@SuppressWarnings("FieldCanBeLocal")
 @Command(name = "help", description = "A command that provides help on other commands")
 public class HelpCommand implements CliRunnable {
 

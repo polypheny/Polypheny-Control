@@ -37,6 +37,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.BranchTrackingStatus;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
@@ -652,7 +654,7 @@ public class ServiceManager {
                 Git git = Git.open( pdbBuildDir );
                 git.fetch().call();
                 map.put( "pdb-branch", git.getRepository().getBranch() );
-                map.put( "pdb-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
+                map.put( "pdb-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
                 map.put( "pdb-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
             } else {
                 map.put( "pdb-branch", "Unknown" );
@@ -669,7 +671,7 @@ public class ServiceManager {
                 Git git = Git.open( puiBuildDir );
                 git.fetch().call();
                 map.put( "pui-branch", git.getRepository().getBranch() );
-                map.put( "pui-commit", git.getRepository().getAllRefs().get( "HEAD" ).getObjectId().getName() );
+                map.put( "pui-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
                 map.put( "pui-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
             } else {
                 map.put( "pui-branch", "Unknown" );
@@ -729,12 +731,14 @@ public class ServiceManager {
      */
     private static class LogTailerListener implements TailerListener {
 
-        private final Consumer<String>[] consumers;
+        private final List<Consumer<String>> consumers;
         private Tailer tailer;
 
 
+        @SafeVarargs
         LogTailerListener( @NonNull final Consumer<String>... consumers ) {
-            this.consumers = consumers;
+            this.consumers = new ArrayList<>();
+            this.consumers.addAll( Arrays.asList( consumers ) );
         }
 
 

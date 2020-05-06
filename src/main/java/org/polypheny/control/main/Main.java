@@ -34,6 +34,7 @@ import org.polypheny.control.control.ServiceManager;
 
 public class Main {
 
+    @SuppressWarnings("unchecked")
     public static void main( String[] args ) {
         final CliBuilder<CliRunnable> builder = Cli.builder( "Polypheny Control" );
         builder.withDescription( "Polypheny-DB" );
@@ -41,7 +42,7 @@ public class Main {
         // define top level commands
         builder.withCommand( HelpCommand.class );
         builder.withCommand( ControlCommand.class );
-        //noinspection unchecked
+
         builder.withCommands( StartCommand.class, StopCommand.class, RestartCommand.class, UpdateCommand.class );
         builder.withDefaultCommand( HelpCommand.class );
 
