@@ -61,6 +61,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.BranchTrackingStatus;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
@@ -447,9 +448,21 @@ public class ServiceManager {
             }
         }
 
-        if ( !pdbBuildDir.exists() ) {
-            // Clone the repository
-            clonePdbRepository( clientCommunicationStream, configuration );
+        try {
+            if ( !pdbBuildDir.exists() ) {
+                Git git = Git.open( pdbBuildDir );
+                if ( !validateGitRepository( git.getRepository() ) ) {
+                    if ( !pdbBuildDir.delete() ) {
+                        throw new RuntimeException( "Unable to delete invalid PDB build folder" );
+                    }
+                    clonePdbRepository( clientCommunicationStream, configuration );
+                }
+                git.close();
+            } else {
+                clonePdbRepository( clientCommunicationStream, configuration );
+            }
+        } catch ( IOException e ) {
+            throw new RuntimeException( "Exception while cloning and validating pdb repo", e );
         }
 
         log.info( "> Pulling Polypheny-DB repository ..." );
@@ -468,6 +481,7 @@ public class ServiceManager {
             }
             git.checkout().setName( branch ).call();
             git.pull().call();
+            git.close();
         } catch ( GitAPIException | IOException e ) {
             throw new RuntimeException( e );
         }
@@ -544,6 +558,7 @@ public class ServiceManager {
                     .setDirectory( pdbBuildDir )
                     .setBranch( branch )
                     .call();
+            git.close();
         } catch ( GitAPIException e ) {
             throw new RuntimeException( e );
         }
@@ -562,8 +577,21 @@ public class ServiceManager {
 
         val uiBuildDir = new File( buildDir, "ui" );
 
-        if ( !uiBuildDir.exists() ) {
-            clonePuiRepository( clientCommunicationStream, configuration );
+        try {
+            if ( !uiBuildDir.exists() ) {
+                Git git = Git.open( uiBuildDir );
+                if ( !validateGitRepository( git.getRepository() ) ) {
+                    if ( !uiBuildDir.delete() ) {
+                        throw new RuntimeException( "Unable to delete invalid UI build folder" );
+                    }
+                    clonePuiRepository( clientCommunicationStream, configuration );
+                }
+                git.close();
+            } else {
+                clonePuiRepository( clientCommunicationStream, configuration );
+            }
+        } catch ( IOException e ) {
+            throw new RuntimeException( "Exception while cloning and validating pui repo", e );
         }
 
         // Pull the repository
@@ -583,6 +611,7 @@ public class ServiceManager {
             }
             git.checkout().setName( branch ).call();
             git.pull().call();
+            git.close();
         } catch ( GitAPIException | IOException e ) {
             throw new RuntimeException( e );
         }
@@ -630,6 +659,7 @@ public class ServiceManager {
                     .setDirectory( uiBuildDir )
                     .setBranch( branch )
                     .call();
+            git.close();
         } catch ( GitAPIException e ) {
             throw new RuntimeException( e );
         }
@@ -650,12 +680,21 @@ public class ServiceManager {
 
         // Get PDB branch and commit
         try {
+            Git git = null;
             if ( pdbBuildDir.exists() ) {
-                Git git = Git.open( pdbBuildDir );
+                git = Git.open( pdbBuildDir );
+                if ( !validateGitRepository( git.getRepository() ) ) {
+                    git.close();
+                    git = null;
+                }
+            }
+
+            if ( git != null ) {
                 git.fetch().call();
                 map.put( "pdb-branch", git.getRepository().getBranch() );
                 map.put( "pdb-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
                 map.put( "pdb-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
+                git.close();
             } else {
                 map.put( "pdb-branch", "Unknown" );
                 map.put( "pdb-commit", "--------" );
@@ -667,12 +706,21 @@ public class ServiceManager {
 
         // Get PUI branch and commit
         try {
+            Git git = null;
             if ( puiBuildDir.exists() ) {
-                Git git = Git.open( puiBuildDir );
+                git = Git.open( puiBuildDir );
+                if ( !validateGitRepository( git.getRepository() ) ) {
+                    git.close();
+                    git = null;
+                }
+            }
+
+            if ( git != null ) {
                 git.fetch().call();
                 map.put( "pui-branch", git.getRepository().getBranch() );
                 map.put( "pui-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
                 map.put( "pui-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
+                git.close();
             } else {
                 map.put( "pui-branch", "Unknown" );
                 map.put( "pui-commit", "--------" );
@@ -708,6 +756,22 @@ public class ServiceManager {
     }
 
 
+    private static boolean validateGitRepository( Repository repo ) {
+        try {
+            for ( Ref ref : repo.getRefDatabase().getRefs() ) {
+                if ( ref.getObjectId() == null ) {
+                    continue;
+                }
+                return true;
+            }
+            return false;
+        } catch ( IOException e ) {
+            log.error( "Exception while validating repo", e );
+            return false;
+        }
+    }
+
+
     public static List<String> getAvailableBranches( File repo ) {
         List<String> branches = new LinkedList<>();
         try {
@@ -719,6 +783,7 @@ public class ServiceManager {
                 name = name.replace( "refs/remotes/origin/", "" );
                 branches.add( name );
             }
+            git.close();
         } catch ( GitAPIException | IOException e ) {
             log.error( "Exception while getting list of branches", e );
         }
