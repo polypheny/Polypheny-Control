@@ -144,7 +144,9 @@ public class PolyphenyDbProcessBuilder {
             command.add( classPath );
             command.add( mainClass );
         }
-        command.addAll( Arrays.asList( arguments ) );
+        if ( arguments.length > 0 ) {
+            command.addAll( Arrays.asList( arguments ) );
+        }
 
         log.info( "> Executing \"{}\"", String.join( " ", command ) );
 

@@ -182,7 +182,10 @@ public class ServiceManager {
             javaOptionsFull.addFirst( "-Xmx" + javaMaximumHeapSize + "G" );
 
             // Build list of arguments
-            List<String> pdbArguments = new LinkedList<>( Arrays.asList( pdbmsArgs.split( " " ) ) );
+            List<String> pdbArguments = new LinkedList<>();
+            if ( pdbmsArgs.trim().length() > 0 ) {
+                pdbArguments.addAll( Arrays.asList( pdbmsArgs.split( " " ) ) );
+            }
 
             if ( new File( javaExecutable ).exists() == false ) {
                 throw new RuntimeException( "The java executable seems not to exist... How did you start this application?!" );
@@ -449,7 +452,7 @@ public class ServiceManager {
         }
 
         try {
-            if ( !pdbBuildDir.exists() ) {
+            if ( pdbBuildDir.exists() ) {
                 Git git = Git.open( pdbBuildDir );
                 if ( !validateGitRepository( git.getRepository() ) ) {
                     if ( !pdbBuildDir.delete() ) {
@@ -578,7 +581,7 @@ public class ServiceManager {
         val uiBuildDir = new File( buildDir, "ui" );
 
         try {
-            if ( !uiBuildDir.exists() ) {
+            if ( uiBuildDir.exists() ) {
                 Git git = Git.open( uiBuildDir );
                 if ( !validateGitRepository( git.getRepository() ) ) {
                     if ( !uiBuildDir.delete() ) {
