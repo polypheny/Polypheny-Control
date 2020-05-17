@@ -695,8 +695,13 @@ public class ServiceManager {
             if ( git != null ) {
                 git.fetch().call();
                 map.put( "pdb-branch", git.getRepository().getBranch() );
-                map.put( "pdb-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
-                map.put( "pdb-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
+                if ( git.getRepository().resolve( Constants.HEAD ) != null ) {
+                    map.put( "pdb-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
+                    map.put( "pdb-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
+                } else {
+                    map.put( "pdb-commit", "--------" );
+                    map.put( "pdb-behind", "0" );
+                }
                 git.close();
             } else {
                 map.put( "pdb-branch", "Unknown" );
@@ -721,8 +726,13 @@ public class ServiceManager {
             if ( git != null ) {
                 git.fetch().call();
                 map.put( "pui-branch", git.getRepository().getBranch() );
-                map.put( "pui-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
-                map.put( "pui-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
+                if ( git.getRepository().resolve( Constants.HEAD ) != null ) {
+                    map.put( "pui-commit", git.getRepository().resolve( Constants.HEAD ).getName() );
+                    map.put( "pui-behind", "" + BranchTrackingStatus.of( git.getRepository(), git.getRepository().getBranch() ).getBehindCount() );
+                } else {
+                    map.put( "pui-commit", "--------" );
+                    map.put( "pui-behind", "0" );
+                }
                 git.close();
             } else {
                 map.put( "pui-branch", "Unknown" );
