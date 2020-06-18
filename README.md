@@ -38,5 +38,33 @@ We highly welcome your contributions to _Polypheny Control_. If you would like t
 Please note that we have a [code of conduct](https://github.com/polypheny/Admin/blob/master/CODE_OF_CONDUCT.md). Please follow it in all your interactions with the project. 
 
 
+## Credits
+_Polypheny Control_ builds upon the great work of several other open source projects:
+
+#### Frontend
+* [ansi_up.js](https://github.com/drudru/ansi_up): Converting text with ANSI terminal codes into colorful HTML.
+* [Font Awesome](https://fontawesome.com/): A set of web-related icons.
+* [jQuery](https://jquery.com/): The library that makes Javascript usable.
+* [jquery.serializeJSON](https://github.com/marioizquierdo/jquery.serializeJSON): Serialize an HTML Form to a JavaScript Object.
+* [Tooltipster](https://iamceege.github.io/tooltipster/): jQuery plugin for modern tooltips.
+
+All those libraries are imported using [WebJars](https://www.webjars.org/).
+
+
+#### Backend
+* [Airline](https://rvesse.github.io/airline/): Annotation-driven Java library for building command line interfaces.
+* [Apache Commons](http://commons.apache.org/): A bunch of useful Java utility classes.
+* [GSON](https://github.com/google/gson): Convert Java Objects into their JSON representation and vice versa.
+* [Javalin](https://javalin.io/): A simple and lightweight java web framework.
+* [JGit](https://www.eclipse.org/jgit/): Pure Java implementation of the Git version control system.
+* [Log4j](https://logging.apache.org/log4j/2.x/): Fast and flexible logging framework for Java.
+* [Project Lombok](https://projectlombok.org/): A library providing compiler annotations for tedious tasks.
+* [SLF4J](http://www.slf4j.org/): Provides a logging API by means of a facade pattern.
+* [Typesafe Config](https://lightbend.github.io/config/): A configuration library using HOCON files.
+* [WinP](http://winp.kohsuke.org/): Windows process management library.
+
+Those projects are used "as is" and are integrated as libraries.
+
+
 ## License
 The MIT License (MIT)
