@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="/font-awesome/5.10.1/css/all.css">
+    <link rel="stylesheet" href="/tooltipster/4.2.7/dist/css/tooltipster.bundle.min.css">
     <link rel="stylesheet" href="/style.css">
     <script>
         function setHref() {
@@ -21,36 +22,36 @@
         <table width="80%" class="dashboard" border="0">
             <tr>
                 <td width="14.3%" height="350px;">
-                    <div class="circle" id="btn-start" style="display: none"><i class="fa fa-play fa-5x"></i></div>
-                    <div class="circle" id="btn-stop"><i class="fa fa-stop fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-start" title="Start Polypheny-DB" style="display: none"><i class="fa fa-play fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-stop" title="Stop Polypheny-DB"><i class="fa fa-stop fa-5x"></i></div>
                 </td>
                 <td width="14.2%"></td>
                 <td width="14.3%">
-                    <div class="circle" id="btn-restart"><i class="fa fa-redo fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-restart" title="Restart Polypheny-DB"><i class="fa fa-redo fa-5x"></i></div>
                 </td>
                 <td width="14.2%"></td>
                 <td width="14.3%">
-                    <div class="circle" id="btn-log"><i class="fa fa-bullhorn fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-log" title="Watch the log"><i class="fa fa-bullhorn fa-5x"></i></div>
                 </td>
                 <td width="14.2%"></td>
                 <td width="14.3%">
-                    <div class="circle" id="btn-update"><i class="fa fa-sync fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-update" title="Update and build Polypheny-DB"><i class="fa fa-sync fa-5x"></i></div>
                 </td>
             </tr>
             <tr>
                 <td></td>
                 <td height="200px">
-                    <div class="circle" id="btn-webui">
+                    <div class="circle tooltip" id="btn-webui" title="Open Polypheny-UI">
                         <a href="/" id="webui-link" style="color:black" target="_blank"><i class="fa fa-window-maximize fa-5x"></i></a>
                     </div>
                 </td>
                 <td></td>
                 <td>
-                    <div class="circle" id="btn-config"><i class="fa fa-wrench fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-config" title="Nothing interesting here yet :)"><i class="fa fa-wrench fa-5x"></i></div>
                 </td>
                 <td></td>
                 <td>
-                    <div class="circle" id="btn-settings"><i class="fa fa-cog fa-5x"></i></div>
+                    <div class="circle tooltip" id="btn-settings" title="Take responsibility and adjust the settings"><i class="fa fa-cog fa-5x"></i></div>
                 </td>
                 <td></td>
             </tr>
@@ -155,6 +156,7 @@
 <script src="/jquery/3.4.1/jquery.js"></script>
 <script src="/jquery-serializejson/2.9.0/jquery.serializejson.min.js"></script>
 <script src="/ansi_up/2.0.2/ansi_up.js"></script>
+<script src="/tooltipster/4.2.7/dist/js/tooltipster.bundle.min.js"></script>
 <script src="/script.js"></script>
 </body>
 

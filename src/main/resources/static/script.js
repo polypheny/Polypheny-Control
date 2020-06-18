@@ -334,6 +334,13 @@ $( document ).on( "mouseleave", ".circle", function () {
     $( this ).css( "background-color", "white" );
 } );
 
+// Activate tooltipster
+$( document ).ready( function () {
+    $( '.tooltip' ).tooltipster( {
+        animation: 'grow',
+    } );
+} );
+
 // Update version
 getControlVersion();
 

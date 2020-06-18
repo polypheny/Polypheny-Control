@@ -108,6 +108,7 @@ dependencies {
     webjars group: "org.webjars", name: "jquery", version: "3.4.1" // MIT
     webjars group: 'org.webjars.npm', name: 'jquery-serializejson', version: '2.9.0' // MIT
     webjars group: 'org.webjars.npm', name: 'ansi_up', version: '2.0.2' // MIT
+    webjars group: 'org.webjars.npm', name: 'tooltipster', version: '4.2.7' // MIT
 
 
     // -- Testing --
