@@ -413,11 +413,12 @@ public class ServiceManager {
                 }
 
                 val buildMode = configuration.getString( "pcrtl.buildmode" );
+                boolean installedUI = false;
                 if ( buildMode.equals( "both" ) || buildMode.equals( "pui" ) ) {
-                    installUi( clientCommunicationStream, configuration );
+                    installedUI = installUi( clientCommunicationStream, configuration );
                 }
-                if ( buildMode.equals( "both" ) || buildMode.equals( "pdb" ) ) {
-                    buildPdb( clientCommunicationStream, configuration );
+                if ( buildMode.equals( "both" ) || buildMode.equals( "pdb" ) || installedUI ) {
+                    buildPdb( clientCommunicationStream, configuration, installedUI );
                 }
 
                 if ( clientCommunicationStream != null ) {
@@ -434,19 +435,31 @@ public class ServiceManager {
     }
 
 
-    private static void buildPdb( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
+    private static void buildPdb( final ClientCommunicationStream clientCommunicationStream, Config configuration, boolean forceInstall ) {
+        boolean requiresBuild = false;
 
         val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
         val repo = configuration.getString( "pcrtl.pdbms.repo" );
         val branch = configuration.getString( "pcrtl.pdbms.branch" );
 
-        // Delete DBMS Jar
+        // Delete old DBMS Jar
+        val oldJar = new File( configuration.getString( "pcrtl.pdbms.oldjarfile" ) );
+        if ( oldJar.exists() ) {
+            if ( !oldJar.delete() ) {
+                log.info( "> Unable to delete the old jar file." );
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Unable to delete the old jar file." );
+                }
+            }
+        }
+
+        // Rename DBMS Jar
         val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( jar.exists() ) {
-            if ( !jar.delete() ) {
-                log.info( "> Unable to delete the jar file." );
+            if ( !jar.renameTo( oldJar ) ) {
+                log.info( "> Unable to rename the jar file." );
                 if ( clientCommunicationStream != null ) {
-                    clientCommunicationStream.send( "> Unable to delete the jar file." );
+                    clientCommunicationStream.send( "> Unable to rename the jar file." );
                 }
             }
         }
@@ -459,10 +472,12 @@ public class ServiceManager {
                         throw new RuntimeException( "Unable to delete invalid PDB build folder" );
                     }
                     clonePdbRepository( clientCommunicationStream, configuration );
+                    requiresBuild = true;
                 }
                 git.close();
             } else {
                 clonePdbRepository( clientCommunicationStream, configuration );
+                requiresBuild = true;
             }
         } catch ( IOException e ) {
             throw new RuntimeException( "Exception while cloning and validating pdb repo", e );
@@ -474,6 +489,7 @@ public class ServiceManager {
         }
         try {
             Git git = Git.open( pdbBuildDir );
+            val oldCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
             if ( !existsLocalBranchWithName( git, branch ) ) {
                 git.branchCreate()
                         .setName( branch )
@@ -484,6 +500,8 @@ public class ServiceManager {
             }
             git.checkout().setName( branch ).call();
             git.pull().call();
+            val newCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            requiresBuild |= !oldCommitId.equals( newCommitId );
             git.close();
         } catch ( GitAPIException | IOException e ) {
             throw new RuntimeException( e );
@@ -491,6 +509,24 @@ public class ServiceManager {
         log.info( "> Pulling Polypheny-DB repository ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Pulling Polypheny-DB repository ... finished." );
+        }
+
+        // Check if we need to build
+        if ( !requiresBuild && !forceInstall ) {
+            log.info( "> No changes to PDB repository and therefore no need to rebuild Polypheny-DB ..." );
+            if ( clientCommunicationStream != null ) {
+                clientCommunicationStream.send( "> No changes to PDB repository and therefore no need to rebuild Polypheny-DB ..." );
+            }
+            // Restore old jar file
+            if ( oldJar.exists() ) {
+                if ( !oldJar.renameTo( jar ) ) {
+                    log.info( "> Unable to restore to the old jar file." );
+                    if ( clientCommunicationStream != null ) {
+                        clientCommunicationStream.send( "> Unable to restore to the old jar file." );
+                    }
+                }
+            }
+            return;
         }
 
         // Build
@@ -572,7 +608,9 @@ public class ServiceManager {
     }
 
 
-    private static void installUi( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
+    // return value indicated whether the repo has been installed (false if there haven't been any changes)
+    private static boolean installUi( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
+        boolean requiresInstall = false;
 
         val buildDir = configuration.getString( "pcrtl.builddir" );
         val repo = configuration.getString( "pcrtl.ui.repo" );
@@ -588,10 +626,12 @@ public class ServiceManager {
                         throw new RuntimeException( "Unable to delete invalid UI build folder" );
                     }
                     clonePuiRepository( clientCommunicationStream, configuration );
+                    requiresInstall = true;
                 }
                 git.close();
             } else {
                 clonePuiRepository( clientCommunicationStream, configuration );
+                requiresInstall = true;
             }
         } catch ( IOException e ) {
             throw new RuntimeException( "Exception while cloning and validating pui repo", e );
@@ -604,6 +644,7 @@ public class ServiceManager {
         }
         try {
             Git git = Git.open( uiBuildDir );
+            val oldCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
             if ( !existsLocalBranchWithName( git, branch ) ) {
                 git.branchCreate()
                         .setName( branch )
@@ -614,6 +655,8 @@ public class ServiceManager {
             }
             git.checkout().setName( branch ).call();
             git.pull().call();
+            val newCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            requiresInstall |= !oldCommitId.equals( newCommitId );
             git.close();
         } catch ( GitAPIException | IOException e ) {
             throw new RuntimeException( e );
@@ -621,6 +664,15 @@ public class ServiceManager {
         log.info( "> Pulling Polypheny-UI repository ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Pulling Polypheny-UI repository ... finished." );
+        }
+
+        // Check if we need to build
+        if ( !requiresInstall ) {
+            log.info( "> No changes to UI repository and therefore no need to rebuild Polypheny-UI ..." );
+            if ( clientCommunicationStream != null ) {
+                clientCommunicationStream.send( "> No changes to UI repository and therefore no need to rebuild Polypheny-UI ..." );
+            }
+            return false;
         }
 
         // Build
@@ -643,6 +695,7 @@ public class ServiceManager {
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Installing Polypheny-UI ... finished." );
         }
+        return true;
     }
 
 
