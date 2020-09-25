@@ -149,11 +149,26 @@ body {
     background-color: #f5f5f5
 }*/
 
-.configuration-table select,
-.configuration-table input {
-    width: 98%;
+.configuration-table select {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
     padding: 2%;
     font-size: 16px;
+    border: 1px solid #bbb;
+    background-color: white;
+    background-image: url(select-arrow.png);
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+.configuration-table input {
+    width: 95%;
+    margin-left: 0;
+    padding: 2%;
+    font-size: 16px;
+    border: 1px solid #bbb;
 }
 
 
