@@ -60,24 +60,26 @@ public class ConfigManager {
         if ( applicationConfFile == null ) {
             val defaultConfig = ConfigFactory.load();
             val workingDir = defaultConfig.getString( "pcrtl.workingdir" );
-
-            if ( new File( workingDir ).exists() == false ) {
-                if ( new File( workingDir ).mkdirs() == false ) {
-                    throw new RuntimeException( "Could not create the folders for " + new File( workingDir ).getAbsolutePath() );
-                }
-            }
-
             val configDir = new File( new File( workingDir ), "config" );
-            if ( configDir.exists() == false ) {
-                if ( configDir.mkdirs() == false ) {
-                    throw new RuntimeException( "Could not create the config folder: " + configDir.getAbsolutePath() );
-                }
-            }
-
+            createConfigFolders( workingDir, configDir );
             applicationConfFile = new File( configDir, "application.conf" );
         }
 
         currentConfig = ConfigFactory.parseFile( applicationConfFile ).withFallback( ConfigFactory.defaultReference() );
+    }
+
+
+    private static void createConfigFolders( String workingDir, File configDir ) {
+        if ( !new File( workingDir ).exists() ) {
+            if ( !new File( workingDir ).mkdirs() ) {
+                throw new RuntimeException( "Could not create the folders for " + new File( workingDir ).getAbsolutePath() );
+            }
+        }
+        if ( !configDir.exists() ) {
+            if ( !configDir.mkdirs() ) {
+                throw new RuntimeException( "Could not create the config folder: " + configDir.getAbsolutePath() );
+            }
+        }
     }
 
 
@@ -88,6 +90,10 @@ public class ConfigManager {
         configRenderOptions = configRenderOptions.setJson( false );
         configRenderOptions = configRenderOptions.setOriginComments( false );
 
+        val defaultConfig = ConfigFactory.load();
+        val workingDir = defaultConfig.getString( "pcrtl.workingdir" );
+        val configDir = new File( new File( workingDir ), "config" );
+        createConfigFolders( workingDir, configDir );
         try (
                 FileOutputStream fos = new FileOutputStream( applicationConfFile, false );
                 BufferedWriter bw = new BufferedWriter( new OutputStreamWriter( fos ) )
