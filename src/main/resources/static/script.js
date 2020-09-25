@@ -134,6 +134,7 @@ $('#btn-log').click(function () {
 
 $('#btn-config').click(function () {
     $( '#dashboardContent' ).hide();
+    $( '.tooltip' ).tooltipster( 'hide' );
     $( '#config-loading' ).show();
     updatePdbBranchList();
     updatePuiBranchList();
@@ -144,6 +145,7 @@ $('#btn-config').click(function () {
 
 $('#btn-settings').click(function () {
     $( '#dashboardContent' ).hide();
+    $( '.tooltip' ).tooltipster( 'hide' );
     $( '#config-loading' ).show();
     updatePdbBranchList();
     updatePuiBranchList();
