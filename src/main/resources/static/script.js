@@ -141,10 +141,10 @@ $('#btn-settings').click(function () {
     $( '#dashboardContent' ).hide();
     $( '.tooltip' ).tooltipster( 'hide' );
     $( '#config-loading' ).show();
-    updateConfigsPage();
-    // updateConfigPage calls updatePdbBranchList in its success method.
-    // updatePdbBranchList calls updatePuiBranchList.
-    // updatePuiBranchList hides the configLoading page and shows the settings page
+    updatePdbBranchList();
+    // updatePdbBranchList calls updatePuiBranchList in its success method.
+    // updatePuiBranchList calls updateConfigPage.
+    // updateConfigPage hides the configLoading page and shows the settings page
 });
 
 
@@ -203,7 +203,7 @@ function updateConfigsPage() {
                     for (var k in array) {
                         var el = $("[value='" + array[k] + "']");
                         if (el.length) {
-                            el.prop("checked", true);
+                            el.prop( "checked", true );
                         }
                     }
                 } else {
@@ -213,7 +213,8 @@ function updateConfigsPage() {
                     }
                 }
             }
-            updatePdbBranchList();
+            $( '#config-loading' ).hide();
+            $( '#settingsContent' ).show();
         },
         url: "config/get",
         data: data
@@ -316,8 +317,7 @@ function updatePuiBranchList() {
             branches.forEach( function ( value ) {
                 $( "#puiBranches" ).append( new Option( value, value ) );
             } );
-            $( '#config-loading' ).hide();
-            $( '#settingsContent' ).show();
+            updateConfigsPage();
         },
         url: "control/puiBranches",
         data: data
