@@ -512,7 +512,7 @@ public class ServiceManager {
         }
 
         // Check if we need to build
-        if ( !requiresBuild && !forceInstall ) {
+        if ( !requiresBuild && !forceInstall && oldJar.exists() ) {
             log.info( "> No changes to PDB repository and therefore no need to rebuild Polypheny-DB ..." );
             if ( clientCommunicationStream != null ) {
                 clientCommunicationStream.send( "> No changes to PDB repository and therefore no need to rebuild Polypheny-DB ..." );
@@ -667,7 +667,8 @@ public class ServiceManager {
         }
 
         // Check if we need to build
-        if ( !requiresInstall ) {
+        val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
+        if ( !requiresInstall && jar.exists() ) {
             log.info( "> No changes to UI repository and therefore no need to rebuild Polypheny-UI ..." );
             if ( clientCommunicationStream != null ) {
                 clientCommunicationStream.send( "> No changes to UI repository and therefore no need to rebuild Polypheny-UI ..." );
