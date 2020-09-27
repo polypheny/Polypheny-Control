@@ -67,6 +67,7 @@ import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.events.OperationType;
 import org.polypheny.control.httpinterface.ClientCommunicationStream;
+import org.polypheny.control.main.NotificationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,6 +157,7 @@ public class ServiceManager {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Polypheny-DB is already running. Stop it first or use the restart function." );
                 }
+                NotificationManager.error( "Polypheny-DB is already running!" );
                 log.warn( "> Polypheny-DB is already running. Stop it first or use the restart function." );
                 return false;
             }
@@ -196,6 +198,7 @@ public class ServiceManager {
                     clientCommunicationStream.send( "> There is no Polypheny-DB jar file. Trigger an update first." );
                 }
                 log.warn( "> There is no Polypheny-DB jar file. Trigger an update first." );
+                NotificationManager.error( "There is no Polypheny-DB JAR file. You need to trigger an update on the dashboard." );
                 return false;
             }
 
@@ -355,6 +358,7 @@ public class ServiceManager {
                     if ( clientCommunicationStream != null ) {
                         clientCommunicationStream.send( "> Stop Polypheny-DB first before updating it." );
                     }
+                    NotificationManager.error( "Stop Polypheny-DB first before updating it." );
                     return false;
                 }
 
@@ -426,6 +430,7 @@ public class ServiceManager {
                     clientCommunicationStream.send( "********************************************************" );
                     clientCommunicationStream.send( "         Polypheny has successfully been built!" );
                     clientCommunicationStream.send( "********************************************************" );
+                    NotificationManager.info( "Polypheny-DB has successfully been built!" );
                 }
                 return true;
             } finally {

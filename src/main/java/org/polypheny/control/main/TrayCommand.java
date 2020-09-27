@@ -34,7 +34,6 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URI;
@@ -146,6 +145,9 @@ public class TrayCommand extends ControlCommand {
             awtException.printStackTrace();
         }
 
+        // Initialize notification manager
+        NotificationManager.setTrayIcon( trayIcon );
+
         // This tasks periodically updates the status of the menu
         TimerTask menuUpdateTask = new TimerTask() {
             @Override
@@ -176,13 +178,13 @@ public class TrayCommand extends ControlCommand {
         menuUpdateTimer.scheduleAtFixedRate( menuUpdateTask, 0, 1000 );
 
         // Output message to the user
-        trayIcon.displayMessage( "Polypheny Control", "has been added to your system tray.", MessageType.INFO );
+        NotificationManager.info( "has been added to your system tray." );
 
         int exitCode = 1;
         try {
             exitCode = super._run_();
         } catch ( RuntimeException e ) {
-            trayIcon.displayMessage( "Polypheny Control", e.getMessage(), MessageType.ERROR );
+            NotificationManager.error( e.getMessage() );
         }
         // super._run_() is blocking. This means, the programm has been terminated. Shutdown
         System.exit( exitCode );
