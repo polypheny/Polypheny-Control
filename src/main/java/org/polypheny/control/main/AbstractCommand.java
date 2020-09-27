@@ -38,7 +38,7 @@ public abstract class AbstractCommand implements CliRunnable {
     @Inject
     protected HelpOption<ControlCommand> help;
 
-    @Option(name = { "-c", "--config" }, description = "Path to the configuration file.", type = OptionType.GLOBAL)
+    @Option(name = { "-c", "--config" }, description = "Path to the configuration file", type = OptionType.GLOBAL)
     protected String applicationConfPath;// ConfigManager.CONFIG_FILE.getAbsolutePath();
 
 

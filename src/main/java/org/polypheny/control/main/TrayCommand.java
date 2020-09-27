@@ -44,7 +44,7 @@ import lombok.SneakyThrows;
 import org.polypheny.control.control.ServiceManager;
 
 
-@Command(name = "tray", description = "Adds Polypheny Control to the system tray")
+@Command(name = "tray", description = "Start Polypheny Control and add it to the system tray")
 public class TrayCommand extends ControlCommand {
 
 
@@ -178,7 +178,15 @@ public class TrayCommand extends ControlCommand {
         // Output message to the user
         trayIcon.displayMessage( "Polypheny Control", "has been added to your system tray.", MessageType.INFO );
 
-        return super._run_();
+        int exitCode = 1;
+        try {
+            exitCode = super._run_();
+        } catch ( RuntimeException e ) {
+            trayIcon.displayMessage( "Polypheny Control", e.getMessage(), MessageType.ERROR );
+        }
+        // super._run_() is blocking. This means, the programm has been terminated. Shutdown
+        System.exit( exitCode );
+        return exitCode;
     }
 
 

@@ -35,7 +35,7 @@ import org.polypheny.control.httpinterface.Server;
 @Command(name = "control", description = "Start Polypheny Control")
 public class ControlCommand extends AbstractCommand {
 
-    @Option(name = { "-p", "--port" }, description = "Port")
+    @Option(name = { "-p", "--port" }, description = "Overwrite port of the Polypheny Control dashboard")
     private int port = -1;
 
     private volatile boolean running = true;

@@ -39,7 +39,7 @@ public class Main {
         // Hide dock icon on MacOS systems
         System.setProperty( "apple.awt.UIElement", "true" );
 
-        final CliBuilder<CliRunnable> builder = Cli.builder( "Polypheny Control" );
+        final CliBuilder<CliRunnable> builder = Cli.builder( "polypheny-control.jar" );
         builder.withDescription( "Polypheny-DB" );
 
         // define top level commands
