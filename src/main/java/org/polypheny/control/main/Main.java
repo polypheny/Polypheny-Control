@@ -36,15 +36,20 @@ public class Main {
 
     @SuppressWarnings("unchecked")
     public static void main( String[] args ) {
+        // Hide dock icon on MacOS systems
+        System.setProperty( "apple.awt.UIElement", "true" );
+
         final CliBuilder<CliRunnable> builder = Cli.builder( "Polypheny Control" );
         builder.withDescription( "Polypheny-DB" );
 
         // define top level commands
         builder.withCommand( HelpCommand.class );
         builder.withCommand( ControlCommand.class );
+        builder.withCommand( TrayCommand.class );
 
         builder.withCommands( StartCommand.class, StopCommand.class, RestartCommand.class, UpdateCommand.class );
-        builder.withDefaultCommand( HelpCommand.class );
+
+        builder.withDefaultCommand( TrayCommand.class );
 
         final CliRunnable cmd = builder.build().parse( args );
 
