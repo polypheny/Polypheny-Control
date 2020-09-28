@@ -1,5 +1,9 @@
 # Polypheny Control
-_Polypheny Control_ allows to easily deploy and monitor Polypheny-DB. 
+Polypheny Control allows to easily setup and monitor Polypheny-DB. It takes care of pulling the required repositories and executing the builds. 
+
+Originally, Polypheny Control has been designed as a tool for automating the evaluation and benchmarking of Polypheny-DB. Its integrated REST interface allows to easily integrate it into complex benchmarking scenarios.
+
+Due to its easy to use user-interface, Polypheny Control is the recommended way for setting up Polypheny-DB.
 
 
 ## Getting Started
@@ -13,20 +17,37 @@ Thanks to [JGit](https://github.com/eclipse/jgit), Polypheny Control contains a 
 
 ### Setup
 Download the latest [polypheny-control.jar](https://github.com/polypheny/Polypheny-Control/releases/latest) from the release section. 
-To start the Web-UI execute `polypheny-control.jar` by specifying the parameter `control`.
+
+On systems with a desktop environment, Polypheny Control can be started by double-clicking the JAR file. Polypheny Control then adds itself to the system tray.
+
+Alternatively, you can also execute the JAR file with the argument `tray`:
+```
+java -jar polypheny-control.jar tray
+```
+
+#### Headless
+Polypheny Control can be started in healess mode by specifying the parameter `control`:
 
 ```
 java -jar polypheny-control.jar control
 ```
 
-The interface can now be accessed on port 8070. This port can be changed using the parameter `-p`:
+The browser-based user interface can now be accessed on port 8070. This port can be changed using the parameter `-p`:
 
 ```
 java -jar polypheny-control.jar control -p 8070
 ```
 
-We strongly recommend not to use port 8080, 8081 and 8082 because these are the default ports of services offered by Polypheny-DB.
+We strongly recommend not to use any port between 8080 and 8089 as these are the default ports of services offered by Polypheny-DB.
 
+
+### First Steps
+
+After starting Polypheny Control, open the dashboard in your browser of choice by navigating to `localhost:8070`. If Polypheny Control is running in tray mode, the dashboard can also be opened by clicking on the icon in the system tray and selecting `dashboard`.
+
+In order to start Polypheny-DB, we first need to trigger a build. This can be done by clicking on the :arrows_counterclockwise: button. When the build has completed, run Polypheny-DB by clicking on :arrow_forward:.
+
+You can now open the Polypheny-UI by opening `localhost:8080` in your browser. 
 
 ## Roadmap
 See the [open issues](https://github.com/polypheny/Polypheny-Control/issues) for a list of proposed features (and known issues).
@@ -48,7 +69,7 @@ _Polypheny Control_ builds upon the great work of several other open source proj
 * [jquery.serializeJSON](https://github.com/marioizquierdo/jquery.serializeJSON): Serialize an HTML Form to a JavaScript Object.
 * [Tooltipster](https://iamceege.github.io/tooltipster/): jQuery plugin for modern tooltips.
 
-All those libraries are imported using [WebJars](https://www.webjars.org/).
+All these libraries are imported using [WebJars](https://www.webjars.org/).
 
 
 #### Backend
@@ -63,7 +84,7 @@ All those libraries are imported using [WebJars](https://www.webjars.org/).
 * [Typesafe Config](https://lightbend.github.io/config/): A configuration library using HOCON files.
 * [WinP](http://winp.kohsuke.org/): Windows process management library.
 
-Those projects are used "as is" and are integrated as libraries.
+These projects are used "as is" and are integrated as libraries.
 
 
 ## License
