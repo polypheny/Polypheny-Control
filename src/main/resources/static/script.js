@@ -122,8 +122,9 @@ $('#btn-restart').click(function () {
 });
 
 $('#btn-update').click(function () {
-    $('#dashboardContent').hide();
-    $('#updateContent').show();
+    $( '#dashboardContent' ).hide();
+    $( '#config-loading' ).hide();
+    $( '#updateContent' ).show();
     sendRequest("control/update");
 });
 
@@ -153,7 +154,8 @@ $('.btn-back').click(function () {
     $('#updateContent').hide();
     $('#logContent').hide();
     $('#configContent').hide();
-    $('#settingsContent').hide();
+    $( '#settingsContent' ).hide();
+    $( '#config-loading' ).hide();
 });
 
 $('#saveConfigs').click(function () {

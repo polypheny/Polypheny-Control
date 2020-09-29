@@ -62,6 +62,8 @@ import org.eclipse.jgit.lib.BranchTrackingStatus;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryCache;
+import org.eclipse.jgit.util.FS;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
@@ -494,7 +496,17 @@ public class ServiceManager {
         }
         try {
             Git git = Git.open( pdbBuildDir );
-            val oldCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            if ( !existsRemoteBranchWithName( git, branch ) ) {
+                throw new RuntimeException( "There is no branch with the name " + branch + " on remote of the Polypheny-DB repo!" );
+            }
+            String oldCommitId;
+            try {
+                oldCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            } catch ( NullPointerException e ) {
+                // This e.g. happens if the working copy is in an invalid state (not the repo itself)
+                oldCommitId = "-1";
+                requiresBuild = true;
+            }
             if ( !existsLocalBranchWithName( git, branch ) ) {
                 git.branchCreate()
                         .setName( branch )
@@ -509,7 +521,7 @@ public class ServiceManager {
             requiresBuild |= !oldCommitId.equals( newCommitId );
             git.close();
         } catch ( GitAPIException | IOException e ) {
-            throw new RuntimeException( e );
+            throw new RuntimeException( "Exception while pulling Polypheny-DB repo", e );
         }
         log.info( "> Pulling Polypheny-DB repository ... finished." );
         if ( clientCommunicationStream != null ) {
@@ -590,7 +602,6 @@ public class ServiceManager {
     public static void clonePdbRepository( ClientCommunicationStream clientCommunicationStream, Config configuration ) {
         val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
         val repo = configuration.getString( "pcrtl.pdbms.repo" );
-        val branch = configuration.getString( "pcrtl.pdbms.branch" );
 
         log.info( "> Cloning Polypheny-DB repository ..." );
         if ( clientCommunicationStream != null ) {
@@ -600,11 +611,11 @@ public class ServiceManager {
             final Git git = Git.cloneRepository()
                     .setURI( repo )
                     .setDirectory( pdbBuildDir )
-                    .setBranch( branch )
+                    .setBranch( "master" )
                     .call();
             git.close();
         } catch ( GitAPIException e ) {
-            throw new RuntimeException( e );
+            throw new RuntimeException( "Exception while cloning Polypheny-DB repo", e );
         }
         log.info( "> Cloning Polypheny-DB repository ... finished." );
         if ( clientCommunicationStream != null ) {
@@ -649,7 +660,17 @@ public class ServiceManager {
         }
         try {
             Git git = Git.open( uiBuildDir );
-            val oldCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            if ( !existsRemoteBranchWithName( git, branch ) ) {
+                throw new RuntimeException( "There is no branch with the name " + branch + " on remote of the Polypheny-UI repo!" );
+            }
+            String oldCommitId;
+            try {
+                oldCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            } catch ( NullPointerException e ) {
+                // This e.g. happens if the working copy is in an invalid state (not the repo itself)
+                oldCommitId = "-1";
+                requiresInstall = true;
+            }
             if ( !existsLocalBranchWithName( git, branch ) ) {
                 git.branchCreate()
                         .setName( branch )
@@ -664,7 +685,7 @@ public class ServiceManager {
             requiresInstall |= !oldCommitId.equals( newCommitId );
             git.close();
         } catch ( GitAPIException | IOException e ) {
-            throw new RuntimeException( e );
+            throw new RuntimeException( "Exception while cloning Polypheny-DB repo", e );
         }
         log.info( "> Pulling Polypheny-UI repository ... finished." );
         if ( clientCommunicationStream != null ) {
@@ -708,7 +729,6 @@ public class ServiceManager {
     public static void clonePuiRepository( ClientCommunicationStream clientCommunicationStream, Config configuration ) {
         val buildDir = configuration.getString( "pcrtl.builddir" );
         val repo = configuration.getString( "pcrtl.ui.repo" );
-        val branch = configuration.getString( "pcrtl.ui.branch" );
         val uiBuildDir = new File( buildDir, "ui" );
 
         log.info( "> Cloning Polypheny-UI repository ..." );
@@ -719,11 +739,11 @@ public class ServiceManager {
             final Git git = Git.cloneRepository()
                     .setURI( repo )
                     .setDirectory( uiBuildDir )
-                    .setBranch( branch )
+                    .setBranch( "master" )
                     .call();
             git.close();
         } catch ( GitAPIException e ) {
-            throw new RuntimeException( e );
+            throw new RuntimeException( "Exception while cloning Polypheny-UI repo", e );
         }
         log.info( "> Cloning Polypheny-UI repository ... finished." );
         if ( clientCommunicationStream != null ) {
@@ -828,8 +848,22 @@ public class ServiceManager {
     }
 
 
+    private static boolean existsRemoteBranchWithName( Git git, String branchName ) throws GitAPIException {
+        List<Ref> branches = git.branchList().setListMode( ListMode.REMOTE ).call();
+        for ( Ref ref : branches ) {
+            if ( ref.getName().equals( "refs/remotes/origin/" + branchName ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     private static boolean validateGitRepository( Repository repo ) {
         try {
+            if ( !RepositoryCache.FileKey.isGitRepository( repo.getDirectory(), FS.DETECTED ) ) {
+                return false;
+            }
             for ( Ref ref : repo.getRefDatabase().getRefs() ) {
                 if ( ref.getObjectId() == null ) {
                     continue;
