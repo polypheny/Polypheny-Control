@@ -3,8 +3,8 @@ group "org.polypheny"
 
 
 def versionMajor = 1
-def versionMinor = 0.2
-def versionQualifier = ""
+def versionMinor = 1
+def versionQualifier = "-SNAPSHOT"
 version = versionMajor + "." + versionMinor + versionQualifier
 
 
