@@ -87,6 +87,15 @@ public class ServiceManager {
     private static boolean currentlyUpdating = false;
 
 
+    static {
+        Runtime.getRuntime().addShutdownHook( new Thread( () -> {
+            if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
+                polyphenyDbProcess.kill();
+            }
+        } ) );
+    }
+
+
     /**
      * This block restores the PolyphenyDbProcess on startup by checking the PID file. It will create a PolyphenyDbProcess
      * from the PID if the file contains a PID number. Then it will check if the process is still alive.
