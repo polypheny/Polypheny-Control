@@ -158,12 +158,10 @@ public abstract class PolyphenyDbProcess {
             try {
                 val kill = Runtime.getRuntime().exec( "TASKKILL /PID " + getPid() ); // SIGTERM -- CTRL + C
                 if ( kill.waitFor( 1, TimeUnit.MINUTES ) ) {
-                    // terminated within the time
-                    if ( kill.exitValue() == 0 ) {
-                        return;
+                    if ( isAlive() ) {
+                        killForcibly();
                     }
                 }
-                killForcibly();
             } catch ( IOException e ) {
                 log.error( "Exception while trying to kill <<me:{}>> via PID on Unix.", getPid(), e );
             } catch ( InterruptedException e ) {
