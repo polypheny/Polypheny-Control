@@ -562,7 +562,8 @@ public class ServiceManager {
         }
         try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( pdbBuildDir ).connect() ) {
             BuildLauncher buildLauncher = connection.newBuild()
-                    .setStandardOutput( System.out )
+                    .setStandardOutput( null )
+                    .setStandardError( System.err )
                     .forTasks( "build" )
                     .withArguments( "-x", "test" );
 
@@ -718,7 +719,8 @@ public class ServiceManager {
         }
         try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( uiBuildDir ).connect() ) {
             BuildLauncher buildLauncher = connection.newBuild()
-                    .setStandardOutput( System.out )
+                    .setStandardOutput( null )
+                    .setStandardError( System.err )
                     .forTasks( "install" )
                     .withArguments( "-x", "test" );
 
