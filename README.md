@@ -49,6 +49,7 @@ In order to start Polypheny-DB, we first need to trigger a build. This can be do
 
 You can now open the Polypheny-UI by opening `localhost:8080` in your browser. 
 
+
 ## Roadmap
 See the [open issues](https://github.com/polypheny/Polypheny-Control/issues) for a list of proposed features (and known issues).
 
@@ -88,4 +89,4 @@ These projects are used "as is" and are integrated as libraries.
 
 
 ## License
-The MIT License (MIT)
+The Apache 2.0 License
