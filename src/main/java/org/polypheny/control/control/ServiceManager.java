@@ -797,7 +797,11 @@ public class ServiceManager {
                 map.put( "pdb-behind", "0" );
             }
         } catch ( IOException | GitAPIException e ) {
-            log.error( "Error while retrieving pdb version", e );
+            if ( currentlyUpdating ) {
+                // ignore exceptions while updating repo
+            } else {
+                log.error( "Error while retrieving pdb version", e );
+            }
         }
 
         // Get PUI branch and commit
@@ -828,7 +832,11 @@ public class ServiceManager {
                 map.put( "pui-behind", "0" );
             }
         } catch ( IOException | GitAPIException e ) {
-            log.error( "Error while retrieving pui version", e );
+            if ( currentlyUpdating ) {
+                // ignore exceptions while updating repo
+            } else {
+                log.error( "Error while retrieving pui version", e );
+            }
         }
 
         return map;
