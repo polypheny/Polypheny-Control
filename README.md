@@ -51,7 +51,7 @@ You can now open the Polypheny-UI by opening `localhost:8080` in your browser.
 
 
 ## Roadmap
-See the [open issues](https://github.com/polypheny/Polypheny-Control/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/polypheny/Polypheny-DB/labels/A-control) for a list of proposed features (and known issues).
 
 
 ## Contributing
