@@ -28,6 +28,7 @@ import lombok.Data;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
+import org.polypheny.control.client.ClientType;
 import org.polypheny.control.control.ServiceManager;
 
 
@@ -158,11 +159,6 @@ class ClientRegistry {
             this.clientType = ClientType.UNKNOWN;
         }
 
-    }
-
-
-    enum ClientType {
-        UNKNOWN, BROWSER, BENCHMARKER
     }
 
 }
