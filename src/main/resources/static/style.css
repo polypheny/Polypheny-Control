@@ -37,25 +37,24 @@
 
 #footer-left {
     text-align: left;
-    padding: 0 15px;
+    padding: 0 1vw;
     width: 25%;
-    font-size: 1.2vw;
+    font-size: 1vw;
 }
 
 #footer-middle {
     text-align: center;
-    padding: 2px 0 0 0;
+    padding: 0.2vw 0 0 0;
     width: 50%;
-    line-height: 20px;
-    size: 1em;
-    font-size: 1.2vw;
+    line-height: 1.6vw;
+    font-size: 1vw;
 }
 
 #footer-right {
     text-align: right;
-    padding: 0 15px;
+    padding: 0 1vw;
     width: 25%;
-    font-size: 1.2vw;
+    font-size: 1vw;
 }
 
 
