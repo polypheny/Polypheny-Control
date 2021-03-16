@@ -16,7 +16,7 @@ import org.polypheny.control.control.ConfigManager;
 public class AuthenticationFileManager {
 
     private static File authenticationFile;
-    private static HashMap<String, String> authenticationFileData;
+    private static HashMap<String, String> authenticationData;
 
 
     private static void loadAuthenticationFile() {
@@ -28,38 +28,43 @@ public class AuthenticationFileManager {
     }
 
 
-    // Key is Name; Value is Encrypted Password
-    public static HashMap<String, String> getAuthenticationFileData() {
-        if ( authenticationFileData == null ) {
+    private static void loadAuthenticationDataFromFile() {
+        if ( authenticationData == null ) {
             loadAuthenticationFile();
-            authenticationFileData = new HashMap<>();
+            authenticationData = new HashMap<>();
             try ( FileReader fileReader = new FileReader( authenticationFile );
                     BufferedReader bufferedReader = new BufferedReader( fileReader ) ) {
                 bufferedReader.lines().map( line -> line.split( "\\s" ) ).forEach( data -> {
                     if ( data.length == 2 ) {
-                        authenticationFileData.put( data[0], data[1] );
+                        authenticationData.put( data[0], data[1] );
                     } else {
                         // Happens only if file format was changed
-                        // TODO: Throw exception
+                        throw new RuntimeException( "Authentication File Data Format Invalid." );
                     }
                 } );
             } catch ( IOException e ) {
                 e.printStackTrace();
             }
         }
-        return authenticationFileData;
     }
 
 
-    public static void setAuthenticationFileData( HashMap<String, String> _authenticationFileData ) {
-        if ( _authenticationFileData == null ) {
-            throw new NullPointerException( "Data to be written cannot be null." );
+    // Key is Name; Value is Encrypted Password
+    public static HashMap<String, String> getAuthenticationData() {
+        loadAuthenticationDataFromFile();
+        return authenticationData;
+    }
+
+
+    public static void writeAuthenticationDataToFile() {
+        if ( authenticationData == null ) {
+            // Data was never modified. So ignore call.
+            return;
         }
         try ( FileWriter fileWriter = new FileWriter( authenticationFile );
                 BufferedWriter bufferedWriter = new BufferedWriter( fileWriter ) ) {
             loadAuthenticationFile();
-            authenticationFileData = _authenticationFileData;
-            for ( Entry<String, String> entry : authenticationFileData.entrySet() ) {
+            for ( Entry<String, String> entry : authenticationData.entrySet() ) {
                 String name = entry.getKey();
                 String password = entry.getValue();
                 bufferedWriter.write( name + " " + password + "\n" );
