@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-html {
+ html {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -22,56 +22,58 @@ html {
 }
 
 .footer {
-    position: absolute;
-    bottom: 0;
     width: 100%;
-    height: 55px; /* Set the fixed height of the footer here */
-    line-height: 50px; /* Vertically center the text there */
-    background-color: rgba(0, 0, 0, 0.28);
     left: 0;
+    bottom: 0;
+    min-height: 6vh;
+    line-height: 6vh; /* Vertically center the text there */
+    background-color: rgba(0, 0, 0, 0.28);
 }
 
 .footer-table {
     width: 100%;
     font-weight: 400;
-    table-layout: fixed;
 }
 
 #footer-left {
     text-align: left;
-    padding: 0 15px;
+    padding: 0 1vw;
     width: 25%;
+    font-size: 1vw;
 }
 
 #footer-middle {
     text-align: center;
-    padding: 2px 0 0 0;
+    padding: 0.2vw 0 0 0;
     width: 50%;
-    line-height: 20px;
-    size: 1em;
+    line-height: 1.3vw;
+    font-size: 1vw;
 }
 
 #footer-right {
     text-align: right;
-    padding: 0 15px;
+    padding: 0 1vw;
     width: 25%;
+    font-size: 1vw;
 }
 
 
 body {
     /* background-color: #A5D7D2; */
     background-color: #3B83C8;
-    margin-bottom: 55px; /* Margin bottom by footer height */
+    margin: 0;
 }
 
 .main {
-    max-width: 1500px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 100%;
+    min-height: calc(100vh - 6vh - 3.5vw); /* 6vh is height of footer & 3.5vw is the approximate margin between heading and top of the page*/
 }
 
 .dashboard {
     margin-left: 10%;
+    text-align: center;
+    margin-bottom: 5%;
+    border-collapse: collapse;
 }
 
 .circle {
@@ -79,11 +81,11 @@ body {
     vertical-align: middle;
     text-align: center;
     background-color: white;
-    width: 150px;
-    height: 150px;
-    -moz-border-radius: 190px;
-    -webkit-border-radius: 190px;
-    border-radius: 190px;
+    width: 10vw;
+    height: 10vw;
+    -moz-border-radius: 5vw;
+    -webkit-border-radius: 5vw;
+    border-radius: 5vw;
     cursor: pointer;
     box-shadow: inset 0 0 0 0 rgba(200, 95, 66, 0.4), inset 0 0 0 16px rgba(255, 255, 255, 0.6), 0 1px 2px rgba(0, 0, 0, 0.1);
     transition: all 0.4s ease-in-out;
@@ -94,8 +96,8 @@ body {
 .heading {
     text-align: center;
     font-family: sans-serif;
-    font-size: 500%;
-    margin-bottom: 30px;
+    font-size: 5vw;
+    margin-bottom: 2.8%;
 }
 
 .content {
