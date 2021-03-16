@@ -24,6 +24,7 @@
 .footer {
     width: 100%;
     left: 0;
+    bottom: 0;
     min-height: 6vh;
     line-height: 6vh; /* Vertically center the text there */
     background-color: rgba(0, 0, 0, 0.28);
