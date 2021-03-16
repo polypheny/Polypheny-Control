@@ -22,6 +22,9 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
 import java.io.Console;
+import java.util.HashMap;
+import org.polypheny.control.authentication.AuthenticationDataManager;
+import org.polypheny.control.authentication.AuthenticationFileManager;
 import org.polypheny.control.authentication.AuthenticationManager;
 import org.polypheny.control.control.ServiceManager;
 
@@ -42,6 +45,9 @@ public class Main {
         builder.withCommand( TrayCommand.class );
 
         builder.withCommands( StartCommand.class, StopCommand.class, RestartCommand.class, UpdateCommand.class );
+
+        // define user management commands
+        builder.withCommands( AddUserCommand.class, RemoveUserCommand.class, ModifyUserCommand.class );
 
         builder.withDefaultCommand( TrayCommand.class );
 
@@ -80,6 +86,7 @@ public class Main {
 
         @Override
         public int _run_() {
+            ensureAuthenticated();
             if ( tail ) {
                 ServiceManager.start( null, true );
 
@@ -96,7 +103,6 @@ public class Main {
 
                 return 0;
             } else {
-                ensureAuthenticated();
                 return ServiceManager.start( null, false ) ? 0 : 1;
             }
         }
@@ -132,6 +138,75 @@ public class Main {
         public int _run_() {
             ensureAuthenticated();
             return ServiceManager.update( null ) ? 0 : 1;
+        }
+    }
+
+
+    @Command(name = "adduser", description = "Add a user")
+    public static class AddUserCommand extends AbstractCommand {
+
+        @Override
+        public int _run_() {
+            HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
+            Console console = System.console();
+            String name = console.readLine( "Name: " );
+            if ( authenticationData.get( name ) != null ) {
+                System.err.println( "A user with the same name exists! Try a different name!" );
+                return 1;
+            }
+            String password = new String( console.readPassword( "Password: " ) );
+            String confPassword = new String( console.readPassword( "Confirm Password: " ) );
+            if ( !password.equals( confPassword ) ) {
+                System.err.println( "Passwords do not match! Try Again!" );
+                return 1;
+            }
+            AuthenticationDataManager.addAuthenticationData( name, password );
+            AuthenticationFileManager.writeAuthenticationDataToFile();
+            return 0;
+        }
+    }
+
+
+    @Command(name = "remuser", description = "Remove a user")
+    public static class RemoveUserCommand extends AbstractCommand {
+
+        @Override
+        public int _run_() {
+            HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
+            Console console = System.console();
+            String name = console.readLine( "Name: " );
+            if ( authenticationData.get( name ) == null ) {
+                System.err.println( "User with the name \"" + name + "\" does not exist!" );
+                return 1;
+            }
+            AuthenticationDataManager.removeAuthenticationData( name );
+            AuthenticationFileManager.writeAuthenticationDataToFile();
+            return 0;
+        }
+    }
+
+
+    @Command(name = "moduser", description = "Modify a user's password")
+    public static class ModifyUserCommand extends AbstractCommand {
+
+        @Override
+        public int _run_() {
+            HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
+            Console console = System.console();
+            String name = console.readLine( "Name: " );
+            if ( authenticationData.get( name ) == null ) {
+                System.err.println( "User with the name \"" + name + "\" does not exist." );
+                return 1;
+            }
+            String password = new String( console.readPassword( "Password: " ) );
+            String confPassword = new String( console.readPassword( "Confirm Password: " ) );
+            if ( !password.equals( confPassword ) ) {
+                System.err.println( "Passwords do not match! Try Again!" );
+                return 1;
+            }
+            AuthenticationDataManager.modifyAuthenticationData( name, password );
+            AuthenticationFileManager.writeAuthenticationDataToFile();
+            return 0;
         }
     }
 
