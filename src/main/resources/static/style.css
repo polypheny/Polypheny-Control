@@ -24,8 +24,8 @@
 .footer {
     width: 100%;
     left: 0;
-    bottom: 0;
-    line-height: 50px; /* Vertically center the text there */
+    min-height: 6vh;
+    line-height: 6vh; /* Vertically center the text there */
     background-color: rgba(0, 0, 0, 0.28);
 }
 
@@ -38,6 +38,7 @@
     text-align: left;
     padding: 0 15px;
     width: 25%;
+    font-size: 1.2vw;
 }
 
 #footer-middle {
@@ -46,12 +47,14 @@
     width: 50%;
     line-height: 20px;
     size: 1em;
+    font-size: 1.2vw;
 }
 
 #footer-right {
     text-align: right;
     padding: 0 15px;
     width: 25%;
+    font-size: 1.2vw;
 }
 
 
@@ -63,7 +66,7 @@ body {
 
 .main {
     max-width: 100%;
-    min-height: calc(100vh - 40px);
+    min-height: calc(100vh - 6vh - 3.5vw); /* 6vh is height of footer & 3.5vw is the approximate margin between heading and top of the page*/
 }
 
 .dashboard {
