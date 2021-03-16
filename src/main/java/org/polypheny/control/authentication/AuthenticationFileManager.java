@@ -1,6 +1,7 @@
 package org.polypheny.control.authentication;
 
 
+import com.typesafe.config.ConfigFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import lombok.val;
-import org.polypheny.control.control.ConfigManager;
 
 
 public class AuthenticationFileManager {
@@ -21,7 +21,7 @@ public class AuthenticationFileManager {
 
     private static void loadAuthenticationFile() {
         if ( authenticationFile == null ) {
-            val config = ConfigManager.getConfig();
+            val config = ConfigFactory.load();
             String workingDir = config.getString( "pcrtl.workingdir" );
             authenticationFile = new File( workingDir, "passwd" );
         }
