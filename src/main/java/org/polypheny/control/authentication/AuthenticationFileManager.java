@@ -4,7 +4,6 @@ package org.polypheny.control.authentication;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,12 +19,19 @@ public class AuthenticationFileManager {
     private static HashMap<String, String> authenticationFileData;
 
 
-    // Key is Name; Value is Encrypted Password
-    public static HashMap<String, String> getAuthenticationFileData() {
-        if ( authenticationFileData == null ) {
+    private static void loadAuthenticationFile() {
+        if ( authenticationFile == null ) {
             val config = ConfigManager.getConfig();
             String workingDir = config.getString( "pcrtl.workingdir" );
             authenticationFile = new File( workingDir, "passwd" );
+        }
+    }
+
+
+    // Key is Name; Value is Encrypted Password
+    public static HashMap<String, String> getAuthenticationFileData() {
+        if ( authenticationFileData == null ) {
+            loadAuthenticationFile();
             authenticationFileData = new HashMap<>();
             try ( FileReader fileReader = new FileReader( authenticationFile );
                     BufferedReader bufferedReader = new BufferedReader( fileReader ) ) {
@@ -49,14 +55,10 @@ public class AuthenticationFileManager {
         if ( _authenticationFileData == null ) {
             throw new NullPointerException( "Data to be written cannot be null." );
         }
-        if ( authenticationFile == null ) {
-            val config = ConfigManager.getConfig();
-            String workingDir = config.getString( "pcrtl.workingdir" );
-            authenticationFile = new File( workingDir, "passwd" );
-        }
-        authenticationFileData = _authenticationFileData;
         try ( FileWriter fileWriter = new FileWriter( authenticationFile );
                 BufferedWriter bufferedWriter = new BufferedWriter( fileWriter ) ) {
+            loadAuthenticationFile();
+            authenticationFileData = _authenticationFileData;
             for ( Entry<String, String> entry : authenticationFileData.entrySet() ) {
                 String name = entry.getKey();
                 String password = entry.getValue();
