@@ -21,6 +21,8 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
+import java.io.Console;
+import org.polypheny.control.authentication.AuthenticationManager;
 import org.polypheny.control.control.ServiceManager;
 
 
@@ -50,14 +52,32 @@ public class Main {
     }
 
 
+    private static String[] getCredentials() {
+        Console console = System.console();
+        String name = console.readLine( "Name: " );
+        String password = new String( console.readPassword( "Password: " ) );
+        return new String[]{ name, password };
+    }
+
+
+    private static void ensureAuthenticated() {
+        String[] credentials = getCredentials();
+        if ( !AuthenticationManager.clientExists( credentials[0], credentials[1] ) ) {
+            System.err.println( "Incorrect Credentials! Try Again!" );
+            System.exit( 1 );
+        }
+    }
+
+
     @Command(name = "start", description = "Start Polypheny-DB")
     public static class StartCommand extends AbstractCommand {
 
         @Option(name = { "-t", "--tail" }, description = "Runs (java) tail on the log output")
-        private boolean tail = false;
+        private final boolean tail = false;
 
         //
         private boolean exit = false;
+
 
         @Override
         public int _run_() {
@@ -69,7 +89,7 @@ public class Main {
                 while ( !exit ) {
                     Thread.yield();
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep( 1000 );
                     } catch ( InterruptedException e ) {
                         // ignore
                     }
@@ -77,6 +97,7 @@ public class Main {
 
                 return 0;
             } else {
+                ensureAuthenticated();
                 return ServiceManager.start( null, false ) ? 0 : 1;
             }
         }
@@ -88,6 +109,7 @@ public class Main {
 
         @Override
         public int _run_() {
+            ensureAuthenticated();
             return ServiceManager.stop( null ) ? 0 : 1;
         }
     }
@@ -98,6 +120,7 @@ public class Main {
 
         @Override
         public int _run_() {
+            ensureAuthenticated();
             return ServiceManager.restart( null, false ) ? 0 : 1;
         }
     }
@@ -108,6 +131,7 @@ public class Main {
 
         @Override
         public int _run_() {
+            ensureAuthenticated();
             return ServiceManager.update( null ) ? 0 : 1;
         }
     }
