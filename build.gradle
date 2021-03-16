@@ -43,6 +43,7 @@ repositories {
 
 
 apply plugin: "java-library"
+apply plugin: "maven-publish"
 apply plugin: "idea"
 apply plugin: "application"
 apply plugin: "io.freefair.lombok"
@@ -104,6 +105,10 @@ dependencies {
     implementation group: "org.eclipse.jgit", name: "org.eclipse.jgit", version: "5.10.0.202012080955-r" // EDL
     implementation group: "org.gradle", name: "gradle-tooling-api", version: "6.7.1" // Apache 2.0
 
+    // Rest requests (for connector lib)
+    implementation group: 'com.konghq', name: 'unirest-java', version: '3.11.11' // License: MIT
+    implementation group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.1' // License: MIT
+
     // Webjar (JS libraries)
     webjars group: "org.webjars", name: "font-awesome", version: "5.15.1" // MIT, SIL OFL, and CC BY licenses
     webjars group: "org.webjars", name: "jquery", version: "3.5.1" // MIT
@@ -161,6 +166,34 @@ artifacts {
     archives distZip // distribution zip
     archives buildDeb // Debian Package
 }
+
+publishing {
+    publications {
+        "${project.name}"(MavenPublication) {
+            from components.java
+            artifact jar
+            artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
+            artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
+            pom {
+                name = 'Polypheny Control'
+                description = 'A tool for deploying and managing Polypheny-DB.'
+                url = 'https://polypheny.org'
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0'
+                    }
+                }
+                scm {
+                    connection = 'https://github.com/polypheny/Polypheny-Control.git'
+                    url = 'https://github.com/polypheny/Polypheny-Control'
+                }
+            }
+        }
+    }
+}
+task generatePom(group: 'publishing', dependsOn: "generatePomFileFor${project.name.capitalize()}Publication")
+
 
 
 ospackage {
