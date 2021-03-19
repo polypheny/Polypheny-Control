@@ -67,7 +67,7 @@ public class ControlTest {
 
     @Test
     public void integrationTest() throws URISyntaxException, InterruptedException {
-        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", ClientType.BROWSER );
+        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", ClientType.BROWSER, null );
 
         // Update and build Polypheny
         controlConnector.updatePolypheny();
