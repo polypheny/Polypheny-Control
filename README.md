@@ -7,7 +7,7 @@ Due to its easy to use user-interface, Polypheny Control is the recommended way 
 
 
 ## Getting Started
-This section describes how to setup Polypheny Control to build and run Polypheny-DB.
+This section describes how to set up Polypheny Control to build and run Polypheny-DB.
 
 
 ### Requirements
@@ -55,7 +55,7 @@ See the [open issues](https://github.com/polypheny/Polypheny-DB/labels/A-control
 
 
 ## Contributing
-We highly welcome your contributions to _Polypheny Control_. If you would like to contribute, please fork the repository and submit your changes as a pull request. Please consult our [Admin Repository](https://github.com/polypheny/Admin) for guidelines and additional information.
+We highly welcome your contributions to _Polypheny Control_. If you would like to contribute, please fork the repository and submit your changes as a pull request. Please consult our [Admin Repository](https://github.com/polypheny/Admin) and our [Website](https://polypheny.org) for guidelines and additional information.
 
 Please note that we have a [code of conduct](https://github.com/polypheny/Admin/blob/master/CODE_OF_CONDUCT.md). Please follow it in all your interactions with the project. 
 
@@ -77,12 +77,16 @@ All these libraries are imported using [WebJars](https://www.webjars.org/).
 * [Airline](https://rvesse.github.io/airline/): Annotation-driven Java library for building command line interfaces.
 * [Apache Commons](http://commons.apache.org/): A bunch of useful Java utility classes.
 * [GSON](https://github.com/google/gson): Convert Java Objects into their JSON representation and vice versa.
+* [Guava](https://github.com/google/guava): Set of special collection types.
 * [Javalin](https://javalin.io/): A simple and lightweight java web framework.
+* [Java-WebSocket](http://tootallnate.github.io/Java-WebSocket/): WebSocket server and client implementation for Java.
 * [JGit](https://www.eclipse.org/jgit/): Pure Java implementation of the Git version control system.
+* [JSON.simple](https://code.google.com/archive/p/json-simple/): A simple Java toolkit for JSON.
 * [Log4j](https://logging.apache.org/log4j/2.x/): Fast and flexible logging framework for Java.
 * [Project Lombok](https://projectlombok.org/): A library providing compiler annotations for tedious tasks.
 * [SLF4J](http://www.slf4j.org/): Provides a logging API by means of a facade pattern.
 * [Typesafe Config](https://lightbend.github.io/config/): A configuration library using HOCON files.
+* [Unirest](http://kong.github.io/unirest-java/): A lightweight HTTP client library.
 * [WinP](http://winp.kohsuke.org/): Windows process management library.
 
 These projects are used "as is" and are integrated as libraries.
