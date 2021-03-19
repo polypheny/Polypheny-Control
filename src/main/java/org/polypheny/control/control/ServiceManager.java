@@ -704,7 +704,24 @@ public class ServiceManager {
             return false;
         }
 
-        // Build
+        // Clean
+        log.info( "> Cleaning Polypheny-UI ..." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Cleaning Polypheny-UI ..." );
+        }
+        try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( uiBuildDir ).connect() ) {
+            BuildLauncher buildLauncher = connection.newBuild()
+                    .setStandardOutput( null )
+                    .setStandardError( System.err )
+                    .forTasks( "clean" );
+            buildLauncher.run();
+        }
+        log.info( "> Cleaning Polypheny-UI ... finished." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Cleaning Polypheny-UI ... finished." );
+        }
+
+        // Install
         log.info( "> Installing Polypheny-UI ..." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Installing Polypheny-UI ..." );
