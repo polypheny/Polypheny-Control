@@ -46,7 +46,7 @@ configurations {
 
 
 dependencies {
-// Log4J
+    // Log4J
     implementation group: "org.slf4j", name: "slf4j-api", version: "1.7.30" // License: MIT
     implementation group: "org.apache.logging.log4j", name: "log4j-slf4j-impl", version: "2.13.1" // License: Apache 2.0
     implementation group: "org.apache.logging.log4j", name: "log4j-core", version: "2.13.1" // License: Apache 2.0
@@ -137,11 +137,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 shadowJar {
-    classifier = ""
+
 }
 assemble.dependsOn shadowJar
 artifacts {
-    //archives jar // regular jar containing only the compiled source
+    archives jar // regular jar containing only the compiled source
     archives shadowJar // fat jar which additionally contains all dependencies
     archives sourcesJar // jar file containing the java doc files
     archives javadocJar // jar file containing the source files
@@ -190,6 +190,11 @@ configurations.archives.artifacts.with { archives ->
     }
 }
 
+task finalize {
+    doLast {
+        println('finally!')
+    }
+}
 
 task extractWebjars(type: Copy) {
     configurations.webjars.each {jar ->
