@@ -443,7 +443,7 @@ public class ServiceManager {
     }
 
 
-    private static void buildPdb( final ClientCommunicationStream clientCommunicationStream, Config configuration, boolean forceInstall ) {
+    private static void buildPdb( final ClientCommunicationStream clientCommunicationStream, Config configuration, boolean forceUiBuild ) {
         boolean requiresBuild = false;
 
         val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
@@ -530,7 +530,7 @@ public class ServiceManager {
         }
 
         // Check if we need to build
-        if ( !requiresBuild && !forceInstall && oldJar.exists() ) {
+        if ( !requiresBuild && !forceUiBuild && oldJar.exists() ) {
             log.info( "> No changes to PDB repository and therefore no need to rebuild Polypheny-DB ..." );
             if ( clientCommunicationStream != null ) {
                 clientCommunicationStream.send( "> No changes to PDB repository and therefore no need to rebuild Polypheny-DB ..." );
@@ -545,6 +545,24 @@ public class ServiceManager {
                 }
             }
             return;
+        }
+
+        if ( forceUiBuild ) {
+            log.info( "> Force updating Polypheny-UI ..." );
+            if ( clientCommunicationStream != null ) {
+                clientCommunicationStream.send( "> Force updating Polypheny-UI ..." );
+            }
+            try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( pdbBuildDir ).connect() ) {
+                BuildLauncher buildLauncher = connection.newBuild()
+                        .setStandardOutput( null )
+                        .setStandardError( System.err )
+                        .forTasks( ":webui:clean" );
+                buildLauncher.run();
+            }
+            log.info( "> Force updating Polypheny-UI ... finished." );
+            if ( clientCommunicationStream != null ) {
+                clientCommunicationStream.send( "> Force updating Polypheny-UI ... finished." );
+            }
         }
 
         // Build
