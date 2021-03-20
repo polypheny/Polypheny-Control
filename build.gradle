@@ -11,8 +11,8 @@ plugins {
 group "org.polypheny"
 
 def versionMajor = 1
-def versionMinor = 3
-def versionQualifier = "-SNAPSHOT"
+def versionMinor = 2.2
+def versionQualifier = ""
 version = versionMajor + "." + versionMinor + versionQualifier
 
 mainClassName = "org.polypheny.control.main.Main"
