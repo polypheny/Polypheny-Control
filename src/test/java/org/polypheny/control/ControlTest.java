@@ -34,6 +34,7 @@ import org.polypheny.control.client.ClientType;
 import org.polypheny.control.client.PolyphenyControlConnector;
 import org.polypheny.control.main.ControlCommand;
 
+
 public class ControlTest {
 
     private static Thread thread;

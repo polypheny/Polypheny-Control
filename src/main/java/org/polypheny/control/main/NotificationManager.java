@@ -16,6 +16,7 @@
 
 package org.polypheny.control.main;
 
+
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
 import lombok.Setter;
