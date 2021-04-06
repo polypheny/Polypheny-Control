@@ -33,8 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @Slf4j
@@ -46,9 +44,12 @@ public class PolyphenyControlConnector {
 
     private final Gson gson = new Gson();
 
+    private final LogHandler logHandler;
 
-    public PolyphenyControlConnector( String controlUrl, ClientType clientType ) throws URISyntaxException {
+
+    public PolyphenyControlConnector( String controlUrl, ClientType clientType, LogHandler logHandler ) throws URISyntaxException {
         this.clientType = clientType;
+        this.logHandler = logHandler;
 
         Unirest.config().connectTimeout( 0 );
         Unirest.config().socketTimeout( 0 );
@@ -176,7 +177,6 @@ public class PolyphenyControlConnector {
     private class WebSocket extends WebSocketClient {
 
         private final Gson gson = new Gson();
-        private final Logger CONTROL_MESSAGES_LOGGER = LoggerFactory.getLogger( "CONTROL_MESSAGES_LOGGER" );
 
 
         public WebSocket( URI serverUri ) {
@@ -203,16 +203,24 @@ public class PolyphenyControlConnector {
                 setClientType();
             }
             if ( data.containsKey( "logOutput" ) ) {
-                CONTROL_MESSAGES_LOGGER.info( data.get( "logOutput" ) );
+                if ( logHandler != null ) {
+                    logHandler.handleLogMessage( data.get( "logOutput" ) );
+                }
             }
             if ( data.containsKey( "startOutput" ) ) {
-                CONTROL_MESSAGES_LOGGER.info( data.get( "startOutput" ) );
+                if ( logHandler != null ) {
+                    logHandler.handleStartupMessage( data.get( "startOutput" ) );
+                }
             }
             if ( data.containsKey( "stopOutput" ) ) {
-                CONTROL_MESSAGES_LOGGER.info( data.get( "stopOutput" ) );
+                if ( logHandler != null ) {
+                    logHandler.handleShutdownMessage( data.get( "stopOutput" ) );
+                }
             }
             if ( data.containsKey( "restartOutput" ) ) {
-                CONTROL_MESSAGES_LOGGER.info( data.get( "restartOutput" ) );
+                if ( logHandler != null ) {
+                    logHandler.handleRestartMessage( data.get( "restartOutput" ) );
+                }
             }
             if ( data.containsKey( "updateOutput" ) ) {
                 String logStr = data.get( "updateOutput" );
@@ -220,9 +228,12 @@ public class PolyphenyControlConnector {
                 if ( logStr.startsWith( "Task :" ) && (logStr.endsWith( "started" ) || logStr.endsWith( "skipped" ) || logStr.endsWith( "UP-TO-DATE" ) || logStr.endsWith( "SUCCESS" )) ) {
                     // Ignore this to avoid cluttering the log. These are gradle log massage where everything is fine.
                 } else {
-                    CONTROL_MESSAGES_LOGGER.info( logStr );
+                    if ( logHandler != null ) {
+                        logHandler.handleUpdateMessage( logStr );
+                    }
                 }
             }
+
         }
 
 

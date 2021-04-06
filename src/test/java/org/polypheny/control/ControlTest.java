@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2019-2021 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.polypheny.control;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +68,7 @@ public class ControlTest {
 
     @Test
     public void integrationTest() throws URISyntaxException, InterruptedException {
-        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", ClientType.BROWSER );
+        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", ClientType.BROWSER, null );
 
         // Update and build Polypheny
         controlConnector.updatePolypheny();

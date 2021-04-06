@@ -32,136 +32,140 @@
 </head>
 
 <body onload="setHref()">
-<div class="main">
-    <h1 class="heading">Polypheny Control</h1>
+<div class="root">
+    <div class="main">
+        <h1 class="heading">Polypheny Control</h1>
 
-    <div id="dashboardContent">
-        <table width="80%" class="dashboard" border="0">
-            <tr>
-                <td width="14.3%" height="350px;">
-                    <div class="circle tooltip" id="btn-start" title="Start Polypheny-DB" style="display: none"><i class="fa fa-play fa-5x"></i></div>
-                    <div class="circle tooltip" id="btn-stop" title="Stop Polypheny-DB"><i class="fa fa-stop fa-5x"></i></div>
-                </td>
-                <td width="14.2%"></td>
-                <td width="14.3%">
-                    <div class="circle tooltip" id="btn-restart" title="Restart Polypheny-DB"><i class="fa fa-redo fa-5x"></i></div>
-                </td>
-                <td width="14.2%"></td>
-                <td width="14.3%">
-                    <div class="circle tooltip" id="btn-log" title="Watch the log"><i class="fa fa-bullhorn fa-5x"></i></div>
-                </td>
-                <td width="14.2%"></td>
-                <td width="14.3%">
-                    <div class="circle tooltip" id="btn-update" title="Update and build Polypheny-DB"><i class="fa fa-sync fa-5x"></i></div>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td height="200px">
-                    <div class="circle tooltip" id="btn-webui" title="Open Polypheny-UI">
-                        <a href="/" id="webui-link" style="color:black" target="_blank"><i class="fa fa-window-maximize fa-5x"></i></a>
-                    </div>
-                </td>
-                <td></td>
-                <td>
-                    <div class="circle tooltip" id="btn-config" title="Nothing interesting here yet :)"><i class="fa fa-wrench fa-5x"></i></div>
-                </td>
-                <td></td>
-                <td>
-                    <div class="circle tooltip" id="btn-settings" title="Take responsibility and adjust the settings"><i class="fa fa-cog fa-5x"></i></div>
-                </td>
-                <td></td>
-            </tr>
-        </table>
-    </div>
+        <div id="dashboardContent">
+            <table width="80%" class="dashboard" border="0">
+                <tr>
+                    <td width="14.3%" style="padding-top: 6%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-start" title="Start Polypheny-DB" style="display: none"><i class="fa fa-play fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                        <div class="circle tooltip" id="btn-stop" title="Stop Polypheny-DB"><i class="fa fa-stop fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                    </td>
+                    <td width="14.2%" style="padding-top: 6%; padding-bottom:4%;"></td>
+                    <td width="14.3%" style="padding-top: 6%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-restart" title="Restart Polypheny-DB"><i class="fa fa-redo fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                    </td>
+                    <td width="14.2%" style="padding-top: 6%; padding-bottom:4%;"></td>
+                    <td width="14.3%" style="padding-top: 6%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-log" title="Watch the log"><i class="fa fa-bullhorn fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                    </td>
+                    <td width="14.2%" style="padding-top: 6%; padding-bottom:4%;"></td>
+                    <td width="14.3%" style="padding-top: 6%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-update" title="Update and build Polypheny-DB"><i class="fa fa-sync fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top: 4%; padding-bottom:4%;"></td>
+                    <td style="padding-top: 4%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-webui" title="Open Polypheny-UI">
+                            <a href="/" id="webui-link" style="color:black" target="_blank"><i class="fa fa-window-maximize fa-5x" style="font-size:min(5vw, 85px);"></i></a>
+                        </div>
+                    </td>
+                    <td style="padding-top: 4%; padding-bottom:4%;"></td>
+                    <td style="padding-top: 4%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-config" title="Nothing interesting here yet :)"><i class="fa fa-wrench fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                    </td>
+                    <td style="padding-top: 4%; padding-bottom:4%;"></td>
+                    <td style="padding-top: 4%; padding-bottom:4%;">
+                        <div class="circle tooltip" id="btn-settings" title="Take responsibility and adjust the settings"><i class="fa fa-cog fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                    </td>
+                    <td style="padding-top: 4%; padding-bottom:4%;"></td>
+                </tr>
+            </table>
+        </div>
 
-    <div id="updateContent" class="content" style="display: none;">
-        <h1>Updating...</h1>
-        <pre class="output" id="updateOutput"></pre>
-        <button type="button" class="btn-back">OK</button>
-    </div>
-
-    <div id="logContent" class="content" style="display: none;">
-        <h1>Watch the log...</h1>
-        <span class="output" id="logOutput"></span>
-        <button type="button" class="btn-back">OK</button>
-    </div>
-
-    <form id="configs" name="configs">
-
-        <div id="configContent" class="content" style="display: none;">
-            <h1>Configuration</h1>
-
+        <div id="updateContent" class="content" style="display: none;">
+            <h1>Updating...</h1>
+            <pre class="output" id="updateOutput"></pre>
             <button type="button" class="btn-back">OK</button>
         </div>
 
-        <div id="settingsContent" class="content" style="display: none;">
-            <h1>Settings</h1>
-            <table class="configuration-table">
-                <tr>
-                    <th>Setting</th>
-                    <th>Value</th>
-                </tr>
-                <tr>
-                    <td>Polypheny-DB Branch</td>
-                    <td>
-                        <select id="pdbBranches" name="pcrtl.pdbms.branch">
-                            <option value="master">master</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Polypheny-UI Branch</td>
-                    <td>
-                        <select id="puiBranches" name="pcrtl.ui.branch">
-                            <option value="master">master</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Build mode</td>
-                    <td>
-                        <select name="pcrtl.buildmode">
-                            <option value="both">Polypheny-DB & Polypheny-UI</option>
-                            <option value="pdb">Polypheny-DB only</option>
-                            <!-- <option value="pui">Polypheny-UI only</option> -->
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Clean mode</td>
-                    <td>
-                        <select name="pcrtl.clean.mode">
-                            <option value="never">Never</option>
-                            <option value="branchChange">When branch changes</option>
-                            <option value="always">Always</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Maximum Java Heap Size (in Gigabyte)</td>
-                    <td><input name="pcrtl.java.heap" value="10" type="number"></td>
-                </tr>
-                <tr>
-                    <td>Polypheny-DB Arguments</td>
-                    <td><input name="pcrtl.pdbms.args" value=""></td>
-                </tr>
-            </table>
-            <button type="button" class="btn-back" id="saveSettings">OK</button>
+        <div id="logContent" class="content" style="display: none;">
+            <h1>Watch the log...</h1>
+            <span class="output" id="logOutput"></span>
+            <button type="button" class="btn-back">OK</button>
         </div>
-    </form>
+
+        <form id="configs" name="configs">
+
+            <div id="configContent" class="content" style="display: none;">
+                <h1>Configuration</h1>
+
+                <button type="button" class="btn-back">OK</button>
+            </div>
+
+            <div id="settingsContent" class="content" style="display: none;">
+                <h1>Settings</h1>
+                <table class="configuration-table">
+                    <tr>
+                        <th>Setting</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Polypheny-DB Branch</td>
+                        <td>
+                            <select id="pdbBranches" name="pcrtl.pdbms.branch">
+                                <option value="master">master</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Polypheny-UI Branch</td>
+                        <td>
+                            <select id="puiBranches" name="pcrtl.ui.branch">
+                                <option value="master">master</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Build mode</td>
+                        <td>
+                            <select name="pcrtl.buildmode">
+                                <option value="both">Polypheny-DB & Polypheny-UI</option>
+                                <option value="pdb">Polypheny-DB only</option>
+                                <!-- <option value="pui">Polypheny-UI only</option> -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Clean mode</td>
+                        <td>
+                            <select name="pcrtl.clean.mode">
+                                <option value="never">Never</option>
+                                <option value="branchChange">When branch changes</option>
+                                <option value="always">Always</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Java Heap Size (in Gigabyte)</td>
+                        <td><input name="pcrtl.java.heap" value="10" type="number"></td>
+                    </tr>
+                    <tr>
+                        <td>Polypheny-DB Arguments</td>
+                        <td><input name="pcrtl.pdbms.args" value=""></td>
+                    </tr>
+                </table>
+                <button type="button" class="btn-back" id="saveSettings">OK</button>
+            </div>
+        </form>
 
 
-    <div id="config-loading" class="content" style="display: none;">
-        <h1>Loading...</h1>
-        <div class="lds-dual-ring"></div>
-        <p>Cloning repositories. Please wait.</p>
+        <div id="config-loading" class="content" style="display: none;">
+            <h1>Loading...</h1>
+            <div class="lds-dual-ring"></div>
+            <p>Cloning repositories. Please wait.</p>
+        </div>
+
     </div>
-
 </div>
 
+<div class="minheight"></div>
+
 <footer class="footer">
-    <table class="footer-table" border="0">
+    <table class="footer-table">
         <tr>
             <td id="footer-left"></td>
             <td id="footer-middle"></td>

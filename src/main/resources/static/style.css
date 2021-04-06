@@ -21,39 +21,52 @@ html {
     font-family: sans-serif;
 }
 
+div.root {
+    position: relative;
+    max-width: 1500px;
+    height: auto !important;
+    height: 100%;
+    min-height: 100%;
+    margin: 0px auto -6vw;
+}
+
+div.minheight {
+    height: 55px;
+    clear: both;
+}
+
 .footer {
     position: absolute;
-    bottom: 0;
+    bottom: 0px !important;
     width: 100%;
-    height: 55px; /* Set the fixed height of the footer here */
-    line-height: 50px; /* Vertically center the text there */
+    height: min(6vh, 55px);
+    line-height: min(6vh, 50px); /* Vertically center the text there */
+    margin: 0px auto;
     background-color: rgba(0, 0, 0, 0.28);
-    left: 0;
+    font-size: min(1vw, 18px);
 }
 
 .footer-table {
     width: 100%;
     font-weight: 400;
-    table-layout: fixed;
 }
 
 #footer-left {
     text-align: left;
-    padding: 0 15px;
+    padding: 0 1vw;
     width: 25%;
 }
 
 #footer-middle {
     text-align: center;
-    padding: 2px 0 0 0;
+    padding: 0.2vw 0 0 0;
     width: 50%;
-    line-height: 20px;
-    size: 1em;
+    line-height: min(1.3vw, 23px);
 }
 
 #footer-right {
     text-align: right;
-    padding: 0 15px;
+    padding: 0 1vw;
     width: 25%;
 }
 
@@ -61,17 +74,19 @@ html {
 body {
     /* background-color: #A5D7D2; */
     background-color: #3B83C8;
-    margin-bottom: 55px; /* Margin bottom by footer height */
+    margin: 0;
 }
 
 .main {
-    max-width: 1500px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 100%;
+    height: calc(100vh - 6vh - 3.5vw); /* 6vh is height of footer & 3.5vw is the approximate margin between heading and top of the page*/
 }
 
 .dashboard {
     margin-left: 10%;
+    text-align: center;
+    margin-bottom: 5%;
+    border-collapse: collapse;
 }
 
 .circle {
@@ -79,14 +94,14 @@ body {
     vertical-align: middle;
     text-align: center;
     background-color: white;
-    width: 150px;
-    height: 150px;
-    -moz-border-radius: 190px;
-    -webkit-border-radius: 190px;
-    border-radius: 190px;
+    width: min(10vw, 170px);
+    height: min(10vw, 170px);
+    -moz-border-radius: min(5vw, 85px);
+    -webkit-border-radius: min(5vw, 85px);
+    border-radius: min(5vw, 85px);
     cursor: pointer;
     box-shadow: inset 0 0 0 0 rgba(200, 95, 66, 0.4), inset 0 0 0 16px rgba(255, 255, 255, 0.6), 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s ease-in-out;
+    transition: all 0.3s ease-in-out;
     margin-left: auto;
     margin-right: auto;
 }
@@ -94,8 +109,8 @@ body {
 .heading {
     text-align: center;
     font-family: sans-serif;
-    font-size: 500%;
-    margin-bottom: 30px;
+    font-size: min(5vw, 90px);
+    margin-bottom: 2.8%;
 }
 
 .content {
@@ -103,7 +118,6 @@ body {
     margin-right: auto;
     background-color: white;
     width: 70%;
-    height: 80%;
     text-align: center;
     padding: 15px;
     box-shadow: 5px 5px 3px gray;
@@ -121,8 +135,6 @@ body {
     display: block;
     font-size: 13px;
 }
-
-
 
 .configuration-table {
     border-collapse: collapse;
