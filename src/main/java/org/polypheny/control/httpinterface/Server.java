@@ -18,11 +18,15 @@ package org.polypheny.control.httpinterface;
 
 
 import com.google.gson.Gson;
+import com.typesafe.config.Config;
 import io.javalin.Javalin;
+import io.javalin.core.security.BasicAuthCredentials;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.polypheny.control.authentication.AuthenticationManager;
+import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.control.Control;
 import org.polypheny.control.control.ServiceManager;
 
@@ -43,6 +47,37 @@ public class Server {
 
         javalin.before( ctx -> {
             log.debug( "Received api call: {}", ctx.path() );
+
+            // If request is for login resources, then do nothing
+            boolean loginRes = ctx.path().equals( "/login.html" ) ||
+                    ctx.path().endsWith( ".css" ) || ctx.path().endsWith( ".js" );
+            if ( ctx.req.getMethod().equals( "GET" ) && loginRes ) {
+                return;
+            }
+
+            Config config = ConfigManager.getConfig();
+            String remoteHost = ctx.req.getRemoteHost();
+            boolean isLocalUser = remoteHost.equals( "localhost" ) || remoteHost.equals( "127.0.0.1" );
+            boolean authenticateLocalUser = config.getBoolean( "pcrtl.localauth.enable" );
+
+            if ( isLocalUser && !authenticateLocalUser ) {
+                // Request is from local user & Authentication for local user is disabled
+            } else {
+                if ( ctx.basicAuthCredentialsExist() ) {
+                    BasicAuthCredentials credentials = ctx.basicAuthCredentials();
+                    boolean clientExists = AuthenticationManager.clientExists( credentials.getUsername(), credentials.getPassword() );
+                    if ( clientExists ) {
+                        ctx.sessionAttribute( "authenticated", true );
+                    } else {
+                        ctx.res.setStatus( 401 );
+                    }
+                } else {
+                    Object authenticated = ctx.sessionAttribute( "authenticated" );
+                    if ( authenticated == null ) {
+                        ctx.redirect( "/login.html" );
+                    }
+                }
+            }
         } );
 
         // /config
