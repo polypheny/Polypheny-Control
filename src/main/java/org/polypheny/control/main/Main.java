@@ -21,11 +21,13 @@ import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
+import com.typesafe.config.Config;
 import java.io.Console;
 import java.util.HashMap;
 import org.polypheny.control.authentication.AuthenticationDataManager;
 import org.polypheny.control.authentication.AuthenticationFileManager;
 import org.polypheny.control.authentication.AuthenticationManager;
+import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.control.ServiceManager;
 
 
@@ -66,6 +68,11 @@ public class Main {
 
 
     private static void ensureAuthenticated() {
+        Config config = ConfigManager.getConfig();
+        if ( !config.getBoolean( "pcrtl.localauth.enable" ) ) {
+            return;
+        }
+
         String[] credentials = getCredentials();
         if ( !AuthenticationManager.clientExists( credentials[0], credentials[1] ) ) {
             System.err.println( "Incorrect Credentials! Try Again!" );
