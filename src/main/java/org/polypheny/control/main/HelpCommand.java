@@ -34,10 +34,10 @@ public class HelpCommand implements CliRunnable {
     private GlobalMetadata<CliRunnable> global;
 
     @Arguments(description = "Provides the name of the commands you want to provide help for")
-    private List<String> commandNames = new ArrayList<>();
+    private final List<String> commandNames = new ArrayList<>();
 
     @Option(name = "--include-hidden", description = "When set hidden commands and options are shown in help", hidden = true)
-    private boolean includeHidden = false;
+    private final boolean includeHidden = false;
 
 
     @Override

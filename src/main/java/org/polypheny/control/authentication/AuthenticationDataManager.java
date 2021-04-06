@@ -15,7 +15,7 @@ public class AuthenticationDataManager {
         byte[] randomBytes = new byte[13];
         random.nextBytes( randomBytes );
         for ( byte randomByte : randomBytes ) {
-            int index = ( randomByte < 0 ? -1 * randomByte : randomByte ) % characters.length();
+            int index = (randomByte < 0 ? -1 * randomByte : randomByte) % characters.length();
             salt.append( characters.charAt( index ) );
         }
         return salt.toString();

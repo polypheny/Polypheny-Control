@@ -28,7 +28,7 @@ import org.polypheny.control.httpinterface.Server;
 public class ControlCommand extends AbstractCommand {
 
     @Option(name = { "-p", "--port" }, description = "Overwrite port of the Polypheny Control dashboard")
-    private int port = -1;
+    private final int port = -1;
 
     private volatile boolean running = true;
 
@@ -48,7 +48,7 @@ public class ControlCommand extends AbstractCommand {
         while ( running ) {
             Thread.yield();
             try {
-                Thread.sleep(1000);
+                Thread.sleep( 1000 );
             } catch ( InterruptedException e ) {
                 // ignore
             }

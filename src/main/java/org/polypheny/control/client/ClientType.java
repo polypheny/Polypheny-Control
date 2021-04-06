@@ -16,6 +16,7 @@
 
 package org.polypheny.control.client;
 
+
 public enum ClientType {
     UNKNOWN, BROWSER, BENCHMARKER
 }
