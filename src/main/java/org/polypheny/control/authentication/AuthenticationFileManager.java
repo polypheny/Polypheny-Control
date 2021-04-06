@@ -43,7 +43,7 @@ public class AuthenticationFileManager {
                     }
                 } );
             } catch ( IOException e ) {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
         }
     }
@@ -70,7 +70,7 @@ public class AuthenticationFileManager {
                 bufferedWriter.write( name + " " + password + "\n" );
             }
         } catch ( IOException e ) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 }
