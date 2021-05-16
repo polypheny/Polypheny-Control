@@ -69,7 +69,11 @@ public class Main {
 
     private static void ensureAuthenticated() {
         Config config = ConfigManager.getConfig();
-        if ( !config.getBoolean( "pcrtl.localauth.enable" ) ) {
+        if ( !config.getBoolean( "pctrl.auth.enable" ) ) {
+            return;
+        } else if ( !config.getBoolean( "pctrl.auth.local" ) ) {
+            return;
+        } else if ( !config.getBoolean( "pctrl.auth.cli" ) ) {
             return;
         }
 
