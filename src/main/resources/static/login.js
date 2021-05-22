@@ -2,9 +2,7 @@ function login() {
     let name = $('#name').val();
     let password = $('#password').val();
     let authHeader = "Basic " + btoa(name + ":" + password);
-    console.log(name);
-    console.log(password);
-    console.log(authHeader);
+
     $.ajax({
         url        : document.location.protocol + '//' + document.location.host + '/',
         type       : 'GET',
