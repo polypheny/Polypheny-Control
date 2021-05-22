@@ -85,6 +85,30 @@ public class Main {
     }
 
 
+    private static void authorizeAdmin() {
+        HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
+        String adminPassword = authenticationData.get( "admin" );
+
+        if ( adminPassword == null ) {
+            System.err.println( "'admin' user does not exist! Please create a admin user before proceeding." );
+            System.exit( 1 );
+        }
+
+        Console console = System.console();
+
+        for ( int i = 1; i <= 3; i++ ) {
+            String password = new String( console.readPassword( "Enter 'admin' password (Try %d/3): ", i ) );
+            if ( !AuthenticationManager.clientExists( "admin", password ) ) {
+                System.err.println( "Incorrect Credentials!" );
+            } else {
+                return;
+            }
+        }
+        System.err.println( "3 incorrect password attempts." );
+        System.exit( 1 );
+    }
+
+
     @Command(name = "start", description = "Start Polypheny-DB")
     public static class StartCommand extends AbstractCommand {
 
@@ -166,11 +190,22 @@ public class Main {
                 return 1;
             }
             String password = new String( console.readPassword( "Password: " ) );
+
+            if ( password.isEmpty() ) {
+                System.err.println( "Password cannot be empty." );
+                System.exit( 1 );
+            }
+
             String confPassword = new String( console.readPassword( "Confirm Password: " ) );
             if ( !password.equals( confPassword ) ) {
                 System.err.println( "Passwords do not match! Try Again!" );
                 return 1;
             }
+
+            if ( !name.equals( "admin" ) ) {
+                authorizeAdmin();
+            }
+
             AuthenticationDataManager.addAuthenticationData( name, password );
             AuthenticationFileManager.writeAuthenticationDataToFile();
             return 0;
@@ -190,6 +225,14 @@ public class Main {
                 System.err.println( "User with the name \"" + name + "\" does not exist!" );
                 return 1;
             }
+
+            if ( !name.equals( "admin" ) ) {
+                authorizeAdmin();
+            } else {
+                System.err.println( "Cannot remove user 'admin'." );
+                System.exit( 1 );
+            }
+
             AuthenticationDataManager.removeAuthenticationData( name );
             AuthenticationFileManager.writeAuthenticationDataToFile();
             return 0;
@@ -210,11 +253,20 @@ public class Main {
                 return 1;
             }
             String password = new String( console.readPassword( "Password: " ) );
+
+            if ( password.isEmpty() ) {
+                System.err.println( "Password cannot be empty." );
+                System.exit( 1 );
+            }
+
             String confPassword = new String( console.readPassword( "Confirm Password: " ) );
             if ( !password.equals( confPassword ) ) {
                 System.err.println( "Passwords do not match! Try Again!" );
                 return 1;
             }
+
+            authorizeAdmin();
+
             AuthenticationDataManager.modifyAuthenticationData( name, password );
             AuthenticationFileManager.writeAuthenticationDataToFile();
             return 0;
