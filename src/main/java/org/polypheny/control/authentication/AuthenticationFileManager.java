@@ -24,6 +24,13 @@ public class AuthenticationFileManager {
             val config = ConfigFactory.load();
             String workingDir = config.getString( "pcrtl.workingdir" );
             authenticationFile = new File( workingDir, "passwd" );
+            if ( !authenticationFile.exists() ) {
+                try {
+                    authenticationFile.createNewFile();
+                } catch ( IOException e ) {
+//                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -61,9 +68,9 @@ public class AuthenticationFileManager {
             // Data was never modified. So ignore call.
             return;
         }
+        loadAuthenticationFile();
         try ( FileWriter fileWriter = new FileWriter( authenticationFile );
                 BufferedWriter bufferedWriter = new BufferedWriter( fileWriter ) ) {
-            loadAuthenticationFile();
             for ( Entry<String, String> entry : authenticationData.entrySet() ) {
                 String name = entry.getKey();
                 String password = entry.getValue();
