@@ -48,6 +48,15 @@ public class Server {
         javalin.before( ctx -> {
             log.debug( "Received api call: {}", ctx.path() );
 
+            Config config = ConfigManager.getConfig();
+            boolean authenticationEnabled = config.getBoolean( "pcrtl.auth.enable" );
+            if ( !authenticationEnabled ) {
+                if ( ctx.path().equals( "/login.html" ) ) {
+                    ctx.redirect( "/" );
+                }
+                return;
+            }
+
             // If request is for login resources, then do nothing
             boolean loginRes = ctx.path().equals( "/login.html" ) ||
                     ctx.path().endsWith( ".css" ) || ctx.path().endsWith( ".js" );
@@ -55,10 +64,9 @@ public class Server {
                 return;
             }
 
-            Config config = ConfigManager.getConfig();
             String remoteHost = ctx.req.getRemoteHost();
             boolean isLocalUser = remoteHost.equals( "localhost" ) || remoteHost.equals( "127.0.0.1" );
-            boolean authenticateLocalUser = config.getBoolean( "pcrtl.localauth.enable" );
+            boolean authenticateLocalUser = config.getBoolean( "pcrtl.auth.local" );
 
             if ( isLocalUser && !authenticateLocalUser ) {
                 // Request is from local user & Authentication for local user is disabled
