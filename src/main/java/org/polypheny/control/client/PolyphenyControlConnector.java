@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import kong.unirest.Cookie;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
@@ -40,15 +41,16 @@ public class PolyphenyControlConnector {
 
     private final String controlUrl;
     private static int clientId = -1;
-    private final ClientType clientType;
+    private final ClientData clientData;
+    private final Cookie jsessionid;
 
     private final Gson gson = new Gson();
 
     private final LogHandler logHandler;
 
 
-    public PolyphenyControlConnector( String controlUrl, ClientType clientType, LogHandler logHandler ) throws URISyntaxException {
-        this.clientType = clientType;
+    public PolyphenyControlConnector( String controlUrl, ClientData clientData, LogHandler logHandler ) throws URISyntaxException {
+        this.clientData = clientData;
         this.logHandler = logHandler;
 
         Unirest.config().connectTimeout( 0 );
@@ -57,6 +59,11 @@ public class PolyphenyControlConnector {
         this.controlUrl = "http://" + controlUrl;
         WebSocket webSocket = new WebSocket( new URI( "ws://" + controlUrl + "/socket/" ) );
         webSocket.connect();
+
+        HttpResponse<String> response = Unirest.get( this.controlUrl + "/" )
+                .basicAuth( clientData.getUsername(), clientData.getPassword() )
+                .asString();
+        jsessionid = response.getCookies().getNamed( "JSESSIONID" );
 
         // Check status of connection and reconnect if necessary
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -75,7 +82,10 @@ public class PolyphenyControlConnector {
     public void stopPolypheny() {
         setClientType(); // Set the client type (again) - does not hurt and makes sure its set
         try {
-            Unirest.post( controlUrl + "/control/stop" ).field( "clientId", clientId ).asString();
+            HttpResponse<String> response = Unirest.post( controlUrl + "/control/stop" )
+                    .field( "clientId", PolyphenyControlConnector.clientId )
+                    .cookie( jsessionid )
+                    .asString();
         } catch ( UnirestException e ) {
             log.error( "Error while stopping Polypheny-DB", e );
         }
@@ -85,7 +95,10 @@ public class PolyphenyControlConnector {
     public void startPolypheny() {
         setClientType(); // Set the client type (again) - does not hurt and makes sure its set
         try {
-            Unirest.post( controlUrl + "/control/start" ).field( "clientId", clientId ).asString();
+            Unirest.post( controlUrl + "/control/start" )
+                    .field( "clientId", clientId )
+                    .cookie( jsessionid )
+                    .asString();
         } catch ( UnirestException e ) {
             log.error( "Error while starting Polypheny-DB", e );
         }
@@ -100,7 +113,10 @@ public class PolyphenyControlConnector {
         }
         // Trigger update
         try {
-            Unirest.post( controlUrl + "/control/update" ).field( "clientId", clientId ).asString();
+            Unirest.post( controlUrl + "/control/update" )
+                    .field( "clientId", clientId )
+                    .cookie( jsessionid )
+                    .asString();
         } catch ( UnirestException e ) {
             log.error( "Error while updating Polypheny-DB", e );
         }
@@ -122,7 +138,11 @@ public class PolyphenyControlConnector {
             obj.put( entry.getKey(), entry.getValue() );
         }
         try {
-            Unirest.post( controlUrl + "/config/set" ).field( "clientId", clientId ).field( "config", obj.toString() ).asString();
+            Unirest.post( controlUrl + "/config/set" )
+                    .field( "clientId", clientId )
+                    .field( "config", obj.toString() )
+                    .cookie( jsessionid )
+                    .asString();
         } catch ( UnirestException e ) {
             log.error( "Error while setting client type", e );
         }
@@ -131,7 +151,11 @@ public class PolyphenyControlConnector {
 
     void setClientType() {
         try {
-            Unirest.post( controlUrl + "/client/type" ).field( "clientId", clientId ).field( "clientType", clientType.name() ).asString();
+            Unirest.post( controlUrl + "/client/type" )
+                    .field( "clientId", clientId )
+                    .field( "clientType", clientData.getClientType().name() )
+                    .cookie( jsessionid )
+                    .asString();
         } catch ( UnirestException e ) {
             log.error( "Error while setting client type", e );
         }
@@ -149,14 +173,19 @@ public class PolyphenyControlConnector {
 
 
     String getStatus() {
-        return gson.fromJson( executeGet( "/control/status" ), String.class );
+        String o = executeGet( "/control/status" );
+        System.out.println(o);
+        return gson.fromJson( o, String.class );
     }
 
 
     private String executeGet( String command ) {
         HttpResponse<String> httpResponse;
         try {
-            httpResponse = Unirest.get( controlUrl + command ).asString();
+            httpResponse = Unirest.get( controlUrl + command )
+                    .cookie( jsessionid )
+                    .asString();
+            System.out.println(httpResponse);
             return httpResponse.getBody();
         } catch ( UnirestException e ) {
             log.error( "Exception while sending request", e );
@@ -167,9 +196,12 @@ public class PolyphenyControlConnector {
 
     private void executePost( String command, String data ) {
         try {
-            Unirest.post( controlUrl + command ).body( data ).asString();
+            Unirest.post( controlUrl + command )
+                    .body( data )
+                    .cookie( jsessionid )
+                    .asString();
         } catch ( UnirestException e ) {
-            log.error( "Exception while sending request", e );
+            log.error( "    Exception while sending request", e );
         }
     }
 
