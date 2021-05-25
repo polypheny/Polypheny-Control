@@ -13,7 +13,6 @@ function login() {
             document.location = document.location.protocol + '//' + document.location.host + '/'
         },
         error      : function(d, data) {
-            console.log(data);
             $('#invalid').css('display', 'block');
         },
     });
