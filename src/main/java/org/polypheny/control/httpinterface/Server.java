@@ -21,11 +21,15 @@ import com.google.gson.Gson;
 import com.typesafe.config.Config;
 import io.javalin.Javalin;
 import io.javalin.core.security.BasicAuthCredentials;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.polypheny.control.authentication.AuthenticationContext;
 import org.polypheny.control.authentication.AuthenticationManager;
+import org.polypheny.control.authentication.AuthenticationUtils;
 import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.control.Control;
 import org.polypheny.control.control.ServiceManager;
@@ -36,6 +40,8 @@ public class Server {
 
     private static final Gson gson = new Gson();
 
+    private final long sessionTimeout;
+
 
     public Server( Control control, int port ) {
         Javalin javalin = Javalin.create( config -> config.addStaticFiles( "/static" ) ).start( port );
@@ -45,45 +51,59 @@ public class Server {
             ws.onClose( ClientRegistry::removeClient );
         } );
 
+        Config config = ConfigManager.getConfig();
+
+        // Configuration in seconds. Converting to milliseconds.
+        sessionTimeout = config.getLong( "pcrtl.control.sessionTimeout" ) * 1000;
+
         javalin.before( ctx -> {
             log.debug( "Received api call: {}", ctx.path() );
 
-            Config config = ConfigManager.getConfig();
-            boolean authenticationEnabled = config.getBoolean( "pcrtl.auth.enable" );
-            if ( !authenticationEnabled ) {
-                if ( ctx.path().equals( "/login.html" ) ) {
-                    ctx.redirect( "/" );
+            HttpSession session = ctx.req.getSession( false );
+
+            if ( session != null ) {
+                long creationTime = session.getCreationTime();
+                long currentTime = new Date().getTime();
+                long difference = currentTime - creationTime;
+
+                if ( difference >= sessionTimeout ) {
+                    session.invalidate();
+                    ctx.res.sendError( 401, "Session Timeout" );
                 }
-                return;
             }
 
-            // If request is for login resources, then do nothing
-            boolean loginRes = ctx.path().equals( "/login.html" ) ||
-                    ctx.path().endsWith( ".css" ) || ctx.path().endsWith( ".js" );
-            if ( ctx.req.getMethod().equals( "GET" ) && loginRes ) {
+            boolean GETRequest = ctx.req.getMethod().equals( "GET" );
+            boolean loginHTMLRequest = ctx.path().startsWith( "/login.html" );
+            boolean loginJSRequest = ctx.path().startsWith( "/login.js" );
+            boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.5.1/jquery.js" );
+            boolean CSSRequest = ctx.path().startsWith( "/style.css" );
+
+            if ( GETRequest && ( loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest ) ) {
                 return;
             }
 
             String remoteHost = ctx.req.getRemoteHost();
-            boolean isLocalUser = remoteHost.equals( "localhost" ) || remoteHost.equals( "127.0.0.1" );
-            boolean authenticateLocalUser = config.getBoolean( "pcrtl.auth.local" );
+            AuthenticationContext context = AuthenticationUtils.getContextForHost( remoteHost );
 
-            if ( isLocalUser && !authenticateLocalUser ) {
-                // Request is from local user & Authentication for local user is disabled
-            } else {
+            if ( AuthenticationUtils.shouldAuthenticate( context ) ) {
                 if ( ctx.basicAuthCredentialsExist() ) {
                     BasicAuthCredentials credentials = ctx.basicAuthCredentials();
                     boolean clientExists = AuthenticationManager.clientExists( credentials.getUsername(), credentials.getPassword() );
                     if ( clientExists ) {
                         ctx.sessionAttribute( "authenticated", true );
                     } else {
-                        ctx.res.setStatus( 401 );
+                        ctx.res.sendError( 403, "Authentication Failed" );
                     }
                 } else {
                     Object authenticated = ctx.sessionAttribute( "authenticated" );
                     if ( authenticated == null ) {
                         ctx.redirect( "/login.html" );
                     }
+                }
+            } else {
+                // If authentication disabled and the request is for login.html, redirect to /
+                if ( ctx.path().startsWith( "/login.html" ) ) {
+                    ctx.redirect( "/" );
                 }
             }
         } );
