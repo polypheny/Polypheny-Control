@@ -1,7 +1,7 @@
 package org.polypheny.control.authentication;
 
 
-import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.Config;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import lombok.val;
+import org.polypheny.control.control.ConfigManager;
 
 
 public class AuthenticationFileManager {
@@ -21,15 +21,16 @@ public class AuthenticationFileManager {
 
     private static void loadAuthenticationFile() {
         if ( authenticationFile == null ) {
-            val config = ConfigFactory.load();
+            Config config = ConfigManager.getConfig();
             String workingDir = config.getString( "pcrtl.workingdir" );
             authenticationFile = new File( workingDir, "passwd" );
-            if ( !authenticationFile.exists() ) {
-                try {
-                    authenticationFile.createNewFile();
-                } catch ( IOException e ) {
-//                    e.printStackTrace();
-                }
+
+            try {
+                // Making sure parent directory exists, so that writes don't fail.
+                authenticationFile.getParentFile().mkdirs();
+                authenticationFile.createNewFile();
+            } catch ( IOException ex ) {
+                throw new RuntimeException( "Cannot Create File: " + authenticationFile.getAbsolutePath() );
             }
         }
     }
@@ -50,7 +51,7 @@ public class AuthenticationFileManager {
                     }
                 } );
             } catch ( IOException e ) {
-                // e.printStackTrace();
+                throw new RuntimeException( "Cannot Read From File: " + authenticationFile.getAbsolutePath() );
             }
         }
     }
@@ -77,7 +78,7 @@ public class AuthenticationFileManager {
                 bufferedWriter.write( name + " " + password + "\n" );
             }
         } catch ( IOException e ) {
-            // e.printStackTrace();
+            throw new RuntimeException( "Cannot Write To File: " + authenticationFile.getAbsolutePath() );
         }
     }
 }
