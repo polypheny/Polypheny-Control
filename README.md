@@ -48,6 +48,59 @@ In order to start Polypheny-DB, we first need to trigger a build. This can be do
 
 You can now open the Polypheny-UI by opening `localhost:8080` in your browser. 
 
+### Authentication
+
+Polypheny Control now allows you to use authentication to allow only verified users to use it. Authentication is available both in the command line and in the browser.
+CLI authentication can be enabled/disabled using the `pcrtl.auth.cli` config option. It is disabled by default.
+Authentication for `localhost` can be enabled/disabled using the `pcrtl.auth.local` config option. It is also disabled by default.
+Authentication itself for be fully enabled/disabled using the `pcrtl.auth.enable` config option. It is enabled by default.
+
+#### The passwd file
+
+Polypheny Control stores user information in a file name **passwd**. This file is NOT protected. You can protect the file against modification by setting the immutable flag using `chattr` on Linux / MacOS and `attrib` on Windows.
+But, remember to reset the flag when modifying the file using polypheny control.
+
+#### Admin User
+
+Polypheny Control requires a **admin** user to create and manage other users. So, before you can create any other user you will need to create a **admin** user using the following command:
+
+```
+java -jar polypheny-control.jar adduser
+```
+
+This will prompt you to enter a name and password. Enter "admin" as the name and a strong password for the user.
+All of the user management actions need to be authorized using the admin password.
+
+An example run of the user management features:
+
+```
+# Creating the admin user (The password is mandatory but won't be visible when you type it out)
+> java -jar polypheny-control.jar adduser
+Name: admin
+Password: 
+Confirm Password: 
+
+# Creating a user
+> java -jar polypheny-control.jar adduser
+Name: Loki
+Password: 
+Confirm Password: 
+Enter 'admin' password (Try 1/3):
+
+# Modifying a user's password
+> java -jar polypheny-control.jar moduser
+Name: Loki
+Password: 
+Confirm Password: 
+Enter 'admin' password (Try 1/3):
+
+# Remove a user
+> java -jar polypheny-control.jar remuser
+Name: Loki
+Enter 'admin' password (Try 1/3):
+
+```
+
 
 ## Roadmap
 See the [open issues](https://github.com/polypheny/Polypheny-DB/labels/A-control) for a list of proposed features (and known issues).
