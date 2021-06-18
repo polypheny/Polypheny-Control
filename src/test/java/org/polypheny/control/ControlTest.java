@@ -29,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.polypheny.control.authentication.AuthenticationDataManager;
 import org.polypheny.control.authentication.AuthenticationFileManager;
@@ -42,6 +43,13 @@ public class ControlTest {
 
     private static Thread thread;
 
+
+    @BeforeClass
+    public static void startControlThread() throws InterruptedException {
+        thread = new Thread( () -> (new ControlCommand())._run_() );
+        thread.start();
+        TimeUnit.SECONDS.sleep( 5 );
+    }
 
     @Before
     public void start() throws InterruptedException {
@@ -63,10 +71,6 @@ public class ControlTest {
         AuthenticationFileManager.getAuthenticationData();
         AuthenticationDataManager.addAuthenticationData( "pc", "pc" );
         AuthenticationFileManager.writeAuthenticationDataToFile();
-
-        thread = new Thread( () -> (new ControlCommand())._run_() );
-        thread.start();
-        TimeUnit.SECONDS.sleep( 5 );
     }
 
 

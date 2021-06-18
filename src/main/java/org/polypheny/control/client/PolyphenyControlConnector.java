@@ -53,8 +53,6 @@ public class PolyphenyControlConnector {
         this.logHandler = logHandler;
 
         this.controlUrl = "http://" + controlUrl;
-        WebSocket webSocket = new WebSocket( new URI( "ws://" + controlUrl + "/socket/" ) );
-        webSocket.connect();
 
         httpConnector = new HttpConnector();
         httpConnector.setSessionTimeoutHandler( () -> {
@@ -63,6 +61,9 @@ public class PolyphenyControlConnector {
             return true;
         } );
         httpConnector.authenticate( this.controlUrl + "/", clientData.getUsername(), clientData.getPassword() );
+
+        WebSocket webSocket = new WebSocket( new URI( "ws://" + controlUrl + "/socket/" ) );
+        webSocket.connect();
 
         // Check status of connection and reconnect if necessary
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
