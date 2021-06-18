@@ -42,9 +42,8 @@ public class ControlTest {
 
     private static Thread thread;
 
-
     @BeforeAll
-    public static void start() throws InterruptedException {
+    public void start() throws InterruptedException {
         // Precautionary measure: Setting the systemProperty 'testing'
         System.setProperty( "testing", "true" );
 
