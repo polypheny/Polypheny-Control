@@ -56,6 +56,8 @@ public class ControlCommand extends AbstractCommand {
             }
         }
 
+        server.shutdown();
+
         return 0;
     }
 

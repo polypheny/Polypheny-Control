@@ -40,11 +40,12 @@ public class Server {
 
     private static final Gson gson = new Gson();
 
+    private Javalin javalin;
     private final long sessionTimeout;
 
 
     public Server( Control control, int port ) {
-        Javalin javalin = Javalin.create( config -> config.addStaticFiles( "/static" ) ).start( port );
+        javalin = Javalin.create( config -> config.addStaticFiles( "/static" ) ).start( port );
 
         javalin.ws( "/socket/", ws -> {
             ws.onConnect( ClientRegistry::addClient );
@@ -149,6 +150,11 @@ public class Server {
                 TimeUnit.SECONDS );
 
         log.info( "Polypheny Control is running on port {}", port );
+    }
+
+
+    public void shutdown() {
+        javalin.stop();
     }
 
 }
