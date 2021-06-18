@@ -36,7 +36,12 @@ public class AuthenticationUtils {
     }
 
     public static boolean shouldAuthenticate(AuthenticationContext context) {
-        if ( context == AuthenticationContext.REMOTEHOST ) {
+        boolean isATest = System.getProperty( "testing" ) != null;
+
+        if ( isATest ) {
+            boolean withAuth = System.getProperty( "withAuth" ).equals( "true" );
+            return withAuth;
+        } else if ( context == AuthenticationContext.REMOTEHOST ) {
             return authenticationEnabled;
         } else if ( context == AuthenticationContext.LOCALHOST ) {
             return localAuthenticationEnabled;

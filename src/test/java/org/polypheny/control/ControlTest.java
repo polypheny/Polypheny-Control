@@ -45,6 +45,9 @@ public class ControlTest {
 
     @BeforeAll
     public static void start() throws InterruptedException {
+        // Precautionary measure: Setting the systemProperty 'testing'
+        System.setProperty( "testing", "true" );
+
         // Backup config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         if ( polyphenyDir.exists() ) {
@@ -80,6 +83,19 @@ public class ControlTest {
 
 
     @Test
+    public void integrationTestWithAuthEnabled() throws URISyntaxException, InterruptedException {
+        System.setProperty( "withAuth", "true" );
+        integrationTest();
+    }
+
+
+    @Test
+    public void integrationTestWithAuthDisabled() throws URISyntaxException, InterruptedException {
+        System.setProperty( "withAuth", "false" );
+        integrationTest();
+    }
+
+
     public void integrationTest() throws URISyntaxException, InterruptedException {
         ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "pc" );
         PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", clientData, null );
