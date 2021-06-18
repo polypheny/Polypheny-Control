@@ -22,7 +22,10 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.builder.CliBuilder;
 import java.io.Console;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import org.apache.commons.io.FileUtils;
 import org.polypheny.control.authentication.AuthenticationContext;
 import org.polypheny.control.authentication.AuthenticationDataManager;
 import org.polypheny.control.authentication.AuthenticationFileManager;
@@ -35,6 +38,9 @@ public class Main {
 
     @SuppressWarnings("unchecked")
     public static void main( String[] args ) {
+        // Check for and restore .polypheny.backup
+        restorePolyphenyBackup();
+
         // Hide dock icon on MacOS systems
         System.setProperty( "apple.awt.UIElement", "true" );
 
@@ -57,6 +63,24 @@ public class Main {
 
         int returnCode = cmd.run();
         System.exit( returnCode );
+    }
+
+
+    private static void restorePolyphenyBackup() {
+        File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
+        File polyphenyDirBackup = new File( System.getProperty( "user.home" ), ".polypheny.backup" );
+
+        try {
+            if ( polyphenyDirBackup.exists() ) {
+                FileUtils.deleteDirectory( polyphenyDir );
+                polyphenyDirBackup.renameTo( polyphenyDir );
+            }
+        } catch ( IOException ex ) {
+            // Could not delete polyphenyDir
+            System.err.println( "Error restoring backup polypheny directory: " + polyphenyDirBackup.getAbsolutePath() + "." );
+            System.err.println( "Please restore the backup polypheny directory by renaming it to '.polypheny'." );
+            System.exit( 1 );
+        }
     }
 
 
