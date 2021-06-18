@@ -30,7 +30,7 @@ public class ControlCommand extends AbstractCommand {
     @Option(name = { "-p", "--port" }, description = "Overwrite port of the Polypheny Control dashboard")
     private final int port = -1;
 
-    private volatile boolean running = true;
+    private volatile Boolean running = true;
 
 
     @Override
@@ -43,7 +43,9 @@ public class ControlCommand extends AbstractCommand {
             server = new Server( control, ConfigManager.getConfig().getInt( "pcrtl.control.port" ) );
         }
 
-        Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
+        if ( System.getProperty( "testing" ) != null ) {
+            Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
+        }
 
         while ( running ) {
             Thread.yield();
@@ -55,6 +57,11 @@ public class ControlCommand extends AbstractCommand {
         }
 
         return 0;
+    }
+
+    public int runWithControlledShutdown(Boolean running) {
+        this.running = running;
+        return _run_();
     }
 
 }
