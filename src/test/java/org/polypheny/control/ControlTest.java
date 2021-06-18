@@ -44,7 +44,7 @@ public class ControlTest {
 
 
     @Before
-    public static void start() throws InterruptedException {
+    public void start() throws InterruptedException {
         // Precautionary measure: Setting the systemProperty 'testing'
         System.setProperty( "testing", "true" );
 
@@ -71,7 +71,7 @@ public class ControlTest {
 
 
     @After
-    public static void shutdown() throws IOException {
+    public void shutdown() throws IOException {
         // Restore config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         FileUtils.deleteDirectory( polyphenyDir );
