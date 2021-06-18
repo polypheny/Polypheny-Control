@@ -41,6 +41,7 @@ import org.polypheny.control.main.ControlCommand;
 public class ControlTest {
 
     private static Thread thread;
+    private volatile static Boolean running = true;
 
     @BeforeAll
     public void start() throws InterruptedException {
@@ -63,7 +64,7 @@ public class ControlTest {
         AuthenticationDataManager.addAuthenticationData( "pc", "pc" );
         AuthenticationFileManager.writeAuthenticationDataToFile();
 
-        thread = new Thread( () -> (new ControlCommand())._run_() );
+        thread = new Thread( () -> (new ControlCommand()).runWithControlledShutdown( running ) );
         thread.start();
         TimeUnit.SECONDS.sleep( 5 );
     }
@@ -71,6 +72,7 @@ public class ControlTest {
 
     @AfterAll
     public static void shutdown() throws IOException {
+        running = false;
         // Restore config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         FileUtils.deleteDirectory( polyphenyDir );
