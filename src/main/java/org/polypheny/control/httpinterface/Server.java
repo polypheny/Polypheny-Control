@@ -46,6 +46,12 @@ public class Server {
     public Server( Control control, int port ) {
         Javalin javalin = Javalin.create( config -> config.staticFiles.add( "/static" ) ).start( port );
 
+        // As try-with-ressources
+        public void shutdown() {
+            javalin.stop();
+        }
+
+
         javalin.ws( "/socket/", ws -> {
             ws.onConnect( ClientRegistry::addClient );
             ws.onClose( ClientRegistry::removeClient );
