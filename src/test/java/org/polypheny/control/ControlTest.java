@@ -107,7 +107,7 @@ public class ControlTest {
 
         // Stop Polypheny
         controlConnector.stopPolypheny();
-        TimeUnit.SECONDS.sleep( 5 );
+        TimeUnit.SECONDS.sleep( 20 );
     }
 
 
