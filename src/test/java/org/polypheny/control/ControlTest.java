@@ -25,6 +25,7 @@ import kong.unirest.HttpRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -38,6 +39,7 @@ import org.polypheny.control.client.PolyphenyControlConnector;
 import org.polypheny.control.main.ControlCommand;
 
 
+@Slf4j
 public class ControlTest {
 
     private static Thread thread;
@@ -58,7 +60,7 @@ public class ControlTest {
         try {
             FileUtils.forceMkdir( new File( System.getProperty( "user.home" ), ".polypheny" ) );
         } catch ( IOException e ) {
-//            e.printStackTrace();
+            log.error( "Caught exception while creating .polypheny folder", e );
         }
         AuthenticationFileManager.getAuthenticationData();
         AuthenticationDataManager.addAuthenticationData( "pc", "pc" );
@@ -84,19 +86,6 @@ public class ControlTest {
 
 
     @Test
-    public void integrationTestWithAuthEnabled() throws URISyntaxException, InterruptedException {
-        System.setProperty( "withAuth", "true" );
-        integrationTest();
-    }
-
-
-    @Test
-    public void integrationTestWithAuthDisabled() throws URISyntaxException, InterruptedException {
-        System.setProperty( "withAuth", "false" );
-        integrationTest();
-    }
-
-
     public void integrationTest() throws URISyntaxException, InterruptedException {
         ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "pc" );
         PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", clientData, null );

@@ -39,7 +39,7 @@ public class AuthenticationUtils {
         boolean isATest = System.getProperty( "testing" ) != null;
 
         if ( isATest ) {
-            boolean withAuth = System.getProperty( "withAuth" ).equals( "true" );
+            boolean withAuth = System.getProperty( "config.auth.local" ).equals( "true" );
             return withAuth;
         } else if ( context == AuthenticationContext.REMOTEHOST ) {
             return authenticationEnabled;
