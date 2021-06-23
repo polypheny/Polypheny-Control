@@ -206,6 +206,7 @@ testWithoutAuth.dependsOn(testClasses)
 
 test {
     systemProperty "testing", "true"
+    systemProperty "config.auth.local", "false"
 }
 test.dependsOn(testWithAuth)
 
