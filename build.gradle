@@ -193,6 +193,9 @@ task testWithAuth(type: Test) {
     systemProperty "config.auth.local", "true"
     description = 'Runs test with local authentication enabled.'
     group = 'verification'
+    doLast {
+        sleep(30 * 1000) // Sleep 30 seconds
+    }
 }
 testWithAuth.dependsOn(testClasses)
 
