@@ -95,7 +95,7 @@ public class ControlTest {
 
         // Start Polypheny
         controlConnector.startPolypheny();
-        TimeUnit.SECONDS.sleep( 20 );
+        TimeUnit.SECONDS.sleep( 40 );
 
         // Execute test query
         GetRequest request = Unirest.get( "{protocol}://{host}:{port}/restapi/v1/res/public.emps" )
