@@ -12,13 +12,15 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
     name: Java ${{ matrix.java }} @ ${{ matrix.os }}
     steps:
-      -   name: Checkout
-          uses: actions/checkout@v2
-      -   name: Set up JDK
-          uses: actions/setup-java@v1
-          with:
-            java-version: ${{ matrix.java }}
-      -   name: Build with Gradle
-          run: ./gradlew assemble
-      -   name: Run tests
-          run: ./gradlew test
+        -   name: Checkout
+            uses: actions/checkout@v2
+        -   name: Set up JDK
+            uses: actions/setup-java@v1
+            with:
+                java-version: ${{ matrix.java }}
+        -   name: Build with Gradle
+            run: ./gradlew assemble
+        -   name: Run tests with local authentication disabled
+            run: ./gradlew testWithoutAuth
+        -   name: Run tests with local authentication enabled
+            run: ./gradlew testWithAuth
