@@ -33,20 +33,21 @@ public class AuthenticationUtils {
         authenticationEnabled = config.getBoolean( "pcrtl.auth.enable" );
         localAuthenticationEnabled = authenticationEnabled && config.getBoolean( "pcrtl.auth.local" );
         cliAuthenticationEnabled = authenticationEnabled && config.getBoolean( "pcrtl.auth.cli" );
+
+        if ( authenticationEnabled && System.getProperty( "config.auth.local" ) != null ) {
+            localAuthenticationEnabled = System.getProperty( "config.auth.local" ).equals( "true" );
+        }
     }
 
     public static boolean shouldAuthenticate(AuthenticationContext context) {
-        boolean isATest = System.getProperty( "testing" ) != null;
-
-        if ( isATest ) {
-            boolean withAuth = System.getProperty( "config.auth.local" ).equals( "true" );
-            return withAuth;
-        } else if ( context == AuthenticationContext.REMOTEHOST ) {
+        if ( context == AuthenticationContext.REMOTEHOST ) {
             return authenticationEnabled;
         } else if ( context == AuthenticationContext.LOCALHOST ) {
             return localAuthenticationEnabled;
-        } else {
+        } else if ( context == AuthenticationContext.CLI ) {
             return cliAuthenticationEnabled;
+        } else {
+            throw new RuntimeException( "Unknown Authentication Context: " + context.name() );
         }
     }
 

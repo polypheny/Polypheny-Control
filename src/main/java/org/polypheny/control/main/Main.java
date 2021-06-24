@@ -94,7 +94,6 @@ public class Main {
 
     private static void ensureAuthenticated() {
         if ( AuthenticationUtils.shouldAuthenticate( AuthenticationContext.CLI ) ) {
-
             String[] credentials = getCredentials();
             if ( !AuthenticationManager.clientExists( credentials[0], credentials[1] ) ) {
                 System.err.println( "Incorrect Credentials! Try Again!" );
