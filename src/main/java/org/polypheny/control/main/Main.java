@@ -45,7 +45,8 @@ public class Main {
 
         final CliRunnable cmd = builder.build().parse( args );
 
-        System.exit( cmd.run() );
+        int returnCode = cmd.run();
+        System.exit( returnCode );
     }
 
 
