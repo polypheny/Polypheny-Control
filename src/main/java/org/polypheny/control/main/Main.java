@@ -39,7 +39,9 @@ public class Main {
     @SuppressWarnings("unchecked")
     public static void main( String[] args ) {
         // Check for and restore .polypheny.backup
-        restorePolyphenyBackup();
+        if ( System.getProperty( "testing" ) != null && System.getProperty( "testing" ).equals( "true" ) ) {
+            restorePolyphenyBackup();
+        }
 
         // Hide dock icon on MacOS systems
         System.setProperty( "apple.awt.UIElement", "true" );
@@ -77,8 +79,8 @@ public class Main {
             }
         } catch ( IOException ex ) {
             // Could not delete polyphenyDir
-            System.err.println( "Error restoring backup polypheny directory: " + polyphenyDirBackup.getAbsolutePath() + "." );
-            System.err.println( "Please restore the backup polypheny directory by renaming it to '.polypheny'." );
+            System.err.println( "Error restoring backup of polypheny directory: " + polyphenyDirBackup.getAbsolutePath() + "." );
+            System.err.println( "Please restore the backup manually by renaming the folder to '.polypheny'." );
             System.exit( 1 );
         }
     }
