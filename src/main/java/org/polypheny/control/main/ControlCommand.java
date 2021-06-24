@@ -43,10 +43,6 @@ public class ControlCommand extends AbstractCommand {
             server = new Server( control, ConfigManager.getConfig().getInt( "pcrtl.control.port" ) );
         }
 
-        if ( System.getProperty( "testing" ) != null ) {
-            Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
-        }
-
         while ( running ) {
             Thread.yield();
             try {
