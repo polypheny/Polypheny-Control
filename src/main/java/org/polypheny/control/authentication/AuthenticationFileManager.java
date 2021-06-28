@@ -97,4 +97,5 @@ public class AuthenticationFileManager {
             throw new RuntimeException( "Cannot Write To File: " + authenticationFile.getAbsolutePath() );
         }
     }
+
 }

@@ -57,7 +57,8 @@ public class ControlCommand extends AbstractCommand {
         return 0;
     }
 
-    public int runWithControlledShutdown(Boolean running) {
+
+    public int runWithControlledShutdown( Boolean running ) {
         this.running = running;
         return _run_();
     }

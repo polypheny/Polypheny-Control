@@ -161,6 +161,7 @@ public class Main {
                 return ServiceManager.start( null, false ) ? 0 : 1;
             }
         }
+
     }
 
 
@@ -172,6 +173,7 @@ public class Main {
             ensureAuthenticated();
             return ServiceManager.stop( null ) ? 0 : 1;
         }
+
     }
 
 
@@ -183,6 +185,7 @@ public class Main {
             ensureAuthenticated();
             return ServiceManager.restart( null, false ) ? 0 : 1;
         }
+
     }
 
 
@@ -194,6 +197,7 @@ public class Main {
             ensureAuthenticated();
             return ServiceManager.update( null ) ? 0 : 1;
         }
+
     }
 
 
@@ -230,6 +234,7 @@ public class Main {
             AuthenticationFileManager.writeAuthenticationDataToFile();
             return 0;
         }
+
     }
 
 
@@ -257,6 +262,7 @@ public class Main {
             AuthenticationFileManager.writeAuthenticationDataToFile();
             return 0;
         }
+
     }
 
 
@@ -291,6 +297,7 @@ public class Main {
             AuthenticationFileManager.writeAuthenticationDataToFile();
             return 0;
         }
+
     }
 
 }

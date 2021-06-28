@@ -60,4 +60,5 @@ public class AuthenticationDataManager {
         HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
         authenticationData.replace( name, encryptPassword( password ) );
     }
+
 }

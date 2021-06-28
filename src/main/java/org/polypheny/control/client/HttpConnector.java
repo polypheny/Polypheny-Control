@@ -26,12 +26,18 @@ import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 
 interface POSTComposer {
+
     MultipartBody composeRequest( HttpRequestWithBody request );
+
 }
 
+
 interface SessionTimeoutHandler {
+
     boolean handleSessionTimeout();
+
 }
+
 
 public class HttpConnector {
 
@@ -45,12 +51,14 @@ public class HttpConnector {
         Unirest.config().concurrency( 200, 100 );
     }
 
+
     public void authenticate( String url, String username, String password ) {
         HttpResponse<String> response = Unirest.get( url )
                 .basicAuth( username, password )
                 .asString();
         jsessionid = response.getCookies().getNamed( "JSESSIONID" );
     }
+
 
     public HttpResponse<String> post( String url, POSTComposer composer ) {
         HttpRequestWithBody request = Unirest.post( url );
@@ -68,6 +76,7 @@ public class HttpConnector {
 
         return response;
     }
+
 
     public HttpResponse<String> get( String url ) {
         GetRequest request = Unirest.get( url );
@@ -91,9 +100,10 @@ public class HttpConnector {
     }
 
 
-    private void ensureJSESSIONIDAttached(HttpRequest request) {
+    private void ensureJSESSIONIDAttached( HttpRequest request ) {
         if ( jsessionid != null ) {
             request.cookie( jsessionid );
         }
     }
+
 }
