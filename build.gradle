@@ -189,26 +189,25 @@ task extractWebjars(type: Copy) {
 classes.dependsOn(extractWebjars)
 
 task testWithAuth(type: Test) {
-    systemProperty "testing", "true"
     systemProperty "config.auth.local", "true"
-    description = 'Runs test with local authentication enabled.'
-    group = 'verification'
+    description = "Runs test with local authentication enabled."
+    group = "verification"
 }
 testWithAuth.dependsOn(testClasses)
 
 task testWithoutAuth(type: Test) {
-    systemProperty "testing", "true"
     systemProperty "config.auth.local", "false"
-    description = 'Runs test with local authentication disabled.'
-    group = 'verification'
+    description = "Runs test with local authentication disabled."
+    group = "verification"
 }
 testWithoutAuth.dependsOn(testClasses)
 
 test {
-    systemProperty "testing", "true"
     systemProperty "config.auth.local", "false"
 }
 test.dependsOn(testWithAuth)
+
+
 
 //////////////
 // IntelliJ //
