@@ -28,4 +28,5 @@ public class AuthenticationManager {
         String encryptedPassword = authenticationData.get( name );
         return encryptedPassword != null && encryptedPassword.equals( Crypt.crypt( password, encryptedPassword ) );
     }
+
 }

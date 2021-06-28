@@ -84,7 +84,7 @@ public class Server {
             boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.5.1/jquery.js" );
             boolean CSSRequest = ctx.path().startsWith( "/style.css" );
 
-            if ( GETRequest && ( loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest ) ) {
+            if ( GETRequest && (loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest) ) {
                 return;
             }
 

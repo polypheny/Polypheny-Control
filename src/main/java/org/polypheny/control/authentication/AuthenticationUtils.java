@@ -24,9 +24,11 @@ import org.polypheny.control.control.ConfigManager;
 
 
 public class AuthenticationUtils {
+
     private static boolean authenticationEnabled;
     private static boolean localAuthenticationEnabled;
     private static boolean cliAuthenticationEnabled;
+
 
     static {
         Config config = ConfigManager.getConfig();
@@ -39,7 +41,8 @@ public class AuthenticationUtils {
         }
     }
 
-    public static boolean shouldAuthenticate(AuthenticationContext context) {
+
+    public static boolean shouldAuthenticate( AuthenticationContext context ) {
         if ( context == AuthenticationContext.REMOTEHOST ) {
             return authenticationEnabled;
         } else if ( context == AuthenticationContext.LOCALHOST ) {
@@ -51,7 +54,8 @@ public class AuthenticationUtils {
         }
     }
 
-    public static AuthenticationContext getContextForHost(String host) {
+
+    public static AuthenticationContext getContextForHost( String host ) {
         try {
             InetAddress clientIPAddress = InetAddress.getByName( host );
             InetAddress serverIPAddress = InetAddress.getLocalHost();
@@ -64,4 +68,5 @@ public class AuthenticationUtils {
             throw new RuntimeException( "Cannot resolve host: " + host );
         }
     }
+
 }

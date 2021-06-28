@@ -56,7 +56,7 @@ public class PolyphenyControlConnector {
 
         httpConnector = new HttpConnector();
         httpConnector.setSessionTimeoutHandler( () -> {
-            httpConnector.authenticate( this.controlUrl + "/", clientData.getUsername(), clientData.getPassword());
+            httpConnector.authenticate( this.controlUrl + "/", clientData.getUsername(), clientData.getPassword() );
             // After authenticating, try again.
             return true;
         } );
@@ -169,7 +169,7 @@ public class PolyphenyControlConnector {
 
     String getStatus() {
         String o = executeGet( "/control/status" );
-        System.out.println(o);
+        System.out.println( o );
         return gson.fromJson( o, String.class );
     }
 

@@ -47,4 +47,5 @@ public class NotificationManager {
             trayIcon.displayMessage( "Polypheny Control", message, MessageType.ERROR );
         }
     }
+
 }
