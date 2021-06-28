@@ -4,7 +4,7 @@ plugins {
     id "application"
     id "maven-publish"
     id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "io.freefair.lombok" version "5.3.0"
+    id "io.freefair.lombok" version "5.3.3.3"
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 }
 
@@ -21,9 +21,7 @@ mainClassName = "org.polypheny.control.main.Main"
 
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
     maven {
         // Gradle tooling API
         url "https://repo.gradle.org/gradle/libs-releases-local/"
@@ -191,11 +189,6 @@ configurations.archives.artifacts.with { archives ->
     }
 }
 
-task finalize {
-    doLast {
-        println('finally!')
-    }
-}
 
 task extractWebjars(type: Copy) {
     configurations.webjars.each {jar ->
