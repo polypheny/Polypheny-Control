@@ -4,23 +4,22 @@ on: [ push, pull_request ]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        java: [ 8, 11, 15 ]
-        os: [ macos-latest, ubuntu-latest, windows-latest ]
-    name: Java ${{ matrix.java }} @ ${{ matrix.os }}
-    steps:
-        -   name: Checkout
-            uses: actions/checkout@v2
-        -   name: Set up JDK
-            uses: actions/setup-java@v1
-            with:
-                java-version: ${{ matrix.java }}
-        -   name: Build with Gradle
-            run: ./gradlew assemble
-        -   name: Run tests with local authentication disabled
-            run: ./gradlew testWithoutAuth
-        -   name: Run tests with local authentication enabled
-            run: ./gradlew testWithAuth
+      runs-on: ${{ matrix.os }}
+      strategy:
+          fail-fast: false
+          matrix:
+              java: [ 8, 11, 15 ]
+              os: [ macos-latest, ubuntu-latest, windows-latest ]
+              withAuth: [ testWithoutAuth, testWithAuth ]
+      name: Java ${{ matrix.java }} @ ${{ matrix.os }} -- ${{ matrix.withAuth }}
+      steps:
+          -   name: Checkout
+              uses: actions/checkout@v2
+          -   name: Set up JDK
+              uses: actions/setup-java@v1
+              with:
+                  java-version: ${{ matrix.java }}
+          -   name: Build with Gradle
+              run: ./gradlew assemble
+          -   name: Run tests
+              run: ./gradlew ${{ matrix.withAuth }}
