@@ -48,7 +48,7 @@ public class ControlTest {
 
     @Before
     public void start() throws InterruptedException {
-        // Precautionary measure: Setting the systemProperty 'testing'
+        // Setting the systemProperty 'testing'
         System.setProperty( "testing", "true" );
 
         // Backup config file
@@ -64,7 +64,7 @@ public class ControlTest {
             log.error( "Caught exception while creating .polypheny folder", e );
         }
         AuthenticationFileManager.getAuthenticationData();
-        AuthenticationDataManager.addAuthenticationData( "pc", "pc" );
+        AuthenticationDataManager.addAuthenticationData( "pc", "super$secret" );
         AuthenticationFileManager.writeAuthenticationDataToFile();
 
         thread = new Thread( () -> (new ControlCommand()).runWithControlledShutdown( running ) );
@@ -88,7 +88,7 @@ public class ControlTest {
 
     @Test
     public void integrationTest() throws URISyntaxException, InterruptedException {
-        ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "pc" );
+        ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "super$secret" );
         PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", clientData, null );
 
         // Update and build Polypheny
