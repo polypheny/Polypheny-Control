@@ -16,6 +16,7 @@
 
 package org.polypheny.control.client;
 
+
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
@@ -39,21 +40,28 @@ public class PolyphenyControlConnector {
 
     private final String controlUrl;
     private static int clientId = -1;
-    private final ClientType clientType;
+    private final ClientData clientData;
+    private final HttpConnector httpConnector;
 
     private final Gson gson = new Gson();
 
     private final LogHandler logHandler;
 
 
-    public PolyphenyControlConnector( String controlUrl, ClientType clientType, LogHandler logHandler ) throws URISyntaxException {
-        this.clientType = clientType;
+    public PolyphenyControlConnector( String controlUrl, ClientData clientData, LogHandler logHandler ) throws URISyntaxException {
+        this.clientData = clientData;
         this.logHandler = logHandler;
 
-        Unirest.config().connectTimeout( 0 );
-        Unirest.config().socketTimeout( 0 );
-        Unirest.config().concurrency( 200, 100 );
         this.controlUrl = "http://" + controlUrl;
+
+        httpConnector = new HttpConnector();
+        httpConnector.setSessionTimeoutHandler( () -> {
+            httpConnector.authenticate( this.controlUrl + "/", clientData.getUsername(), clientData.getPassword() );
+            // After authenticating, try again.
+            return true;
+        } );
+        httpConnector.authenticate( this.controlUrl + "/", clientData.getUsername(), clientData.getPassword() );
+
         WebSocket webSocket = new WebSocket( new URI( "ws://" + controlUrl + "/socket/" ) );
         webSocket.connect();
 
@@ -74,7 +82,9 @@ public class PolyphenyControlConnector {
     public void stopPolypheny() {
         setClientType(); // Set the client type (again) - does not hurt and makes sure its set
         try {
-            Unirest.post( controlUrl + "/control/stop" ).field( "clientId", clientId ).asString();
+            httpConnector.post( controlUrl + "/control/stop", request -> {
+                return request.field( "clientId", clientId );
+            } );
         } catch ( UnirestException e ) {
             log.error( "Error while stopping Polypheny-DB", e );
         }
@@ -84,7 +94,9 @@ public class PolyphenyControlConnector {
     public void startPolypheny() {
         setClientType(); // Set the client type (again) - does not hurt and makes sure its set
         try {
-            Unirest.post( controlUrl + "/control/start" ).field( "clientId", clientId ).asString();
+            httpConnector.post( controlUrl + "/control/start", request -> {
+                return request.field( "clientId", clientId );
+            } );
         } catch ( UnirestException e ) {
             log.error( "Error while starting Polypheny-DB", e );
         }
@@ -99,7 +111,9 @@ public class PolyphenyControlConnector {
         }
         // Trigger update
         try {
-            Unirest.post( controlUrl + "/control/update" ).field( "clientId", clientId ).asString();
+            httpConnector.post( controlUrl + "/control/update", request -> {
+                return request.field( "clientId", clientId );
+            } );
         } catch ( UnirestException e ) {
             log.error( "Error while updating Polypheny-DB", e );
         }
@@ -121,7 +135,10 @@ public class PolyphenyControlConnector {
             obj.put( entry.getKey(), entry.getValue() );
         }
         try {
-            Unirest.post( controlUrl + "/config/set" ).field( "clientId", clientId ).field( "config", obj.toString() ).asString();
+            httpConnector.post( controlUrl + "/config/set", request -> {
+                return request.field( "clientId", clientId )
+                        .field( "config", obj.toString() );
+            } );
         } catch ( UnirestException e ) {
             log.error( "Error while setting client type", e );
         }
@@ -130,7 +147,10 @@ public class PolyphenyControlConnector {
 
     void setClientType() {
         try {
-            Unirest.post( controlUrl + "/client/type" ).field( "clientId", clientId ).field( "clientType", clientType.name() ).asString();
+            httpConnector.post( controlUrl + "/client/type", request -> {
+                return request.field( "clientId", clientId )
+                        .field( "clientType", clientData.getClientType().name() );
+            } );
         } catch ( UnirestException e ) {
             log.error( "Error while setting client type", e );
         }
@@ -148,14 +168,16 @@ public class PolyphenyControlConnector {
 
 
     String getStatus() {
-        return gson.fromJson( executeGet( "/control/status" ), String.class );
+        String o = executeGet( "/control/status" );
+        System.out.println( o );
+        return gson.fromJson( o, String.class );
     }
 
 
     private String executeGet( String command ) {
         HttpResponse<String> httpResponse;
         try {
-            httpResponse = Unirest.get( controlUrl + command ).asString();
+            httpResponse = httpConnector.get( controlUrl + command );
             return httpResponse.getBody();
         } catch ( UnirestException e ) {
             log.error( "Exception while sending request", e );
@@ -166,9 +188,11 @@ public class PolyphenyControlConnector {
 
     private void executePost( String command, String data ) {
         try {
-            Unirest.post( controlUrl + command ).body( data ).asString();
+            Unirest.post( controlUrl + command )
+                    .body( data )
+                    .asString();
         } catch ( UnirestException e ) {
-            log.error( "Exception while sending request", e );
+            log.error( "    Exception while sending request", e );
         }
     }
 

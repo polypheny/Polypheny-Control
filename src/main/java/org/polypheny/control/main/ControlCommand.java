@@ -19,6 +19,8 @@ package org.polypheny.control.main;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import java.util.HashMap;
+import org.polypheny.control.authentication.AuthenticationFileManager;
 import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.control.Control;
 import org.polypheny.control.httpinterface.Server;
@@ -28,13 +30,20 @@ import org.polypheny.control.httpinterface.Server;
 public class ControlCommand extends AbstractCommand {
 
     @Option(name = { "-p", "--port" }, description = "Overwrite port of the Polypheny Control dashboard")
-    private int port = -1;
+    private final int port = -1;
 
-    private volatile boolean running = true;
+    @Option(name = { "-x", "--suppress-warning" }, description = "Suppress the 'No Users Exist' Warning")
+    protected boolean suppressWarning = false;
+
+    private volatile Boolean running = true;
 
 
     @Override
     public int _run_() {
+        HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
+        if ( !suppressWarning && authenticationData.isEmpty() ) {
+            warn();
+        }
         Control control = new Control();
         final Server server;
         if ( port > 0 ) {
@@ -43,18 +52,32 @@ public class ControlCommand extends AbstractCommand {
             server = new Server( control, ConfigManager.getConfig().getInt( "pcrtl.control.port" ) );
         }
 
-        Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
-
         while ( running ) {
             Thread.yield();
             try {
-                Thread.sleep(1000);
+                Thread.sleep( 1000 );
             } catch ( InterruptedException e ) {
                 // ignore
             }
         }
 
+        server.shutdown();
+
         return 0;
+    }
+
+
+    private static void warn() {
+        System.out.println( "WARNING: No Users Exist. Polypheny-Control executes and manages Polypheny-Db." );
+        System.out.println( "WARNING: For security reasons it is advisable to create atleast one user." );
+        System.out.println( "WARNING: To know more about User Management and Authentication, visit " );
+        System.out.println( "WARNING: https://github.com/polypheny/Polypheny-Control#authentication\n\n" );
+    }
+
+
+    public int runWithControlledShutdown( Boolean running ) {
+        this.running = running;
+        return _run_();
     }
 
 }

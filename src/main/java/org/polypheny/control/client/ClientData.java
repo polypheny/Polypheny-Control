@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2019-2021 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,32 @@
 package org.polypheny.control.client;
 
 
-public enum ClientType {
-    UNKNOWN, BROWSER, BENCHMARKER
+public class ClientData {
+
+    private final ClientType clientType;
+    private final String username;
+    private final String password;
+
+
+    public ClientData( ClientType clientType, String username, String password ) {
+        this.clientType = clientType;
+        this.username = username;
+        this.password = password;
+    }
+
+
+    public ClientType getClientType() {
+        return clientType;
+    }
+
+
+    public String getUsername() {
+        return username;
+    }
+
+
+    public String getPassword() {
+        return password;
+    }
+
 }

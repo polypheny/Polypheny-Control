@@ -25,36 +25,57 @@ import kong.unirest.HttpRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.polypheny.control.authentication.AuthenticationDataManager;
+import org.polypheny.control.authentication.AuthenticationFileManager;
+import org.polypheny.control.client.ClientData;
 import org.polypheny.control.client.ClientType;
 import org.polypheny.control.client.PolyphenyControlConnector;
 import org.polypheny.control.main.ControlCommand;
 
+
+@Slf4j
 public class ControlTest {
 
-    private static Thread thread;
+    private Thread thread;
+    private volatile Boolean running = true;
 
 
-    @BeforeClass
-    public static void start() throws InterruptedException {
+    @Before
+    public void start() throws InterruptedException {
+        // Setting the systemProperty 'testing'
+        System.setProperty( "testing", "true" );
+
         // Backup config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         if ( polyphenyDir.exists() ) {
             polyphenyDir.renameTo( new File( System.getProperty( "user.home" ), ".polypheny.backup" ) );
         }
 
-        thread = new Thread( () -> (new ControlCommand())._run_() );
+        // Create passwd data and an account
+        try {
+            FileUtils.forceMkdir( new File( System.getProperty( "user.home" ), ".polypheny" ) );
+        } catch ( IOException e ) {
+            log.error( "Caught exception while creating .polypheny folder", e );
+        }
+        AuthenticationFileManager.getAuthenticationData();
+        AuthenticationDataManager.addAuthenticationData( "pc", "super$secret" );
+        AuthenticationFileManager.writeAuthenticationDataToFile();
+
+        thread = new Thread( () -> (new ControlCommand()).runWithControlledShutdown( running ) );
         thread.start();
         TimeUnit.SECONDS.sleep( 5 );
     }
 
 
-    @AfterClass
-    public static void shutdown() throws IOException {
+    @After
+    public void shutdown() throws IOException {
+        running = false;
         // Restore config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         FileUtils.deleteDirectory( polyphenyDir );
@@ -67,14 +88,15 @@ public class ControlTest {
 
     @Test
     public void integrationTest() throws URISyntaxException, InterruptedException {
-        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", ClientType.BROWSER, null );
+        ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "super$secret" );
+        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", clientData, null );
 
         // Update and build Polypheny
         controlConnector.updatePolypheny();
 
         // Start Polypheny
         controlConnector.startPolypheny();
-        TimeUnit.SECONDS.sleep( 20 );
+        TimeUnit.SECONDS.sleep( 40 );
 
         // Execute test query
         GetRequest request = Unirest.get( "{protocol}://{host}:{port}/restapi/v1/res/public.emps" )
@@ -85,7 +107,7 @@ public class ControlTest {
 
         // Stop Polypheny
         controlConnector.stopPolypheny();
-        TimeUnit.SECONDS.sleep( 5 );
+        TimeUnit.SECONDS.sleep( 20 );
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2019-2021 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package org.polypheny.control.client;
+package org.polypheny.control.authentication;
 
 
-public enum ClientType {
-    UNKNOWN, BROWSER, BENCHMARKER
+public enum AuthenticationContext {
+    CLI,
+    LOCALHOST,
+    REMOTEHOST
 }
