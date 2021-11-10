@@ -3,8 +3,8 @@ plugins {
     id "java-library"
     id "application"
     id "maven-publish"
-    id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "io.freefair.lombok" version "5.3.3.3"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "io.freefair.lombok" version "6.2.0"
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
 }
 
@@ -25,10 +25,6 @@ repositories {
     maven {
         // Gradle tooling API
         url "https://repo.gradle.org/gradle/libs-releases-local/"
-    }
-    maven {
-        // DBIS Nexus
-        url "https://dbis-nexus.dmi.unibas.ch/repository/maven2/"
     }
 }
 
