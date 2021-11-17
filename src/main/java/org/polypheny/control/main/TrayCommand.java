@@ -24,6 +24,7 @@ import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Taskbar;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
@@ -61,17 +62,16 @@ public class TrayCommand extends ControlCommand {
         TrayIcon trayIcon = new TrayIcon( iconStopped, "Polypheny Control", trayPopupMenu );
         trayIcon.setImageAutoSize( true ); // Adjust to default size as per system recommendation
 
-        // TODO: This requires Java >= 9
         // Set application icon (displayed in some os in notifications)
-        //try {
-        //    Taskbar taskbar = Taskbar.getTaskbar();
-        //    // set icon for mac os (and other systems which do support this method)
-        //    taskbar.setIconImage( iconRunning );
-        //} catch (final UnsupportedOperationException e) {
-        //    System.out.println("The os does not support: 'taskbar.setIconImage'");
-        //} catch (final SecurityException e) {
-        //    System.out.println("There was a security exception for: 'taskbar.setIconImage'");
-        //}
+        try {
+            Taskbar taskbar = Taskbar.getTaskbar();
+            // Set icon for macOS (and other systems which do support this method)
+            taskbar.setIconImage( iconRunning );
+        } catch ( final UnsupportedOperationException e ) {
+            System.out.println( "The os does not support: 'taskbar.setIconImage'" );
+        } catch ( final SecurityException e ) {
+            System.out.println( "There was a security exception for: 'taskbar.setIconImage'" );
+        }
 
         // Add status text
         MenuItem statusItem = new MenuItem( "???" );

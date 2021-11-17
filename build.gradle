@@ -43,8 +43,8 @@ sourceSets {
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = "1.9"
+    targetCompatibility = "1.9"
 }
 
 
