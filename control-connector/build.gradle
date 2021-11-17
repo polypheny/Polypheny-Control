@@ -92,6 +92,8 @@ publishing {
     publications {
         shadow(MavenPublication) { publication ->
             from components.java
+            artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
+            artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
             pom {
                 name = "Polypheny Control Connector"
                 description = "A library that connects to Polypheny Control and enables remote control."
