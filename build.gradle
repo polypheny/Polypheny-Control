@@ -134,7 +134,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 shadowJar {
-
+    classifier ""
 }
 assemble.dependsOn shadowJar
 artifacts {
@@ -146,6 +146,9 @@ artifacts {
 
 
 // Disable automatically added shadowed zip / tar archives
+distTar.dependsOn shadowJar
+distZip.dependsOn shadowJar
+startScripts.dependsOn shadowJar
 shadowDistTar.enabled = false
 shadowDistTar.classifier = "REMOVE_ME"
 shadowDistZip.enabled = false

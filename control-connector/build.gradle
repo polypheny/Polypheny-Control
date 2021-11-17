@@ -1,6 +1,7 @@
 plugins {
     id "java-library"
     id "maven-publish"
+    id "signing"
     id "io.freefair.lombok"
 }
 
@@ -86,11 +87,11 @@ artifacts {
     archives javadocJar // jar file containing the source files
 }
 
+
 publishing {
     publications {
-        "${project.name}"(MavenPublication) {
-            from components.java
-            artifact jar
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
             artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
             artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
             pom {
@@ -99,16 +100,53 @@ publishing {
                 url = "https://polypheny.org"
                 licenses {
                     license {
-                        name = "Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0"
+                        name = 'Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0'
                     }
                 }
                 scm {
                     connection = "https://github.com/polypheny/Polypheny-Control.git"
                     url = "https://github.com/polypheny/Polypheny-Control"
                 }
+                developers {
+                    developer {
+                        id = 'polypheny'
+                        name = 'Polypheny'
+                        email = 'mail@polypheny.org'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/polypheny/polypheny-control"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
 }
-task generatePom(group: 'publishing', dependsOn: "generatePomFileFor${project.name.capitalize()}Publication")
+//task generatePom(group: 'publishing', dependsOn: "generatePomFileFor${project.name.capitalize()}Publication")
+
+
+signing {
+    required { gradle.taskGraph.hasTask("publish") }
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.shadow
+}
+
