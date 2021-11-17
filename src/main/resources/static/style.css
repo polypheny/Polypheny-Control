@@ -187,6 +187,10 @@ body {
     height: 50px;
 }
 
+.btn-back-disabled {
+    background-color: #bfbfbf !important;
+}
+
 .btn-back:hover,
 .btn-back.hover {
     background-color: #28486d;

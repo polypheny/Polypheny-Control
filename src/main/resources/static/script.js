@@ -41,19 +41,22 @@ webSocket.onmessage = function (msg) {
         }
         setClientType();
     }
-    if (data.hasOwnProperty("status")) { // Periodically sent by server to keep the connection open
+    if ( data.hasOwnProperty("status") ) { // Periodically sent by server to keep the connection open
         if ( data["status"] === "running" ) {
             $( '#btn-start' ).hide();
             $( '#btn-stop' ).show();
+            $( '#updateOutputBackButton' ).removeClass('btn-back-disabled');
         } else if ( data["status"] === "idling" ) {
             $( '#btn-stop' ).hide();
             $( '#btn-start' ).show();
+            $( '#updateOutputBackButton' ).removeClass('btn-back-disabled');
         } else { // updating
             $( '#logContent' ).hide();
             $( '#configContent' ).hide();
             $( '#settingsContent' ).hide();
             $( '#dashboardContent' ).hide();
             $( '#updateContent' ).show();
+            $( '#updateOutputBackButton' ).addClass('btn-back-disabled');
         }
         $( '#footer-right' ).text( "Status: " + data["status"] );
     }
@@ -122,6 +125,7 @@ $('#btn-restart').click(function () {
 });
 
 $('#btn-update').click(function () {
+    $( '#updateOutputBackButton' ).addClass('btn-back-disabled');
     $( '#dashboardContent' ).hide();
     $( '#config-loading' ).hide();
     $( '#updateContent' ).show();
