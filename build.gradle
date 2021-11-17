@@ -4,8 +4,8 @@ plugins {
     id "application"
     id "maven-publish"
     id "com.github.johnrengelman.shadow" version "7.1.0"
-    id "io.freefair.lombok" version "6.2.0"
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.0"
+    id "io.freefair.lombok" version "6.3.0"
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.1"
 }
 
 import org.jetbrains.gradle.ext.*
@@ -43,8 +43,8 @@ sourceSets {
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 }
 
 
