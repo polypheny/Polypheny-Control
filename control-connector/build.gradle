@@ -1,0 +1,114 @@
+plugins {
+    id "java-library"
+    id "maven-publish"
+    id "io.freefair.lombok"
+}
+
+group "org.polypheny"
+
+version = versionMajor + "." + versionMinor + versionQualifier
+
+repositories {
+    mavenCentral()
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java"]
+        }
+        resources {
+            srcDirs = ["src/main/resources", "${buildDir}/webjars-content"]
+        }
+    }
+    test {
+        java {
+            srcDirs = ["src/test/java"]
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+
+dependencies {
+
+    // Guava
+    implementation group: "com.google.guava", name: "guava", version: guava_version // Apache 2.0
+
+    // JSON libs
+    implementation group: "com.google.code.gson", name: "gson", version: gson_version // Apache 2.0
+    implementation group: "com.googlecode.json-simple", name: "json-simple", version: json_simple_version
+
+    // REST requests (for connector lib)
+    implementation group: "com.konghq", name: "unirest-java", version: unirest_version // MIT
+    implementation group: "org.java-websocket", name: "Java-WebSocket", version: java_websocket_version // MIT
+
+    // -- Testing --
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: jupiter_version
+    testRuntimeOnly group: "org.junit.jupiter", name: "junit-jupiter-engine", version: jupiter_version
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+
+/**
+ * JARs
+ */
+jar {
+    manifest {
+        attributes "Manifest-Version": "1.0"
+        attributes "Copyright": "The Polypheny Project (polypheny.org)"
+        attributes "Implementation-Version": project.version
+        attributes "Multi-Release": "true"
+        attributes "Version": project.version
+    }
+}
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier "sources"
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier "javadoc"
+    from javadoc.destinationDir
+}
+artifacts {
+    archives jar // regular jar containing only the compiled source
+    archives sourcesJar // jar file containing the java doc files
+    archives javadocJar // jar file containing the source files
+}
+
+publishing {
+    publications {
+        "${project.name}"(MavenPublication) {
+            from components.java
+            artifact jar
+            artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
+            artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
+            pom {
+                name = "Polypheny Control Connector"
+                description = "A library that connects to Polypheny Control and enables remote control."
+                url = "https://polypheny.org"
+                licenses {
+                    license {
+                        name = "Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0"
+                    }
+                }
+                scm {
+                    connection = "https://github.com/polypheny/Polypheny-Control.git"
+                    url = "https://github.com/polypheny/Polypheny-Control"
+                }
+            }
+        }
+    }
+}
+task generatePom(group: 'publishing', dependsOn: "generatePomFileFor${project.name.capitalize()}Publication")

@@ -1,1 +1,3 @@
 rootProject.name = 'polypheny-control'
+include 'control-connector'
+
