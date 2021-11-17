@@ -91,16 +91,16 @@ public class ServiceManager {
     /**
      * This block restores the PolyphenyDbProcess on startup by checking the PID file. It will create a PolyphenyDbProcess
      * from the PID if the file contains a PID number. Then it will check if the process is still alive.
-     * <p>
+     *
      * TODO: This is maybe not required since we start a child process. By the termination of this process usually the child
-     * processes are terminated too. However, if later on there is another way of creating the polypheny-db process this
-     * static block would be more relevant (I guess).
+     *  processes are terminated too. However, if later on there is another way of creating the Polypheny-DB process this
+     *  static block would be more relevant (I guess).
      */
     private static void restorePolyphenyDbProcess() {
         val configuration = ConfigManager.getConfig();
         val workingDir = new File( configuration.getString( "pcrtl.workingdir" ) );
-        if ( workingDir.exists() == false ) {
-            if ( workingDir.mkdirs() == false ) {
+        if ( !workingDir.exists() ) {
+            if ( !workingDir.mkdirs() ) {
                 throw new RuntimeException( "Could not create the required directories: " + workingDir );
             }
             if ( SystemUtils.IS_OS_WINDOWS ) {
@@ -120,7 +120,7 @@ public class ServiceManager {
 
                 try ( val pidReader = new BufferedReader( new InputStreamReader( new FileInputStream( pidFile ), StandardCharsets.UTF_8 ) ) ) {
                     val line = pidReader.readLine();
-                    if ( line != null && line.isEmpty() == false ) {
+                    if ( line != null && !line.isEmpty() ) {
                         // Restore
                         polyphenyDbProcess = PolyphenyDbProcess.createFromPid( Integer.parseInt( line ) );
                     }
@@ -130,7 +130,7 @@ public class ServiceManager {
                     log.error( "IOException while recovering the PID.", e );
                 }
 
-                if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() == false ) {
+                if ( polyphenyDbProcess != null && !polyphenyDbProcess.isAlive() ) {
                     // if dead, make sure the file is empty
                     try ( val pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile ), StandardCharsets.UTF_8 ) ) {
                         pidWriter.append( "" );
@@ -192,11 +192,11 @@ public class ServiceManager {
                 pdbArguments.addAll( Arrays.asList( pdbmsArgs.split( " " ) ) );
             }
 
-            if ( new File( javaExecutable ).exists() == false ) {
+            if ( !new File( javaExecutable ).exists() ) {
                 throw new RuntimeException( "The java executable seems not to exist... How did you start this application?!" );
             }
 
-            if ( new File( pdbmsJar ).exists() == false ) {
+            if ( !new File( pdbmsJar ).exists() ) {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> There is no Polypheny-DB jar file. Trigger an update first." );
                 }
@@ -205,8 +205,8 @@ public class ServiceManager {
                 return false;
             }
 
-            if ( new File( logsDir ).exists() == false ) {
-                if ( new File( logsDir ).mkdirs() == false ) {
+            if ( !new File( logsDir ).exists() ) {
+                if ( !new File( logsDir ).mkdirs() ) {
                     throw new RuntimeException( "Could not create the logs directory." );
                 }
             }
@@ -306,7 +306,7 @@ public class ServiceManager {
 
             polyphenyDbProcess = null;
 
-            // stopping std out redirectors
+            // Stopping std out redirectors
             if ( logTailer != null ) {
                 logTailer.stop();
             }
@@ -316,7 +316,7 @@ public class ServiceManager {
             }
             errTailer = null;
 
-            if ( pidFile.delete() == false ) {
+            if ( !pidFile.delete() ) {
                 try ( val pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile, false ), StandardCharsets.UTF_8 ) ) {
                     pidWriter.append( "" );
                     pidWriter.flush();
@@ -681,6 +681,9 @@ public class ServiceManager {
         try {
             Git git = Git.open( uiBuildDir );
             if ( !existsRemoteBranchWithName( git, branch ) ) {
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> There is no branch with the name " + branch + " on remote of the Polypheny-UI repo! You can change the repo in the settings." );
+                }
                 throw new RuntimeException( "There is no branch with the name " + branch + " on remote of the Polypheny-UI repo!" );
             }
             String oldCommitId;
