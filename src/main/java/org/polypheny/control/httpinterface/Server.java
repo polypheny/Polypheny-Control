@@ -81,7 +81,7 @@ public class Server {
             boolean GETRequest = ctx.req.getMethod().equals( "GET" );
             boolean loginHTMLRequest = ctx.path().startsWith( "/login.html" );
             boolean loginJSRequest = ctx.path().startsWith( "/login.js" );
-            boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.5.1/jquery.js" );
+            boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.7.1/jquery.js" );
             boolean CSSRequest = ctx.path().startsWith( "/style.css" );
 
             if ( GETRequest && (loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest) ) {
