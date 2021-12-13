@@ -26,10 +26,10 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.polypheny.control.client.ClientType;
 import org.polypheny.control.client.PolyphenyControlConnector;
 import org.polypheny.control.main.ControlCommand;
@@ -39,7 +39,7 @@ public class ControlTest {
     private static Thread thread;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void start() throws InterruptedException {
         // Backup config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
@@ -53,7 +53,7 @@ public class ControlTest {
     }
 
 
-    @AfterClass
+    @AfterAll
     public static void shutdown() throws IOException {
         // Restore config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
@@ -79,7 +79,7 @@ public class ControlTest {
         // Execute test query
         GetRequest request = Unirest.get( "{protocol}://{host}:{port}/restapi/v1/res/public.emps" )
                 .queryString( "public.emps.empid", "=" + 100 );
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "{\"result\":[{\"public.emps.name\":\"Bill\",\"public.emps.salary\":10000,\"public.emps.empid\":100,\"public.emps.commission\":1000,\"public.emps.deptno\":10}],\"size\":1}",
                 executeRest( request ).getBody() );
 
