@@ -36,12 +36,15 @@ div.minheight {
 }
 
 .footer {
+   /*
     position: absolute;
     bottom: 0px !important;
+    margin: 0px auto;
+    */
+    margin-top: 50px;
     width: 100%;
     height: min(6vh, 55px);
     line-height: min(6vh, 50px); /* Vertically center the text there */
-    margin: 0px auto;
     background-color: rgba(0, 0, 0, 0.28);
     font-size: min(1vw, 18px);
 }
@@ -79,7 +82,10 @@ body {
 
 .main {
     max-width: 100%;
-    height: calc(100vh - 6vh - 3.5vw); /* 6vh is height of footer & 3.5vw is the approximate margin between heading and top of the page*/
+    /*
+    height: calc(100vh - 6vh - 3.5vw);
+    */
+    /* 6vh is height of footer & 3.5vw is the approximate margin between heading and top of the page*/
 }
 
 .dashboard {
