@@ -13,36 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-html {
+* {
     margin: 0;
     padding: 0;
+}
+
+html,
+body {
     height: 100%;
     font-family: sans-serif;
 }
 
 div.root {
     position: relative;
-    max-width: 1500px;
-    height: auto !important;
-    height: 100%;
-    /*
-    min-height: 100%;
-    margin: 0px auto -6vw;
-	*/
-    min-height: calc(100vh - min(6vh,55px));
+    max-width: 100%;
+    overflow-y: scroll;
+    /* height: auto !important;*/
+    height: calc(100% - min(6vh, 55px));
+    /* min-height: calc(100vh - min(6vh, 55px)); */
+    /* margin: 0px auto -6vw; */
 }
 
-
+.main {
+    overflow: hidden;
+}
 
 .footer {
-
-    /* position: absolute;
-   bottom: 0px !important; */
+    position: absolute;
+    bottom: 0px !important;
     margin: 0px auto;
     width: 100%;
     height: min(6vh, 55px);
-    line-height: min(6vh, 50px); /* Vertically center the text there */
+    /* line-height: min(6vh, 55px); */
+    /* Vertically center the text there */
     background-color: rgba(0, 0, 0, 0.28);
     font-size: min(1vw, 18px);
 }
@@ -146,7 +149,8 @@ body {
     margin-bottom: 20px;
 }
 
-.configuration-table th, .configuration-table td {
+.configuration-table th,
+.configuration-table td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -239,7 +243,7 @@ input[type=checkbox] {
 }
 
 /* Move the slider in the correct position if the checkbox is clicked */
-.checkbox input[type=checkbox]:checked + label {
+.checkbox input[type=checkbox]:checked+label {
     left: 54px;
     background: #27cc1b;
 }
@@ -267,6 +271,7 @@ input[type=checkbox] {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
