@@ -76,7 +76,7 @@ webSocket.onmessage = function (msg) {
         if ( data["version"]["pui-behind"] > 0 ) {
             puiString = "<span style='color: #a90005; font-weight: 900'>" + puiString + "</span>";
         }
-        $( '#footer-middle' ).html( pdbString + " <br> " + puiString );
+        $( '#footer-middle' ).html( pdbString + "&nbsp &nbsp" + puiString );
     }
     if ( data.hasOwnProperty( "startOutput" ) ) {
         appendOutput( $( '#startOutput' ), data["startOutput"] );
