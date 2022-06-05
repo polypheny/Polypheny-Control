@@ -7,7 +7,7 @@ plugins {
 
 group "org.polypheny"
 
-version = versionMajor + "." + versionMinor + versionQualifier
+version = versionMajor + "." + versionMinor
 
 repositories {
     mavenCentral()
