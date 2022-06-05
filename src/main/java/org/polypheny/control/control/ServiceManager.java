@@ -374,6 +374,7 @@ public class ServiceManager {
                     }
                 }
 
+                val buildMode = configuration.getString( "pcrtl.buildmode" );
                 val cleanMode = configuration.getString( "pcrtl.clean.mode" );
                 boolean clean = false;
                 if ( cleanMode.equals( "always" ) ) {
@@ -383,7 +384,7 @@ public class ServiceManager {
                     if ( !versions.get( "pdb-branch" ).equals( configuration.getString( "pcrtl.pdbms.branch" ) ) ) {
                         clean = true;
                     }
-                    if ( !versions.get( "pui-branch" ).equals( configuration.getString( "pcrtl.ui.branch" ) ) ) {
+                    if ( !buildMode.equals( "pdb" ) && !versions.get( "pui-branch" ).equals( configuration.getString( "pcrtl.ui.branch" ) ) ) {
                         clean = true;
                     }
                 }
@@ -419,7 +420,6 @@ public class ServiceManager {
                     clientCommunicationStream.send( "> Updating Polypheny-DB ..." );
                 }
 
-                val buildMode = configuration.getString( "pcrtl.buildmode" );
                 boolean installedUI = false;
                 if ( buildMode.equals( "both" ) || buildMode.equals( "pui" ) ) {
                     installedUI = installUi( clientCommunicationStream, configuration );
