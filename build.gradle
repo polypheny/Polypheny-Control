@@ -7,11 +7,17 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.4"
 }
 
-import org.jetbrains.gradle.ext.*
+
+import org.jetbrains.gradle.ext.Application
 
 group "org.polypheny"
 
-version = versionMajor + "." + versionMinor + versionQualifier
+if (isSnapshot.toBoolean()) {
+    version = versionMajor + "." + versionMinor + "." + versionPatch + "-SNAPSHOT"
+} else {
+    version = versionMajor + "." + versionMinor + "." + versionPatch
+}
+
 
 mainClassName = "org.polypheny.control.main.Main"
 

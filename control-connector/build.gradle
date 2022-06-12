@@ -7,7 +7,11 @@ plugins {
 
 group "org.polypheny"
 
-version = versionMajor + "." + versionMinor + versionQualifier
+if (isSnapshot.toBoolean()) {
+    version = versionMajor + "." + versionMinor + "." + versionPatch + "-SNAPSHOT"
+} else {
+    version = versionMajor + "." + versionMinor + "." + versionPatch
+}
 
 repositories {
     mavenCentral()
@@ -44,7 +48,7 @@ dependencies {
 
     // JSON libs
     implementation group: "com.google.code.gson", name: "gson", version: gson_version // Apache 2.0
-    implementation group: "com.googlecode.json-simple", name: "json-simple", version: json_simple_version
+    implementation group: "com.googlecode.json-simple", name: "json-simple", version: json_simple_version // Apache 2.0
 
     // REST requests (for connector lib)
     implementation group: "com.konghq", name: "unirest-java", version: unirest_version // MIT
@@ -149,4 +153,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.shadow
 }
-
