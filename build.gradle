@@ -7,8 +7,6 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.4"
 }
 
-import org.jetbrains.gradle.ext.Application
-
 group "org.polypheny"
 
 version = versionMajor + "." + versionMinor + versionQualifier
@@ -122,6 +120,7 @@ jar {
         attributes "Implementation-Version": project.version
         attributes "Multi-Release": "true"
         attributes "Version": project.version
+        attributes "Add-Opens": "java.base/java.lang"
     }
 }
 task sourcesJar(type: Jar, dependsOn: classes) {
