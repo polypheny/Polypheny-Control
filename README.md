@@ -1,9 +1,7 @@
 # Polypheny Control
-Polypheny Control allows to easily setup and monitor Polypheny-DB. It takes care of pulling the required repositories and executing the builds. 
+Polypheny Control allows to easily setup and monitor Polypheny-DB. It takes care of pulling the required repositories and executing the builds.
 
-Originally, Polypheny Control has been designed as a tool for automating the evaluation and benchmarking of Polypheny-DB. Its integrated REST interface allows to easily integrate it into complex benchmarking scenarios.
-
-Due to its easy to use user-interface, Polypheny Control is the recommended way for setting up Polypheny-DB.
+Polypheny Control has been designed as a tool for automating the evaluation and benchmarking of Polypheny-DB. Its integrated REST interface allows to easily integrate it into complex benchmarking scenarios.
 
 
 ## Getting Started
@@ -26,7 +24,8 @@ java -jar polypheny-control.jar tray
 ```
 
 #### Headless
-Polypheny Control can be started in healess mode by specifying the parameter `control`:
+
+Polypheny Control can be started in headless mode by specifying the parameter `control`:
 
 ```
 java -jar polypheny-control.jar control
