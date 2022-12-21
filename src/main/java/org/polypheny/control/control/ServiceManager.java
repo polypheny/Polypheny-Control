@@ -627,17 +627,25 @@ public class ServiceManager {
 
         // Move plugins to .polypheny/plugins
         val pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
+        if ( !pluginsFolder.exists() ) {
+            if ( !pluginsFolder.mkdirs() ) {
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Unable to create plugins folder!" );
+                }
+                throw new RuntimeException( "Unable to create plugins folder!" );
+            }
+        }
         val pluginsBuildFolder = new File( pdbBuildDir, "build" + File.separator + "plugins" );
         File[] pluginFiles = pluginsBuildFolder.listFiles( ( dir, name ) -> name.endsWith( ".zip" ) );
         if ( pluginFiles != null ) {
-            for ( File f : files ) {
+            for ( File f : pluginFiles ) {
                 try {
-                    Files.move( f.toPath(), pluginsFolder.toPath(), StandardCopyOption.REPLACE_EXISTING );
+                    Files.move( f.toPath(), new File( pluginsFolder, f.getName() ).toPath(), StandardCopyOption.REPLACE_EXISTING );
                 } catch ( IOException e ) {
                     if ( clientCommunicationStream != null ) {
                         clientCommunicationStream.send( "> Unable to move plugin file!" );
                     }
-                    throw new RuntimeException( "Unable to move plugin file!" );
+                    throw new RuntimeException( "Unable to move plugin file!", e );
                 }
             }
         } else {
