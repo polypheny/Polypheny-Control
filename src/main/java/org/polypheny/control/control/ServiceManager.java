@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -593,11 +594,18 @@ public class ServiceManager {
 
         File dbmsJar = null;
         if ( files != null ) {
+            int applicableFileCounter = 0;
             for ( File f : files ) {
-                if ( !f.getName().contains( "javadoc" ) && !f.getName().contains( "sources" ) ) {
+                if ( !f.getName().contains( "javadoc" ) && !f.getName().contains( "sources" ) && !f.getName().contains( "test" ) ) {
                     dbmsJar = f;
-                    break;
+                    applicableFileCounter++;
                 }
+            }
+            if ( applicableFileCounter > 1 ) {
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> There are multiple applicable JAR files in the dbms/build/libs folder!" );
+                }
+                throw new RuntimeException( "There are multiple applicable JAR files in the dbms/build/libs folder!" );
             }
         } else {
             throw new RuntimeException( "JAR file not found!" );
@@ -615,6 +623,25 @@ public class ServiceManager {
                 clientCommunicationStream.send( "> JAR file does not exist!" );
             }
             throw new RuntimeException( "JAR file does not exist!" );
+        }
+
+        // Move plugins to .polypheny/plugins
+        val pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
+        val pluginsBuildFolder = new File( pdbBuildDir, "build" + File.separator + "plugins" );
+        File[] pluginFiles = pluginsBuildFolder.listFiles( ( dir, name ) -> name.endsWith( ".zip" ) );
+        if ( pluginFiles != null ) {
+            for ( File f : files ) {
+                try {
+                    Files.move( f.toPath(), pluginsFolder.toPath(), StandardCopyOption.REPLACE_EXISTING );
+                } catch ( IOException e ) {
+                    if ( clientCommunicationStream != null ) {
+                        clientCommunicationStream.send( "> Unable to move plugin file!" );
+                    }
+                    throw new RuntimeException( "Unable to move plugin file!" );
+                }
+            }
+        } else {
+            // Ignore for now, could be a version of Polypheny prior to the introduction of the plugin support
         }
     }
 
