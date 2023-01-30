@@ -131,17 +131,17 @@ public class Control {
 
 
     public void polyfierStart( Context ctx ) {
-        ctx.result( gson.toJson( PolyfierManager.start( this, getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
+        ctx.result( gson.toJson( PolyfierManager.start( getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
     }
 
 
     public void polyfierStopForcefully( Context ctx ) {
-        ctx.result( gson.toJson( PolyfierManager.stopForcefully( this, getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
+        ctx.result( gson.toJson( PolyfierManager.stopForcefully( getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
     }
 
 
     public void polyfierStopGracefully( Context ctx ) {
-        ctx.result( gson.toJson( PolyfierManager.stopGracefully( this, getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
+        ctx.result( gson.toJson( PolyfierManager.stopGracefully( getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
     }
 
 

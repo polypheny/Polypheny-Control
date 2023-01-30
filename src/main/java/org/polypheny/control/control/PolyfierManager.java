@@ -30,7 +30,7 @@ public class PolyfierManager {
     private static PolyfierRunner polyfierRunnerInstance;
 
 
-    public static boolean start( Control control, final ClientCommunicationStream logOutputStream, final ClientCommunicationStream polyfierOutputStream ) {
+    public static boolean start( final ClientCommunicationStream logOutputStream, final ClientCommunicationStream polyfierOutputStream ) {
         // Check status
         if ( ServiceManager.getStatus() != "idling" ) {
             polyfierOutputStream.send( "Control must be in idle state. Stop Polypheny and try again." );
@@ -54,7 +54,7 @@ public class PolyfierManager {
     }
 
 
-    public static boolean stopForcefully( Control control, final ClientCommunicationStream logOutputStream, final ClientCommunicationStream polyfierOutputStream ) {
+    public static boolean stopForcefully( final ClientCommunicationStream logOutputStream, final ClientCommunicationStream polyfierOutputStream ) {
         ServiceManager.polyfierMode = false;
         polyfierOutputStream.send( "Forcefully leaving Polyfier mode" );
         // ToDo: Solve differently
@@ -75,7 +75,7 @@ public class PolyfierManager {
     }
 
 
-    public static boolean stopGracefully( Control control, final ClientCommunicationStream logOutputStream, final ClientCommunicationStream polyfierOutputStream ) {
+    public static boolean stopGracefully( final ClientCommunicationStream logOutputStream, final ClientCommunicationStream polyfierOutputStream ) {
         ServiceManager.polyfierMode = false;
         polyfierOutputStream.send( "Gracefully leaving Polyfier mode" );
         polyfierRunnerInstance.stopGracefully();
@@ -121,6 +121,8 @@ public class PolyfierManager {
 
 
         void processJob() {
+            polyfierOutputStream.send( "Processing Job: JOB_ID" );
+
             Config config = ConfigManager.getConfig();
 
             // Set repository
