@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2017-2021 The Polypheny Project
+  ~ Copyright 2017-2023 The Polypheny Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@
                     </td>
                     <td style="padding-top: 4%; padding-bottom:4%;"></td>
                     <td style="padding-top: 4%; padding-bottom:4%;">
-                        <div class="circle tooltip" id="btn-config" title="Nothing interesting here yet :)"><i class="fa fa-wrench fa-5x" style="font-size:min(5vw, 85px);"></i></div>
+                        <div class="circle tooltip" id="btn-polyfier" title="Polyfier"><i class="fa fa-clipboard-check fa-5x" style="font-size:min(5vw, 85px);"></i></div>
                     </td>
                     <td style="padding-top: 4%; padding-bottom:4%;"></td>
                     <td style="padding-top: 4%; padding-bottom:4%;">
@@ -88,13 +88,35 @@
             <button type="button" class="btn-back">OK</button>
         </div>
 
+        <div id="polyfierContent" class="content" style="display: none;">
+            <h1>Polyfier</h1>
+
+            <span id="polyfierConnectionStatus">Disconnected</span>
+
+            <button type="button" id="polyfierStart">Start</button>
+
+            <br><br>
+
+            <button type="button" class="btn-back">OK</button>
+        </div>
+
+        <div id="polyfierRunningContent" class="content" style="display: none;">
+            <h1>Polyfier is running...</h1>
+            <pre class="output" id="polyfierOutput" style="height: 200px;"></pre>
+            <pre class="output" id="logOutputPolyfier"></pre>
+            <button type="button" class="btn-red" id="polyfierStop">Stop</button>
+        </div>
+
+        <div id="polyfierStopContent" class="content" style="display: none;">
+            <h1>Stop Polyfier?</h1>
+            <p>When Polyfier is stopped gracefully, the currently running job is being completed but no new job is started. A forceful stop immediately terminates the Polyfier mode and aborts the currently running job.</p>
+            <button type="button" class="btn-red" id="polyfierStopGracefully">Stop Gracefully</button>
+            <button type="button" class="btn-red" id="polyfierStopForcefully">Stop Forcefully</button>
+            <br><br>
+            <button type="button" class="btn-blue" id="polyfierStop-back">back</button>
+        </div>
+
         <form id="configs" name="configs">
-
-            <div id="configContent" class="content" style="display: none;">
-                <h1>Configuration</h1>
-
-                <button type="button" class="btn-back">OK</button>
-            </div>
 
             <div id="settingsContent" class="content" style="display: none;">
                 <h1>Settings</h1>
@@ -148,6 +170,26 @@
                         <td><input name="pcrtl.pdbms.args" value=""></td>
                     </tr>
                 </table>
+                <br>
+                <h2 style="text-align: left;">Polyfier</h2>
+                <table class="configuration-table">
+                    <tr>
+                        <th>Setting</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Polyfier Control Server</td>
+                        <td>
+                            <input name="pcrtl.polyfier.server" value="polyfier.polypheny.com">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Polyfier API Key</td>
+                        <td>
+                            <input name="pcrtl.polyfier.apikey">
+                        </td>
+                    </tr>
+                </table>
                 <button type="button" class="btn-back" id="saveSettings">OK</button>
             </div>
         </form>
@@ -174,7 +216,7 @@
     </table>
 </footer>
 
-<script src="/jquery/3.6.1/jquery.js"></script>
+<script src="/jquery/3.6.2/jquery.js"></script>
 <script src="/jquery-serializejson/2.9.0/jquery.serializejson.min.js"></script>
 <script src="/ansi_up/2.0.2/ansi_up.js"></script>
 <script src="/tooltipster/4.2.8/dist/js/tooltipster.bundle.min.js"></script>

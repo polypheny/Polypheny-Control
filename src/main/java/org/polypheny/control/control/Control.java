@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2017-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,10 @@ public class Control {
 
 
     public synchronized void setConfig( Context ctx ) {
+        if ( ServiceManager.polyfierMode ) {
+            getClientCommunicationStream( ctx, "Running in Polyfier mode, all commands are ignored!" );
+            return;
+        }
         getClientCommunicationStream( ctx, "currentConfig" );
 
         val json = ctx.formParam( "config" );
@@ -91,22 +95,53 @@ public class Control {
 
 
     public void start( Context ctx ) {
+        if ( ServiceManager.polyfierMode ) {
+            getClientCommunicationStream( ctx, "Running in Polyfier mode, all commands are ignored!" );
+            return;
+        }
         ctx.result( gson.toJson( ServiceManager.start( getClientCommunicationStream( ctx, "logOutput" ) ) ) );
     }
 
 
     public void stop( Context ctx ) {
+        if ( ServiceManager.polyfierMode ) {
+            getClientCommunicationStream( ctx, "Running in Polyfier mode, all commands are ignored!" );
+            return;
+        }
         ctx.result( gson.toJson( ServiceManager.stop( getClientCommunicationStream( ctx, "logOutput" ) ) ) );
     }
 
 
     public void restart( Context ctx ) {
+        if ( ServiceManager.polyfierMode ) {
+            getClientCommunicationStream( ctx, "Running in Polyfier mode, all commands are ignored!" );
+            return;
+        }
         ctx.result( gson.toJson( ServiceManager.restart( getClientCommunicationStream( ctx, "logOutput" ) ) ) );
     }
 
 
     public void update( Context ctx ) {
+        if ( ServiceManager.polyfierMode ) {
+            getClientCommunicationStream( ctx, "Running in Polyfier mode, all commands are ignored!" );
+            return;
+        }
         ctx.result( gson.toJson( ServiceManager.update( getClientCommunicationStream( ctx, "updateOutput" ) ) ) );
+    }
+
+
+    public void polyfierStart( Context ctx ) {
+        ctx.result( gson.toJson( PolyfierManager.start( this, getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
+    }
+
+
+    public void polyfierStopForcefully( Context ctx ) {
+        ctx.result( gson.toJson( PolyfierManager.stopForcefully( this, getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
+    }
+
+
+    public void polyfierStopGracefully( Context ctx ) {
+        ctx.result( gson.toJson( PolyfierManager.stopGracefully( this, getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
     }
 
 

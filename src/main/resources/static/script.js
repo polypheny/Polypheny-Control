@@ -1,29 +1,22 @@
 /*
- * The MIT License (MIT)
+ * Copyright 2017-2023 The Polypheny Project
  *
- * Copyright (c) 2017-2019 Databases and Information Systems Research Group, University of Basel, Switzerland
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 var webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/socket/");
 var clientId = 0;
+var state = "";
 
 var debug = false;
 
@@ -42,14 +35,30 @@ webSocket.onmessage = function (msg) {
         setClientType();
     }
     if ( data.hasOwnProperty("status") ) { // Periodically sent by server to keep the connection open
-        if ( data["status"] === "running" ) {
+        if ( data["status"] === "polyfier" ) {
+            $( '#logContent' ).hide();
+            $( '#polyfierContent' ).hide();
+            $( '#settingsContent' ).hide();
+            $( '#dashboardContent' ).hide();
+            if ( $('#polyfierStopContent').is(":hidden") ) {
+                $( '#polyfierRunningContent' ).show();
+            }
+        } else if ( data["status"] === "running" ) {
             $( '#btn-start' ).hide();
             $( '#btn-stop' ).show();
             $( '#updateOutputBackButton' ).removeClass('btn-back-disabled');
+            if (! $('#polyfierRunningContent').is(":hidden") ) {
+                $( '#polyfierRunningContent' ).hide();
+                $( '#dashboardContent' ).show();
+            }
         } else if ( data["status"] === "idling" ) {
             $( '#btn-stop' ).hide();
             $( '#btn-start' ).show();
             $( '#updateOutputBackButton' ).removeClass('btn-back-disabled');
+            if (! $('#polyfierRunningContent').is(":hidden") ) {
+                $( '#polyfierRunningContent' ).hide();
+                $( '#dashboardContent' ).show();
+            }
         } else { // updating
             $( '#logContent' ).hide();
             $( '#configContent' ).hide();
@@ -57,8 +66,13 @@ webSocket.onmessage = function (msg) {
             $( '#dashboardContent' ).hide();
             $( '#updateContent' ).show();
             $( '#updateOutputBackButton' ).addClass('btn-back-disabled');
+            if (! $('#polyfierRunningContent').is(":hidden") ) {
+                $( '#polyfierRunningContent' ).hide();
+                $( '#dashboardContent' ).show();
+            }
         }
         $( '#footer-right' ).text( "Status: " + data["status"] );
+        state = data["status"];
     }
     if ( data.hasOwnProperty( "benchmarkerConnected" ) ) { // Periodically sent by server to keep the connection open
         if ( data["benchmarkerConnected"] === "true" ) {
@@ -91,8 +105,15 @@ webSocket.onmessage = function (msg) {
         appendOutput($('#updateOutput'), data["updateOutput"]);
     }
     if (data.hasOwnProperty("logOutput")) {
-        appendOutput($('#logOutput'), data["logOutput"]);
+        if (state === "polyfier") {
+            appendOutput($('#logOutputPolyfier'), data["logOutput"]);
+        } else {
+            appendOutput($('#logOutput'), data["logOutput"]);
+        }
     }
+    if (data.hasOwnProperty("polyfierOutput")) {
+            appendOutput($('#polyfierOutput'), data["polyfierOutput"]);
+        }
 };
 
 webSocket.onclose = function () {
@@ -137,9 +158,9 @@ $('#btn-log').click(function () {
     $('#logContent').show();
 });
 
-$('#btn-config').click(function () {
+$('#btn-polyfier').click(function () {
     $( '#dashboardContent' ).hide();
-    $( '#configContent' ).show();
+    $( '#polyfierContent' ).show();
 });
 
 $('#btn-settings').click(function () {
@@ -157,17 +178,43 @@ $('.btn-back').click(function () {
     $('#dashboardContent').show();
     $('#updateContent').hide();
     $('#logContent').hide();
-    $('#configContent').hide();
-    $( '#settingsContent' ).hide();
-    $( '#config-loading' ).hide();
-});
-
-$('#saveConfigs').click(function () {
-    saveConfigs();
+    $('#polyfierContent').hide();
+    $('#settingsContent' ).hide();
+    $('#config-loading' ).hide();
 });
 
 $('#saveSettings').click(function () {
     saveConfigs();
+});
+
+$('#polyfierStart').click(function () {
+    sendRequest("polyfier/start");
+});
+
+$('#polyfierStop').click(function () {
+    $('#polyfierRunningContent').hide();
+    $('#polyfierStopContent').show();
+});
+
+$('#polyfierStop-back').click(function () {
+    $('#polyfierStopContent').hide();
+    if ( state === 'polyfier' ) {
+        $('#polyfierRunningContent').show();
+    } else {
+        $('#dashboardContent').show();
+    }
+});
+
+$('#polyfierStopForcefully').click(function () {
+    sendRequest("polyfier/stopForcefully");
+    $('#polyfierStopContent').hide();
+    $('#polyfierRunningContent').show();
+});
+
+$('#polyfierStopGracefully').click(function () {
+    sendRequest("polyfier/stopGracefully");
+    $('#polyfierStopContent').hide();
+    $('#polyfierRunningContent').show();
 });
 
 function sendRequest(url) {

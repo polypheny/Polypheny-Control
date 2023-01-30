@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2017-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,11 @@ public class Server {
         javalin.get( "/control/status", control::getStatus );
         javalin.get( "/control/pdbBranches", control::getAvailablePdbBranches );
         javalin.get( "/control/puiBranches", control::getAvailablePuiBranches );
+
+        // /polyfier
+        javalin.post( "/polyfier/start", control::polyfierStart );
+        javalin.post( "/polyfier/stopForcefully", control::polyfierStopForcefully );
+        javalin.post( "/polyfier/stopGracefully", control::polyfierStopGracefully );
 
         // Client
         javalin.post( "/client/type", ClientRegistry::setClientType );

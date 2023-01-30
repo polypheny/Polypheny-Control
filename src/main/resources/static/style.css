@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2017-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,6 +177,7 @@ body {
 
 
 /* http://callmenick.com/post/stylish-css-buttons */
+.btn-blue,
 .btn-back {
     color: #fff;
     background-color: #346392;
@@ -191,10 +192,28 @@ body {
     background-color: #bfbfbf !important;
 }
 
+.btn-blue:hover,
+.btn-blue.hover,
 .btn-back:hover,
 .btn-back.hover {
     background-color: #28486d;
     text-shadow: -1px 1px #193047;
+}
+
+.btn-red {
+    color: #fff;
+    background-color: #db0e3a;
+    text-shadow: -1px 1px #6d272f;
+    border: none;
+    font-size: 25px;
+    width: 200px;
+    height: 50px;
+}
+
+.btn-red:hover,
+.btn-red.hover {
+    background-color: #b9082d;
+    text-shadow: -1px 1px #542329;
 }
 
 .dropzone {

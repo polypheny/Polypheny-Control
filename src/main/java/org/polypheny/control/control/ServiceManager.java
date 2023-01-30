@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 The Polypheny Project
+ * Copyright 2017-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ public class ServiceManager {
     private static Tailer errTailer = null; // ! Shared over multiple stateless requests
 
     private static boolean currentlyUpdating = false;
-
+    public static boolean polyfierMode = false;
 
     static {
         Runtime.getRuntime().addShutdownHook( new Thread( () -> {
@@ -153,6 +153,11 @@ public class ServiceManager {
 
 
     public static boolean start( final ClientCommunicationStream clientCommunicationStream, final boolean startTailers ) {
+        return start( clientCommunicationStream, true, "" );
+    }
+
+
+    public static boolean start( final ClientCommunicationStream clientCommunicationStream, final boolean startTailers, String additionalArguments ) {
         val configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
             //restorePolyphenyDbProcess();
@@ -191,6 +196,9 @@ public class ServiceManager {
             List<String> pdbArguments = new LinkedList<>();
             if ( pdbmsArgs.trim().length() > 0 ) {
                 pdbArguments.addAll( Arrays.asList( pdbmsArgs.split( " " ) ) );
+            }
+            if ( additionalArguments.trim().length() > 0 ) {
+                pdbArguments.addAll( Arrays.asList( additionalArguments.split( " " ) ) );
             }
 
             if ( !new File( javaExecutable ).exists() ) {
@@ -911,7 +919,9 @@ public class ServiceManager {
 
 
     public static Object getStatus() {
-        if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
+        if ( polyfierMode ) {
+            return "polyfier";
+        } else if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
             return "running";
         } else if ( currentlyUpdating ) {
             return "updating";
