@@ -10,17 +10,17 @@ jobs:
             contents: read
             packages: write
         steps:
-            -   uses: actions/checkout@v2
-            -   name: Set up Java
-                uses: actions/setup-java@v2
-                with:
-                    java-version: '11'
-                    distribution: 'adopt'
-            -   name: Publish package
-                run: ./gradlew publish
-                env:
-                    MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-                    MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
-                    ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+            - uses: actions/checkout@v3
+            - name: Set up Java
+              uses: actions/setup-java@v3
+              with:
+                  java-version: '11'
+                  distribution: 'adopt'
+            - name: Publish package
+              run: ./gradlew publish
+              env:
+                  MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+                  MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+                  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
