@@ -10,7 +10,7 @@ This section describes how to set up Polypheny Control to build and run Polyphen
 
 ### Requirements
 To build and start Polypheny-DB using Polypheny Control you need to have a Java JDK of version 11 or higher installed on your system.
-Thanks to [JGit](https://github.com/eclipse/jgit), Polypheny Control contains a pure Java implementation of Git. Therefore, it is no longer required to have Git installed on the system.
+Thanks to [JGit](https://eclipse.dev/jgit/), Polypheny Control contains a pure Java implementation of Git. Therefore, it is no longer required to have Git installed on the system.
 
 
 ### Setup
@@ -67,7 +67,7 @@ _Polypheny Control_ builds upon the great work of several other open source proj
 * [Font Awesome](https://fontawesome.com/): A set of web-related icons.
 * [jQuery](https://jquery.com/): The library that makes Javascript usable.
 * [jquery.serializeJSON](https://github.com/marioizquierdo/jquery.serializeJSON): Serialize an HTML Form to a JavaScript Object.
-* [Tooltipster](https://iamceege.github.io/tooltipster/): jQuery plugin for modern tooltips.
+* [Tooltipster](https://calebjacob.github.io/tooltipster/): jQuery plugin for modern tooltips.
 
 All these libraries are imported using [WebJars](https://www.webjars.org/).
 
