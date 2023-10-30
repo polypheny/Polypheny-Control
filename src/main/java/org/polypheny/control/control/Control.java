@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import lombok.NonNull;
-import lombok.val;
 import org.polypheny.control.httpinterface.ClientCommunicationStream;
 
 
@@ -54,7 +53,7 @@ public class Control {
         }
         getClientCommunicationStream( ctx, "currentConfig" );
 
-        val json = ctx.formParam( "config" );
+        String json = ctx.formParam( "config" );
 
         JsonObject object = JsonParser.parseString( json ).getAsJsonObject();
 
@@ -166,8 +165,8 @@ public class Control {
 
 
     public void getAvailablePdbBranches( Context ctx ) {
-        val configuration = ConfigManager.getConfig();
-        val pdbbuilddir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
+        Config configuration = ConfigManager.getConfig();
+        File pdbbuilddir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
         if ( !pdbbuilddir.exists() ) {
             ServiceManager.clonePdbRepository( null, configuration );
         }
@@ -177,8 +176,8 @@ public class Control {
 
 
     public void getAvailablePuiBranches( Context ctx ) {
-        val configuration = ConfigManager.getConfig();
-        val puiBuildDir = new File( configuration.getString( "pcrtl.puibuilddir" ) );
+        Config configuration = ConfigManager.getConfig();
+        File puiBuildDir = new File( configuration.getString( "pcrtl.puibuilddir" ) );
         if ( !puiBuildDir.exists() ) {
             ServiceManager.clonePuiRepository( null, configuration );
         }
@@ -190,7 +189,7 @@ public class Control {
     private ClientCommunicationStream getClientCommunicationStream( @NonNull final Context context, @NonNull final String topic ) {
         String str = context.formParam( "clientId" );
         if ( str != null ) {
-            val cid = Integer.parseInt( str );
+            int cid = Integer.parseInt( str );
             return new ClientCommunicationStream( cid, topic );
         }
         throw new NoSuchElementException( "The request does not contain a client identifier (clientId)" );

@@ -42,7 +42,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
@@ -98,8 +97,8 @@ public class ServiceManager {
      *  static block would be more relevant (I guess).
      */
     private static void restorePolyphenyDbProcess() {
-        val configuration = ConfigManager.getConfig();
-        val workingDir = new File( configuration.getString( "pcrtl.workingdir" ) );
+        Config configuration = ConfigManager.getConfig();
+        File workingDir = new File( configuration.getString( "pcrtl.workingdir" ) );
         if ( !workingDir.exists() ) {
             if ( !workingDir.mkdirs() ) {
                 throw new RuntimeException( "Could not create the required directories: " + workingDir );
@@ -113,14 +112,14 @@ public class ServiceManager {
             }
         }
 
-        val pidFile = new File( configuration.getString( "pcrtl.pdbms.pidfile" ) );
+        File pidFile = new File( configuration.getString( "pcrtl.pdbms.pidfile" ) );
         try {
             FileUtils.touch( pidFile );
             if ( pidFile.exists() ) {
                 // should always be true...
 
-                try ( val pidReader = new BufferedReader( new InputStreamReader( new FileInputStream( pidFile ), StandardCharsets.UTF_8 ) ) ) {
-                    val line = pidReader.readLine();
+                try ( BufferedReader pidReader = new BufferedReader( new InputStreamReader( new FileInputStream( pidFile ), StandardCharsets.UTF_8 ) ) ) {
+                    String line = pidReader.readLine();
                     if ( line != null && !line.isEmpty() ) {
                         // Restore
                         polyphenyDbProcess = PolyphenyDbProcess.createFromPid( Integer.parseInt( line ) );
@@ -133,7 +132,7 @@ public class ServiceManager {
 
                 if ( polyphenyDbProcess != null && !polyphenyDbProcess.isAlive() ) {
                     // if dead, make sure the file is empty
-                    try ( val pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile ), StandardCharsets.UTF_8 ) ) {
+                    try ( OutputStreamWriter pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile ), StandardCharsets.UTF_8 ) ) {
                         pidWriter.append( "" );
                         pidWriter.flush();
                     } catch ( IOException e ) {
@@ -158,7 +157,7 @@ public class ServiceManager {
 
 
     public static boolean start( final ClientCommunicationStream clientCommunicationStream, final boolean startTailers, String additionalArguments ) {
-        val configuration = ConfigManager.getConfig();
+        Config configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
             //restorePolyphenyDbProcess();
 
@@ -171,17 +170,17 @@ public class ServiceManager {
                 return false;
             }
 
-            val workingDir = configuration.getString( "pcrtl.workingdir" );
-            val pidFile = configuration.getString( "pcrtl.pdbms.pidfile" );
-            val logsDir = configuration.getString( "pcrtl.logsdir" );
-            val javaExecutable = configuration.getString( "pcrtl.java.executable" ) + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
-            val javaOptions = configuration.getStringList( "pcrtl.java.options" );
-            val javaMaximumHeapSize = configuration.getString( "pcrtl.java.heap" );
-            val pdbmsJar = configuration.getString( "pcrtl.pdbms.jarfile" );
-            val pdbmsMainClass = configuration.getString( "pcrtl.pdbms.mainclass" );
-            val pdbmsArgs = configuration.getString( "pcrtl.pdbms.args" );
-            val logFile = new File( new File( logsDir ), new SimpleDateFormat( "'polypheny-db_'yyyy.MM.dd_HH-mm-ss.SSS'.log'" ).format( new Date() ) ).getAbsolutePath();
-            val errFile = logFile.substring( 0, logFile.lastIndexOf( '.' ) ) + ".err.log";
+            String workingDir = configuration.getString( "pcrtl.workingdir" );
+            String pidFile = configuration.getString( "pcrtl.pdbms.pidfile" );
+            String logsDir = configuration.getString( "pcrtl.logsdir" );
+            String javaExecutable = configuration.getString( "pcrtl.java.executable" ) + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
+            List<String> javaOptions = configuration.getStringList( "pcrtl.java.options" );
+            String javaMaximumHeapSize = configuration.getString( "pcrtl.java.heap" );
+            String pdbmsJar = configuration.getString( "pcrtl.pdbms.jarfile" );
+            String pdbmsMainClass = configuration.getString( "pcrtl.pdbms.mainclass" );
+            String pdbmsArgs = configuration.getString( "pcrtl.pdbms.args" );
+            String logFile = new File( new File( logsDir ), new SimpleDateFormat( "'polypheny-db_'yyyy.MM.dd_HH-mm-ss.SSS'.log'" ).format( new Date() ) ).getAbsolutePath();
+            String errFile = logFile.substring( 0, logFile.lastIndexOf( '.' ) ) + ".err.log";
             //
             //
 
@@ -220,7 +219,7 @@ public class ServiceManager {
                 }
             }
 
-            try ( val pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile, false ), StandardCharsets.UTF_8 ) ) {
+            try ( OutputStreamWriter pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile, false ), StandardCharsets.UTF_8 ) ) {
 
                 log.info( "> Starting Polypheny-DB" );
                 if ( clientCommunicationStream != null ) {
@@ -242,7 +241,7 @@ public class ServiceManager {
                         .withErrFile( new File( errFile ), false )
                         .start();
 
-                val polyphenyDbProcessId = polyphenyDbProcess.getPid();
+                int polyphenyDbProcessId = polyphenyDbProcess.getPid();
                 pidWriter.append( String.valueOf( polyphenyDbProcessId ) );
                 pidWriter.flush();
 
@@ -292,7 +291,7 @@ public class ServiceManager {
 
 
     public static boolean stop( final ClientCommunicationStream clientCommunicationStream ) {
-        val configuration = ConfigManager.getConfig();
+        Config configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
             //restorePolyphenyDbProcess();
 
@@ -310,7 +309,7 @@ public class ServiceManager {
             }
 
             //
-            val pidFile = new File( configuration.getString( "pcrtl.pdbms.pidfile" ) );
+            File pidFile = new File( configuration.getString( "pcrtl.pdbms.pidfile" ) );
             //
 
             polyphenyDbProcess = null;
@@ -326,7 +325,7 @@ public class ServiceManager {
             errTailer = null;
 
             if ( !pidFile.delete() ) {
-                try ( val pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile, false ), StandardCharsets.UTF_8 ) ) {
+                try ( OutputStreamWriter pidWriter = new OutputStreamWriter( new FileOutputStream( pidFile, false ), StandardCharsets.UTF_8 ) ) {
                     pidWriter.append( "" );
                     pidWriter.flush();
                 } catch ( IOException e ) {
@@ -359,7 +358,7 @@ public class ServiceManager {
 
 
     public static boolean update( final ClientCommunicationStream clientCommunicationStream ) {
-        val configuration = ConfigManager.getConfig();
+        Config configuration = ConfigManager.getConfig();
         synchronized ( MUTEX ) {
             try {
                 currentlyUpdating = true;
@@ -374,8 +373,8 @@ public class ServiceManager {
                     return false;
                 }
 
-                val workingDir = configuration.getString( "pcrtl.workingdir" );
-                val builddir = configuration.getString( "pcrtl.builddir" );
+                String workingDir = configuration.getString( "pcrtl.workingdir" );
+                String builddir = configuration.getString( "pcrtl.builddir" );
 
                 if ( !new File( workingDir ).exists() ) {
                     if ( !new File( workingDir ).mkdirs() ) {
@@ -383,8 +382,8 @@ public class ServiceManager {
                     }
                 }
 
-                val buildMode = configuration.getString( "pcrtl.buildmode" );
-                val cleanMode = configuration.getString( "pcrtl.clean.mode" );
+                String buildMode = configuration.getString( "pcrtl.buildmode" );
+                String cleanMode = configuration.getString( "pcrtl.clean.mode" );
                 boolean clean = false;
                 if ( cleanMode.equals( "always" ) ) {
                     clean = true;
@@ -455,12 +454,12 @@ public class ServiceManager {
     private static void buildPdb( final ClientCommunicationStream clientCommunicationStream, Config configuration, boolean forceUiBuild ) {
         boolean requiresBuild = false;
 
-        val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
-        val repo = configuration.getString( "pcrtl.pdbms.repo" );
-        val branch = configuration.getString( "pcrtl.pdbms.branch" );
+        File pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
+        String repo = configuration.getString( "pcrtl.pdbms.repo" );
+        String branch = configuration.getString( "pcrtl.pdbms.branch" );
 
         // Delete old DBMS Jar
-        val oldJar = new File( configuration.getString( "pcrtl.pdbms.oldjarfile" ) );
+        File oldJar = new File( configuration.getString( "pcrtl.pdbms.oldjarfile" ) );
         if ( oldJar.exists() ) {
             if ( !oldJar.delete() ) {
                 log.info( "> Unable to delete the old jar file." );
@@ -471,7 +470,7 @@ public class ServiceManager {
         }
 
         // Rename DBMS Jar
-        val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
+        File jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( jar.exists() ) {
             if ( !jar.renameTo( oldJar ) ) {
                 log.info( "> Unable to rename the jar file." );
@@ -527,7 +526,7 @@ public class ServiceManager {
             }
             git.checkout().setName( branch ).call();
             git.pull().call();
-            val newCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            String newCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
             requiresBuild |= !oldCommitId.equals( newCommitId );
             git.close();
         } catch ( GitAPIException | IOException e ) {
@@ -597,7 +596,7 @@ public class ServiceManager {
         }
 
         // Move jar to working dir
-        val dbmsJarFolder = new File( pdbBuildDir, "dbms" + File.separator + "build" + File.separator + "libs" );
+        File dbmsJarFolder = new File( pdbBuildDir, "dbms" + File.separator + "build" + File.separator + "libs" );
         File[] files = dbmsJarFolder.listFiles( ( dir, name ) -> name.startsWith( "dbms-" ) );
 
         File dbmsJar = null;
@@ -634,7 +633,7 @@ public class ServiceManager {
         }
 
         // Move plugins to .polypheny/plugins
-        val pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
+        File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
         if ( !pluginsFolder.exists() ) {
             if ( !pluginsFolder.mkdirs() ) {
                 if ( clientCommunicationStream != null ) {
@@ -643,7 +642,7 @@ public class ServiceManager {
                 throw new RuntimeException( "Unable to create plugins folder!" );
             }
         }
-        val pluginsBuildFolder = new File( pdbBuildDir, "build" + File.separator + "plugins" );
+        File pluginsBuildFolder = new File( pdbBuildDir, "build" + File.separator + "plugins" );
         File[] pluginFiles = pluginsBuildFolder.listFiles( ( dir, name ) -> name.endsWith( ".zip" ) );
         if ( pluginFiles != null ) {
             for ( File f : pluginFiles ) {
@@ -663,8 +662,8 @@ public class ServiceManager {
 
 
     public static void clonePdbRepository( ClientCommunicationStream clientCommunicationStream, Config configuration ) {
-        val pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
-        val repo = configuration.getString( "pcrtl.pdbms.repo" );
+        File pdbBuildDir = new File( configuration.getString( "pcrtl.pdbbuilddir" ) );
+        String repo = configuration.getString( "pcrtl.pdbms.repo" );
 
         log.info( "> Cloning Polypheny-DB repository ..." );
         if ( clientCommunicationStream != null ) {
@@ -691,11 +690,11 @@ public class ServiceManager {
     private static boolean installUi( final ClientCommunicationStream clientCommunicationStream, Config configuration ) {
         boolean requiresInstall = false;
 
-        val buildDir = configuration.getString( "pcrtl.builddir" );
-        val repo = configuration.getString( "pcrtl.ui.repo" );
-        val branch = configuration.getString( "pcrtl.ui.branch" );
+        String buildDir = configuration.getString( "pcrtl.builddir" );
+        String repo = configuration.getString( "pcrtl.ui.repo" );
+        String branch = configuration.getString( "pcrtl.ui.branch" );
 
-        val uiBuildDir = new File( buildDir, "ui" );
+        File uiBuildDir = new File( buildDir, "ui" );
 
         try {
             if ( uiBuildDir.exists() ) {
@@ -747,7 +746,7 @@ public class ServiceManager {
             }
             git.checkout().setName( branch ).call();
             git.pull().call();
-            val newCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
+            String newCommitId = git.getRepository().resolve( Constants.HEAD ).getName();
             requiresInstall |= !oldCommitId.equals( newCommitId );
             git.close();
         } catch ( GitAPIException | IOException e ) {
@@ -759,7 +758,7 @@ public class ServiceManager {
         }
 
         // Check if we need to build
-        val jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
+        File jar = new File( configuration.getString( "pcrtl.pdbms.jarfile" ) );
         if ( !requiresInstall && jar.exists() ) {
             log.info( "> No changes to UI repository and therefore no need to rebuild Polypheny-UI ..." );
             if ( clientCommunicationStream != null ) {
@@ -811,9 +810,9 @@ public class ServiceManager {
 
 
     public static void clonePuiRepository( ClientCommunicationStream clientCommunicationStream, Config configuration ) {
-        val buildDir = configuration.getString( "pcrtl.builddir" );
-        val repo = configuration.getString( "pcrtl.ui.repo" );
-        val uiBuildDir = new File( buildDir, "ui" );
+        String buildDir = configuration.getString( "pcrtl.builddir" );
+        String repo = configuration.getString( "pcrtl.ui.repo" );
+        File uiBuildDir = new File( buildDir, "ui" );
 
         log.info( "> Cloning Polypheny-UI repository ..." );
         if ( clientCommunicationStream != null ) {
@@ -837,10 +836,10 @@ public class ServiceManager {
 
 
     public static Map<String, String> getVersion() {
-        val configuration = ConfigManager.getConfig();
-        val buildDir = configuration.getString( "pcrtl.builddir" );
-        val pdbBuildDir = new File( buildDir, "pdb" );
-        val puiBuildDir = new File( buildDir, "ui" );
+        Config configuration = ConfigManager.getConfig();
+        String buildDir = configuration.getString( "pcrtl.builddir" );
+        File pdbBuildDir = new File( buildDir, "pdb" );
+        File puiBuildDir = new File( buildDir, "ui" );
 
         Map<String, String> map = new HashMap<>();
 
@@ -1016,11 +1015,11 @@ public class ServiceManager {
         @Override
         public void fileNotFound() {
             if ( this.tailer.getFile().getName().endsWith( ".err.log" ) ) {
-                for ( val consumer : consumers ) {
+                for ( Consumer<String> consumer : consumers ) {
                     consumer.accept( "> !! The error log file was not found. Stopping the Tailer. !!" );
                 }
             } else {
-                for ( val consumer : consumers ) {
+                for ( Consumer<String> consumer : consumers ) {
                     consumer.accept( "> !! The log file was not found. Stopping the Tailer. !!" );
                 }
             }
@@ -1031,11 +1030,11 @@ public class ServiceManager {
         @Override
         public void fileRotated() {
             if ( this.tailer.getFile().getName().endsWith( ".err.log" ) ) {
-                for ( val consumer : consumers ) {
+                for ( Consumer<String> consumer : consumers ) {
                     consumer.accept( "> !! The current error log file has rotated !!" );
                 }
             } else {
-                for ( val consumer : consumers ) {
+                for ( Consumer<String> consumer : consumers ) {
                     consumer.accept( "> !! The current log file has rotated !!" );
                 }
             }
@@ -1044,7 +1043,7 @@ public class ServiceManager {
 
         @Override
         public void handle( String s ) {
-            for ( val consumer : consumers ) {
+            for ( Consumer<String> consumer : consumers ) {
                 consumer.accept( s );
             }
         }
@@ -1052,8 +1051,8 @@ public class ServiceManager {
 
         @Override
         public void handle( Exception e ) {
-            for ( val consumer : consumers ) {
-                consumer.accept( "> !! Exception occurred: " + e.getLocalizedMessage() + ". Stopping the Tailer. !!" );
+            for ( Consumer<String> consumer : consumers ) {
+                consumer.accept( "> !! Exception occurred: " + e.getMessage() + ". Stopping the Tailer. !!" );
             }
             this.tailer.stop();
         }

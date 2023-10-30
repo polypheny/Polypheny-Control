@@ -20,15 +20,16 @@ package org.polypheny.control.control;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigValue;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -50,9 +51,9 @@ public class ConfigManager {
 
     private static void loadConfigFile() {
         if ( applicationConfFile == null ) {
-            val defaultConfig = ConfigFactory.load();
-            val workingDir = defaultConfig.getString( "pcrtl.workingdir" );
-            val configDir = new File( new File( workingDir ), "config" );
+            Config defaultConfig = ConfigFactory.load();
+            String workingDir = defaultConfig.getString( "pcrtl.workingdir" );
+            File configDir = new File( new File( workingDir ), "config" );
             createConfigFolders( workingDir, configDir );
             applicationConfFile = new File( configDir, "application.conf" );
         }
@@ -82,9 +83,9 @@ public class ConfigManager {
         configRenderOptions = configRenderOptions.setJson( false );
         configRenderOptions = configRenderOptions.setOriginComments( false );
 
-        val defaultConfig = ConfigFactory.load();
-        val workingDir = defaultConfig.getString( "pcrtl.workingdir" );
-        val configDir = new File( new File( workingDir ), "config" );
+        Config defaultConfig = ConfigFactory.load();
+        String workingDir = defaultConfig.getString( "pcrtl.workingdir" );
+        File configDir = new File( new File( workingDir ), "config" );
         createConfigFolders( workingDir, configDir );
         try (
                 FileOutputStream fos = new FileOutputStream( applicationConfFile, false );
@@ -104,7 +105,7 @@ public class ConfigManager {
 
 
     public static String getCurrentConfigAsJson() {
-        val config = getConfig();
+        Config config = getConfig();
         ConfigRenderOptions configRenderOptions = ConfigRenderOptions.defaults();
         configRenderOptions = configRenderOptions.setComments( false );
         configRenderOptions = configRenderOptions.setFormatted( true );
@@ -115,10 +116,10 @@ public class ConfigManager {
 
 
     public static Properties convertToProperties( Config config ) {
-        val properties = new Properties();
-        for ( val entry : config.entrySet() ) {
-            val key = entry.getKey();
-            val value = entry.getValue();
+        Properties properties = new Properties();
+        for ( Entry<String, ConfigValue> entry : config.entrySet() ) {
+            String key = entry.getKey();
+            ConfigValue value = entry.getValue();
 
             final String stringValue;
             switch ( value.valueType() ) {

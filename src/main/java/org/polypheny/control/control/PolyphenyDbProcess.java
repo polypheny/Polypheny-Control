@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.commons.lang3.SystemUtils;
 import org.jvnet.winp.WinProcess;
 import org.jvnet.winp.WinpException;
@@ -148,7 +148,7 @@ public abstract class PolyphenyDbProcess {
         public void kill() {
             // "PID Mode"
             try {
-                val kill = Runtime.getRuntime().exec( "TASKKILL /PID " + getPid() ); // SIGTERM -- CTRL + C
+                Process kill = Runtime.getRuntime().exec( "TASKKILL /PID " + getPid() ); // SIGTERM -- CTRL + C
                 if ( kill.waitFor( 1, TimeUnit.MINUTES ) ) {
                     if ( isAlive() ) {
                         killForcibly();
@@ -194,7 +194,7 @@ public abstract class PolyphenyDbProcess {
             long pid = -1;
 
             try {
-                val pidField = process.getClass().getDeclaredField( "pid" );
+                Field pidField = process.getClass().getDeclaredField( "pid" );
 
                 AccessController.doPrivileged( (PrivilegedAction<Void>) () -> {
                     pidField.setAccessible( true );
@@ -228,8 +228,8 @@ public abstract class PolyphenyDbProcess {
             if ( super.process == null ) {
                 // "PID Mode"
                 try {
-                    val process = Runtime.getRuntime().exec( "ps -p " + pid );
-                    try ( val input = new BufferedReader( new InputStreamReader( process.getInputStream() ) ) ) {
+                    Process process = Runtime.getRuntime().exec( "ps -p " + pid );
+                    try ( BufferedReader input = new BufferedReader( new InputStreamReader( process.getInputStream() ) ) ) {
                         String line;
                         while ( (line = input.readLine()) != null ) {
                             if ( line.contains( " " + pid + " " ) ) {
@@ -252,7 +252,7 @@ public abstract class PolyphenyDbProcess {
         public void kill() {
             // "PID Mode"
             try {
-                val kill = Runtime.getRuntime().exec( "kill -15 " + pid ); // SIGTERM -- CTRL + C
+                Process kill = Runtime.getRuntime().exec( "kill -15 " + pid ); // SIGTERM -- CTRL + C
                 if ( kill.waitFor( 1, TimeUnit.MINUTES ) ) {
                     // terminated within the time
                     if ( kill.exitValue() == 0 ) {
@@ -273,7 +273,7 @@ public abstract class PolyphenyDbProcess {
             if ( super.process == null ) {
                 // "PID Mode"
                 try {
-                    val kill = Runtime.getRuntime().exec( "kill -9 " + pid ); // SIGKILL
+                    Process kill = Runtime.getRuntime().exec( "kill -9 " + pid ); // SIGKILL
                     if ( kill.waitFor( 1, TimeUnit.SECONDS ) ) {
                         // terminated within the time
                         if ( kill.exitValue() == 0 ) {
