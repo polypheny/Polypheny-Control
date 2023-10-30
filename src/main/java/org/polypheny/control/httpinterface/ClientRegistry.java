@@ -96,7 +96,7 @@ class ClientRegistry {
         clientMap.put( ctx.session, client );
         reverseClientMap.put( cid, client );
         sendMessage( cid, "clientId", "" + cid );
-        log.info( "Registered client {} from IP {}", cid, ctx.session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Registered client {} from IP {}", cid, ctx.session.getRemoteAddress() );
         sendMessage( cid, "status", "" + ServiceManager.getStatus() );
         sendMessage( cid, "benchmarkerConnected", "" + ClientRegistry.getBenchmarkerConnected() );
         sendMessage( cid, "version", ServiceManager.getVersion() );
@@ -106,7 +106,7 @@ class ClientRegistry {
     static void removeClient( WsCloseContext closeContext ) {
         Client client = clientMap.remove( closeContext.session );
         reverseClientMap.remove( client.clientId );
-        log.info( "Removed client {} from IP {}", client.clientId, closeContext.session.getRemoteAddress().getAddress().getHostAddress() );
+        log.info( "Removed client {} from IP {}", client.clientId, closeContext.session.getRemoteAddress() );
     }
 
 

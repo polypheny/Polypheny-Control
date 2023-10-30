@@ -30,11 +30,11 @@ import org.polypheny.control.control.ServiceManager;
 @Slf4j
 public class Server {
 
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
 
     public Server( Control control, int port ) {
-        Javalin javalin = Javalin.create( config -> config.addStaticFiles( "/static" ) ).start( port );
+        Javalin javalin = Javalin.create( config -> config.staticFiles.add( "/static" ) ).start( port );
 
         javalin.ws( "/socket/", ws -> {
             ws.onConnect( ClientRegistry::addClient );

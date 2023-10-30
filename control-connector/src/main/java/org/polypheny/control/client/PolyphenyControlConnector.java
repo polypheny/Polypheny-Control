@@ -28,10 +28,10 @@ import java.util.concurrent.TimeUnit;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.simple.JSONObject;
 
 
 @Slf4j

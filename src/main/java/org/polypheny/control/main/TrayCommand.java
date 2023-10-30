@@ -105,13 +105,13 @@ public class TrayCommand extends ControlCommand {
         // Add separator
         trayPopupMenu.addSeparator();
 
-        // Open Polypheny-Control UI in the browser
+        // Open Polypheny-UI in the browser
         MenuItem puiItem = new MenuItem( "Polypheny-UI" );
         puiItem.addActionListener( new ActionListener() {
             @SneakyThrows
             @Override
             public void actionPerformed( ActionEvent e ) {
-                Desktop.getDesktop().browse( new URI( "http://localhost:8080" ) );
+                Desktop.getDesktop().browse( new URI( "http://localhost:7659" ) );
             }
         } );
         trayPopupMenu.add( puiItem );

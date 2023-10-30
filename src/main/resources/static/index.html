@@ -20,18 +20,12 @@
     <title>Polypheny Control</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="/font-awesome/5.15.4/css/all.css">
+    <link rel="stylesheet" href="/font-awesome/6.4.2/css/all.css">
     <link rel="stylesheet" href="/tooltipster/4.2.8/dist/css/tooltipster.bundle.min.css">
     <link rel="stylesheet" href="/style.css">
-    <script>
-        function setHref() {
-            document.getElementById( 'webui-link' ).href = window.location.protocol + "//" + window.location.hostname + ":8080/";
-        }
-
-    </script>
 </head>
 
-<body onload="setHref()">
+<body>
 <div class="root">
     <div class="main">
         <h1 class="heading">Polypheny Control</h1>
@@ -216,11 +210,17 @@
     </table>
 </footer>
 
-<script src="/jquery/3.6.2/jquery.js"></script>
+<script src="/jquery/3.7.1/jquery.js"></script>
 <script src="/jquery-serializejson/2.9.0/jquery.serializejson.min.js"></script>
 <script src="/ansi_up/2.0.2/ansi_up.js"></script>
 <script src="/tooltipster/4.2.8/dist/js/tooltipster.bundle.min.js"></script>
 <script src="/script.js"></script>
+<script>
+    function setHref() {
+        document.getElementById( 'webui-link' ).href = window.location.protocol + "//" + window.location.hostname + ":7659/";
+    }
+    setHref();
+</script>
 </body>
 
 </html>
