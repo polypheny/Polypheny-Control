@@ -3,16 +3,16 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'app.cash.licensee:licensee-gradle-plugin:1.6.0'
+        classpath 'app.cash.licensee:licensee-gradle-plugin:1.8.0'
     }
 }
 
 plugins {
     id "java-library"
-    id "application"
+    //id "application"
     id "maven-publish"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "io.freefair.lombok" version "6.6.1"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "io.freefair.lombok" version "8.4"
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
 }
 
@@ -30,7 +30,7 @@ if (isSnapshot.toBoolean()) {
 }
 
 
-mainClassName = "org.polypheny.control.main.Main"
+var mainClassName = "org.polypheny.control.main.Main"
 
 
 repositories {
@@ -59,8 +59,8 @@ sourceSets {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
-    sourceCompatibility = "1.9"
-    targetCompatibility = "1.9"
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
 }
 
 
@@ -156,43 +156,23 @@ jar {
         attributes "Add-Opens": "java.base/java.lang"
     }
 }
-task sourcesJar(type: Jar, dependsOn: classes) {
+/*task sourcesJar(type: Jar, dependsOn: classes) {
     classifier "sources"
     from sourceSets.main.allSource
 }
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier "javadoc"
     from javadoc.destinationDir
-}
+}*/
 shadowJar {
-    classifier = ""
+    archiveClassifier.set('')
 }
 assemble.dependsOn shadowJar
 artifacts {
     //archives jar // regular jar containing only the compiled source
     archives shadowJar // fat jar which additionally contains all dependencies
-    archives sourcesJar // jar file containing the java doc files
-    archives javadocJar // jar file containing the source files
-}
-
-
-// Disable automatically added shadowed zip / tar archives
-distTar.dependsOn shadowJar
-distZip.dependsOn shadowJar
-startScripts.dependsOn shadowJar
-shadowDistTar.enabled = false
-shadowDistTar.classifier = "REMOVE_ME"
-shadowDistZip.enabled = false
-shadowDistZip.classifier = "REMOVE_ME"
-configurations.archives.artifacts.with { archives ->
-    def archivesIterator = archives.iterator()
-    while (archivesIterator.hasNext()) {
-        def archive = archivesIterator.next()
-        if (archive.classifier.equals("REMOVE_ME")) {
-            //println "Shadow archive to delete: ${archive}"
-            archivesIterator.remove()
-        }
-    }
+    //archives sourcesJar // jar file containing the java doc files
+    //archives javadocJar // jar file containing the source files
 }
 
 
