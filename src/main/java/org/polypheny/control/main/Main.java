@@ -208,9 +208,9 @@ public class Main {
         public int _run_() {
             HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
             Console console = System.console();
-            String name = console.readLine( "Name: " );
+            String name = console.readLine( "Username: " );
             if ( authenticationData.get( name ) != null ) {
-                System.err.println( "A user with the same name exists! Try a different name!" );
+                System.err.println( "A user with the same username exists! Try a different name!" );
                 return 1;
             }
             String password = new String( console.readPassword( "Password: " ) );
@@ -245,9 +245,9 @@ public class Main {
         public int _run_() {
             HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
             Console console = System.console();
-            String name = console.readLine( "Name: " );
+            String name = console.readLine( "Username: " );
             if ( authenticationData.get( name ) == null ) {
-                System.err.println( "User with the name \"" + name + "\" does not exist!" );
+                System.err.println( "A user with the name \"" + name + "\" does not exist!" );
                 return 1;
             }
 
@@ -273,7 +273,7 @@ public class Main {
         public int _run_() {
             HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
             Console console = System.console();
-            String name = console.readLine( "Name: " );
+            String name = console.readLine( "Username: " );
             if ( authenticationData.get( name ) == null ) {
                 System.err.println( "User with the name \"" + name + "\" does not exist." );
                 return 1;

@@ -19,6 +19,7 @@ package org.polypheny.control.main;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.typesafe.config.Config;
 import java.util.HashMap;
 import org.polypheny.control.authentication.AuthenticationFileManager;
 import org.polypheny.control.control.ConfigManager;
@@ -29,10 +30,10 @@ import org.polypheny.control.httpinterface.Server;
 @Command(name = "control", description = "Start Polypheny Control")
 public class ControlCommand extends AbstractCommand {
 
-    @Option(name = { "-p", "--port" }, description = "Overwrite port of the Polypheny Control dashboard")
+    @Option(name = { "-p", "--port" }, description = "Overwrite port of the Polypheny Control dashboard and API.")
     private final int port = -1;
 
-    @Option(name = { "-x", "--suppress-warning" }, description = "Suppress the 'No Users Exist' Warning")
+    @Option(name = { "-x", "--suppress-warning" }, description = "Suppress the auth warnings on startup.")
     protected boolean suppressWarning = false;
 
     private volatile Boolean running = true;
@@ -41,8 +42,18 @@ public class ControlCommand extends AbstractCommand {
     @Override
     public int _run_() {
         HashMap<String, String> authenticationData = AuthenticationFileManager.getAuthenticationData();
-        if ( !suppressWarning && authenticationData.isEmpty() ) {
-            warn();
+        Config config = ConfigManager.getConfig();
+        if ( config.getBoolean( "pcrtl.auth.enable" ) ) {
+            if ( !suppressWarning && authenticationData.isEmpty() ) {
+                warnNoUserAccounts();
+            }
+            if ( !suppressWarning && !config.getBoolean( "pcrtl.auth.local" ) ) {
+                warnNoAuthOnLocalhost();
+            }
+        } else {
+            if ( !suppressWarning ) {
+                warnAuthDisabled();
+            }
         }
         Control control = new Control();
         final Server server;
@@ -51,6 +62,8 @@ public class ControlCommand extends AbstractCommand {
         } else {
             server = new Server( control, ConfigManager.getConfig().getInt( "pcrtl.control.port" ) );
         }
+
+        Runtime.getRuntime().addShutdownHook( new Thread( () -> running = false ) );
 
         while ( running ) {
             Thread.yield();
@@ -67,11 +80,25 @@ public class ControlCommand extends AbstractCommand {
     }
 
 
-    private static void warn() {
-        System.out.println( "WARNING: No Users Exist. Polypheny-Control executes and manages Polypheny-Db." );
-        System.out.println( "WARNING: For security reasons it is advisable to create atleast one user." );
-        System.out.println( "WARNING: To know more about User Management and Authentication, visit " );
-        System.out.println( "WARNING: https://github.com/polypheny/Polypheny-Control#authentication\n\n" );
+    private static void warnNoUserAccounts() {
+        System.out.println( "WARNING: No Users Exist. Polypheny-Control executes and manages Polypheny-DB." );
+        System.out.println( "WARNING: For security reasons it is advisable to create at least one user." );
+        System.out.println( "WARNING: To learn more about User Management and Authentication, visit " );
+        System.out.println( "WARNING: https://docs.polypheny.com/en/latest/devs/polypheny-control#authentication\n\n" );
+    }
+
+
+    private static void warnNoAuthOnLocalhost() {
+        System.out.println( "WARNING: Authentication for requests from localhost are disabled." );
+        System.out.println( "WARNING: To learn more about User Management and Authentication, visit " );
+        System.out.println( "WARNING: https://docs.polypheny.com/en/latest/devs/polypheny-control#authentication\n\n" );
+    }
+
+
+    private static void warnAuthDisabled() {
+        System.out.println( "WARNING: Authentication is disabled." );
+        System.out.println( "WARNING: To learn more about User Management and Authentication, visit " );
+        System.out.println( "WARNING: https://docs.polypheny.com/en/latest/devs/polypheny-control#authentication\n\n" );
     }
 
 

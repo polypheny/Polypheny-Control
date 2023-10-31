@@ -20,12 +20,12 @@ package org.polypheny.control.httpinterface;
 import com.google.gson.Gson;
 import com.typesafe.config.Config;
 import io.javalin.Javalin;
-import io.javalin.core.security.BasicAuthCredentials;
+import io.javalin.security.BasicAuthCredentials;
+import jakarta.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.polypheny.control.authentication.AuthenticationContext;
 import org.polypheny.control.authentication.AuthenticationManager;
@@ -42,15 +42,11 @@ public class Server {
 
     private final long sessionTimeout;
 
+    private final Javalin javalin;
+
 
     public Server( Control control, int port ) {
-        Javalin javalin = Javalin.create( config -> config.staticFiles.add( "/static" ) ).start( port );
-
-        // As try-with-ressources
-        public void shutdown() {
-            javalin.stop();
-        }
-
+        javalin = Javalin.create( config -> config.staticFiles.add( "/static" ) ).start( port );
 
         javalin.ws( "/socket/", ws -> {
             ws.onConnect( ClientRegistry::addClient );
@@ -65,7 +61,7 @@ public class Server {
         javalin.before( ctx -> {
             log.debug( "Received api call: {}", ctx.path() );
 
-            HttpSession session = ctx.req.getSession( false );
+            HttpSession session = ctx.req().getSession( false );
 
             if ( session != null ) {
                 long creationTime = session.getCreationTime();
@@ -74,11 +70,11 @@ public class Server {
 
                 if ( difference >= sessionTimeout ) {
                     session.invalidate();
-                    ctx.res.sendError( 401, "Session Timeout" );
+                    ctx.res().sendError( 401, "Session Timeout" );
                 }
             }
 
-            boolean GETRequest = ctx.req.getMethod().equals( "GET" );
+            boolean GETRequest = ctx.req().getMethod().equals( "GET" );
             boolean loginHTMLRequest = ctx.path().startsWith( "/login.html" );
             boolean loginJSRequest = ctx.path().startsWith( "/login.js" );
             boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.7.1/jquery.js" );
@@ -88,17 +84,17 @@ public class Server {
                 return;
             }
 
-            String remoteHost = ctx.req.getRemoteHost();
+            String remoteHost = ctx.req().getRemoteHost();
             AuthenticationContext context = AuthenticationUtils.getContextForHost( remoteHost );
 
             if ( AuthenticationUtils.shouldAuthenticate( context ) ) {
-                if ( ctx.basicAuthCredentialsExist() ) {
+                if ( ctx.basicAuthCredentials() != null ) {
                     BasicAuthCredentials credentials = ctx.basicAuthCredentials();
                     boolean clientExists = AuthenticationManager.clientExists( credentials.getUsername(), credentials.getPassword() );
                     if ( clientExists ) {
                         ctx.sessionAttribute( "authenticated", true );
                     } else {
-                        ctx.res.sendError( 403, "Authentication Failed" );
+                        ctx.res().sendError( 403, "Authentication Failed" );
                     }
                 } else {
                     Object authenticated = ctx.sessionAttribute( "authenticated" );
@@ -160,6 +156,11 @@ public class Server {
                 TimeUnit.SECONDS );
 
         log.info( "Polypheny Control is running on port {}", port );
+    }
+
+
+    public void shutdown() {
+        javalin.stop();
     }
 
 }
