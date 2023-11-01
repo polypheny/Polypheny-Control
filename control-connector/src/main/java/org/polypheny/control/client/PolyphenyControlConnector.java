@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 The Polypheny Project
+ * Copyright 2019-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,9 +82,7 @@ public class PolyphenyControlConnector {
     public void stopPolypheny() {
         setClientType(); // Set the client type (again) - does not hurt and makes sure its set
         try {
-            httpConnector.post( controlUrl + "/control/stop", request -> {
-                return request.field( "clientId", clientId );
-            } );
+            httpConnector.post( controlUrl + "/control/stop", request -> request.field( "clientId", clientId ) );
         } catch ( UnirestException e ) {
             log.error( "Error while stopping Polypheny-DB", e );
         }
@@ -94,9 +92,7 @@ public class PolyphenyControlConnector {
     public void startPolypheny() {
         setClientType(); // Set the client type (again) - does not hurt and makes sure its set
         try {
-            httpConnector.post( controlUrl + "/control/start", request -> {
-                return request.field( "clientId", clientId );
-            } );
+            httpConnector.post( controlUrl + "/control/start", request -> request.field( "clientId", clientId ) );
         } catch ( UnirestException e ) {
             log.error( "Error while starting Polypheny-DB", e );
         }
@@ -111,9 +107,7 @@ public class PolyphenyControlConnector {
         }
         // Trigger update
         try {
-            httpConnector.post( controlUrl + "/control/update", request -> {
-                return request.field( "clientId", clientId );
-            } );
+            httpConnector.post( controlUrl + "/control/update", request -> request.field( "clientId", clientId ) );
         } catch ( UnirestException e ) {
             log.error( "Error while updating Polypheny-DB", e );
         }
@@ -135,10 +129,9 @@ public class PolyphenyControlConnector {
             obj.put( entry.getKey(), entry.getValue() );
         }
         try {
-            httpConnector.post( controlUrl + "/config/set", request -> {
-                return request.field( "clientId", clientId )
-                        .field( "config", obj.toString() );
-            } );
+            httpConnector.post(
+                    controlUrl + "/config/set",
+                    request -> request.field( "clientId", clientId ).field( "config", obj.toString() ) );
         } catch ( UnirestException e ) {
             log.error( "Error while setting client type", e );
         }
@@ -147,10 +140,9 @@ public class PolyphenyControlConnector {
 
     void setClientType() {
         try {
-            httpConnector.post( controlUrl + "/client/type", request -> {
-                return request.field( "clientId", clientId )
-                        .field( "clientType", clientData.getClientType().name() );
-            } );
+            httpConnector.post(
+                    controlUrl + "/client/type",
+                    request -> request.field( "clientId", clientId ).field( "clientType", clientData.getClientType().name() ) );
         } catch ( UnirestException e ) {
             log.error( "Error while setting client type", e );
         }
@@ -168,9 +160,7 @@ public class PolyphenyControlConnector {
 
 
     String getStatus() {
-        String o = executeGet( "/control/status" );
-        System.out.println( o );
-        return gson.fromJson( o, String.class );
+        return gson.fromJson( executeGet( "/control/status" ), String.class );
     }
 
 
@@ -188,11 +178,9 @@ public class PolyphenyControlConnector {
 
     private void executePost( String command, String data ) {
         try {
-            Unirest.post( controlUrl + command )
-                    .body( data )
-                    .asString();
+            Unirest.post( controlUrl + command ).body( data ).asString();
         } catch ( UnirestException e ) {
-            log.error( "    Exception while sending request", e );
+            log.error( "Exception while sending request", e );
         }
     }
 

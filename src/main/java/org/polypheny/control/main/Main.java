@@ -49,14 +49,14 @@ public class Main {
         final CliBuilder<CliRunnable> builder = Cli.builder( "polypheny-control.jar" );
         builder.withDescription( "Polypheny-DB" );
 
-        // define top level commands
+        // Define top level commands
         builder.withCommand( HelpCommand.class );
         builder.withCommand( ControlCommand.class );
         builder.withCommand( TrayCommand.class );
 
         builder.withCommands( StartCommand.class, StopCommand.class, RestartCommand.class, UpdateCommand.class );
 
-        // define user management commands
+        // Define user management commands
         builder.withCommands( AddUserCommand.class, RemoveUserCommand.class, ModifyUserCommand.class );
 
         builder.withDefaultCommand( TrayCommand.class );
@@ -110,7 +110,7 @@ public class Main {
         String adminPassword = authenticationData.get( "admin" );
 
         if ( adminPassword == null ) {
-            System.err.println( "'admin' user does not exist! Please create a admin user before proceeding." );
+            System.err.println( "'admin' user does not exist! Please create an admin user before proceeding." );
             System.exit( 1 );
         }
 
@@ -124,7 +124,7 @@ public class Main {
                 return;
             }
         }
-        System.err.println( "3 incorrect password attempts." );
+        System.err.println( "Three incorrect password attempts." );
         System.exit( 1 );
     }
 
