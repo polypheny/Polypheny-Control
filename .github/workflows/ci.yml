@@ -10,6 +10,7 @@ jobs:
       matrix:
         java: [ 11, 17 ]
         os: [ macos-latest, ubuntu-latest, windows-latest ]
+        withAuth: [ testWithoutAuth, testWithAuth ]
     name: Java ${{ matrix.java }} @ ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -20,4 +21,6 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew assemble
+      - name: Run tests
+        run: ./gradlew ${{ matrix.withAuth }}

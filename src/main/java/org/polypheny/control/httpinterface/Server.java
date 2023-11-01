@@ -18,11 +18,19 @@ package org.polypheny.control.httpinterface;
 
 
 import com.google.gson.Gson;
+import com.typesafe.config.Config;
 import io.javalin.Javalin;
+import io.javalin.security.BasicAuthCredentials;
+import jakarta.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.polypheny.control.authentication.AuthenticationContext;
+import org.polypheny.control.authentication.AuthenticationManager;
+import org.polypheny.control.authentication.AuthenticationUtils;
+import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.control.Control;
 import org.polypheny.control.control.ServiceManager;
 
@@ -32,17 +40,74 @@ public class Server {
 
     private static final Gson GSON = new Gson();
 
+    private final long sessionTimeout;
+
+    private final Javalin javalin;
+
 
     public Server( Control control, int port ) {
-        Javalin javalin = Javalin.create( config -> config.staticFiles.add( "/static" ) ).start( port );
+        javalin = Javalin.create( config -> config.staticFiles.add( "/static" ) ).start( port );
 
         javalin.ws( "/socket/", ws -> {
             ws.onConnect( ClientRegistry::addClient );
             ws.onClose( ClientRegistry::removeClient );
         } );
 
+        Config config = ConfigManager.getConfig();
+
+        // Configuration in seconds. Converting to milliseconds.
+        sessionTimeout = config.getLong( "pcrtl.control.sessionTimeout" ) * 1000;
+
         javalin.before( ctx -> {
             log.debug( "Received api call: {}", ctx.path() );
+
+            HttpSession session = ctx.req().getSession( false );
+
+            if ( session != null ) {
+                long creationTime = session.getCreationTime();
+                long currentTime = new Date().getTime();
+                long difference = currentTime - creationTime;
+
+                if ( difference >= sessionTimeout ) {
+                    session.invalidate();
+                    ctx.res().sendError( 401, "Session Timeout" );
+                }
+            }
+
+            boolean GETRequest = ctx.req().getMethod().equals( "GET" );
+            boolean loginHTMLRequest = ctx.path().startsWith( "/login.html" );
+            boolean loginJSRequest = ctx.path().startsWith( "/login.js" );
+            boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.7.1/jquery.js" );
+            boolean CSSRequest = ctx.path().startsWith( "/style.css" );
+
+            if ( GETRequest && (loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest) ) {
+                return;
+            }
+
+            String remoteHost = ctx.req().getRemoteHost();
+            AuthenticationContext context = AuthenticationUtils.getContextForHost( remoteHost );
+
+            if ( AuthenticationUtils.shouldAuthenticate( context ) ) {
+                if ( ctx.basicAuthCredentials() != null ) {
+                    BasicAuthCredentials credentials = ctx.basicAuthCredentials();
+                    boolean clientExists = AuthenticationManager.clientExists( credentials.getUsername(), credentials.getPassword() );
+                    if ( clientExists ) {
+                        ctx.sessionAttribute( "authenticated", true );
+                    } else {
+                        ctx.res().sendError( 403, "Authentication Failed" );
+                    }
+                } else {
+                    Object authenticated = ctx.sessionAttribute( "authenticated" );
+                    if ( authenticated == null ) {
+                        ctx.redirect( "/login.html" );
+                    }
+                }
+            } else {
+                // If authentication disabled and the request is for login.html, redirect to /
+                if ( ctx.path().startsWith( "/login.html" ) ) {
+                    ctx.redirect( "/" );
+                }
+            }
         } );
 
         // /config
@@ -91,6 +156,11 @@ public class Server {
                 TimeUnit.SECONDS );
 
         log.info( "Polypheny Control is running on port {}", port );
+    }
+
+
+    public void shutdown() {
+        javalin.stop();
     }
 
 }

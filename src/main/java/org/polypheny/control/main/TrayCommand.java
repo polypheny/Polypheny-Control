@@ -42,7 +42,7 @@ public class TrayCommand extends ControlCommand {
 
     @Override
     public int _run_() {
-        //checking for support
+        // Check if try mode is supported
         if ( !SystemTray.isSupported() ) {
             System.err.println( "System tray is not supported! Use headless mode instead." );
             System.out.println( "In order to start Polypheny Control in headless mode, specify the argument \"control\"." );

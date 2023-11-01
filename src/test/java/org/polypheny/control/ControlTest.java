@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 The Polypheny Project
+ * Copyright 2019-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,29 +25,49 @@ import kong.unirest.HttpRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.polypheny.control.authentication.AuthenticationDataManager;
+import org.polypheny.control.authentication.AuthenticationFileManager;
+import org.polypheny.control.client.ClientData;
 import org.polypheny.control.client.ClientType;
 import org.polypheny.control.client.PolyphenyControlConnector;
+import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.main.ControlCommand;
 
+
+@Slf4j
 public class ControlTest {
 
     private static Thread thread;
-
+    private volatile static Boolean running = true;
 
     @BeforeAll
     public static void start() throws InterruptedException {
+        // Setting the systemProperty 'testing'
+        System.setProperty( "testing", "true" );
+
         // Backup config file
-        File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
+        File polyphenyDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
         if ( polyphenyDir.exists() ) {
-            polyphenyDir.renameTo( new File( System.getProperty( "user.home" ), ".polypheny.backup" ) );
+            polyphenyDir.renameTo( new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" ) );
         }
 
-        thread = new Thread( () -> (new ControlCommand())._run_() );
+        // Create passwd data and an account
+        try {
+            FileUtils.forceMkdir( new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) ) );
+        } catch ( IOException e ) {
+            log.error( "Caught exception while creating .pcrtl folder", e );
+        }
+        AuthenticationFileManager.getAuthenticationData();
+        AuthenticationDataManager.addAuthenticationData( "pc", "super$secret" );
+        AuthenticationFileManager.writeAuthenticationDataToFile();
+
+        thread = new Thread( () -> (new ControlCommand()).runWithControlledShutdown( running ) );
         thread.start();
         TimeUnit.SECONDS.sleep( 5 );
     }
@@ -55,6 +75,7 @@ public class ControlTest {
 
     @AfterAll
     public static void shutdown() throws IOException {
+        running = false;
         // Restore config file
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         FileUtils.deleteDirectory( polyphenyDir );
@@ -67,14 +88,15 @@ public class ControlTest {
 
     @Test
     public void integrationTest() throws URISyntaxException, InterruptedException {
-        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", ClientType.BROWSER, null );
+        ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "super$secret" );
+        PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", clientData, null );
 
         // Update and build Polypheny
         controlConnector.updatePolypheny();
 
         // Start Polypheny
         controlConnector.startPolypheny();
-        TimeUnit.SECONDS.sleep( 20 );
+        TimeUnit.SECONDS.sleep( 30 );
 
         // Execute test query
         GetRequest request = Unirest.get( "{protocol}://{host}:{port}/restapi/v1/res/public.emps" )
@@ -85,7 +107,7 @@ public class ControlTest {
 
         // Stop Polypheny
         controlConnector.stopPolypheny();
-        TimeUnit.SECONDS.sleep( 5 );
+        TimeUnit.SECONDS.sleep( 15 );
     }
 
 

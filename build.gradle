@@ -74,9 +74,8 @@ dependencies {
 
     // Log4J
     implementation group: "org.slf4j", name: "slf4j-api", version: slf4j_version // MIT
-    implementation group: "org.apache.logging.log4j", name: "log4j-slf4j-impl", version: log4j_version // Apache 2.0
+    implementation group: "org.apache.logging.log4j", name: "log4j-slf4j2-impl", version: log4j_version // Apache 2.0
     implementation group: "org.apache.logging.log4j", name: "log4j-core", version: log4j_version // Apache 2.0
-    implementation group: "org.apache.logging.log4j", name: "log4j-api", version: log4j_version // Apache 2.0
 
     // Configuration management
     implementation group: "com.typesafe", name: "config", version: typesafe_config_version // Apache 2.0
@@ -150,6 +149,7 @@ jar {
         attributes "Implementation-Version": project.version
         attributes "Multi-Release": "true"
         attributes "Version": project.version
+        attributes "Main-Class": mainClassName
         attributes "Add-Opens": "java.base/java.lang"
     }
 }
@@ -187,6 +187,26 @@ task extractWebjars(type: Copy) {
     }
 }
 classes.dependsOn(extractWebjars)
+
+task testWithAuth(type: Test) {
+    systemProperty "config.auth.local", "true"
+    description = "Runs test with local authentication enabled."
+    group = "verification"
+}
+testWithAuth.dependsOn(testClasses)
+
+task testWithoutAuth(type: Test) {
+    systemProperty "config.auth.local", "false"
+    description = "Runs test with local authentication disabled."
+    group = "verification"
+}
+testWithoutAuth.dependsOn(testClasses)
+
+test {
+    systemProperty "config.auth.local", "false"
+}
+test.dependsOn(testWithAuth)
+
 
 
 //////////////

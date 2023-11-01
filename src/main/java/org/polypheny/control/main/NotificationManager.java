@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 The Polypheny Project
+ * Copyright 2017-2023 The Polypheny Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 package org.polypheny.control.main;
+
 
 import java.awt.TrayIcon;
 import java.awt.TrayIcon.MessageType;
@@ -46,4 +47,5 @@ public class NotificationManager {
             trayIcon.displayMessage( "Polypheny Control", message, MessageType.ERROR );
         }
     }
+
 }
