@@ -592,6 +592,20 @@ public class ServiceManager {
             }
             buildLauncher.run();
         }
+        try ( ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory( pdbBuildDir ).connect() ) {
+            // Build shadow jar again to include plugins (not a nice solution, but it takes time till this is fixed on all branches)
+            BuildLauncher buildLauncher = connection.newBuild()
+                    .setStandardOutput( null )
+                    .setStandardError( System.err )
+                    .forTasks( "dbms:shadowJar" )
+                    .withArguments( "-x", "test", "-x", "licensee" );
+
+            if ( clientCommunicationStream != null ) {
+                buildLauncher.addProgressListener( event -> clientCommunicationStream.send( event.getDisplayName() ), OperationType.TASK );
+            }
+            buildLauncher.run();
+        }
+
         log.info( "> Building Polypheny-DB ... finished." );
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Building Polypheny-DB ... finished." );
