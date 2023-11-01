@@ -156,6 +156,16 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>Purge plugins folder</td>
+                        <td>
+                            <select name="pcrtl.plugins.purge">
+                                <option value="never">Never</option>
+                                <option value="afterBuilding">After building Polypheny</option>
+                                <option value="onStartup">On startup of Polypheny</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>Maximum Java Heap Size (in Gigabyte)</td>
                         <td><input name="pcrtl.java.heap" value="10" type="number"></td>
                     </tr>

@@ -51,10 +51,10 @@ public class ControlTest {
         // Setting the systemProperty 'testing'
         System.setProperty( "testing", "true" );
 
-        // Backup .pctrl folder
-        File pctrlDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
-        if ( pctrlDir.exists() ) {
-            pctrlDir.renameTo( new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" ) );
+        // Backup .pcontrol folder
+        File pcontrolDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        if ( pcontrolDir.exists() ) {
+            pcontrolDir.renameTo( new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" ) );
         }
 
         // Backup .polypheny folder
@@ -91,12 +91,12 @@ public class ControlTest {
             polyphenyDirBackup.renameTo( polyphenyDir );
         }
 
-        // Restore .pctrl
-        File pctrlDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
-        FileUtils.deleteDirectory( pctrlDir );
-        File pctrlDirBackup = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" );
-        if ( pctrlDirBackup.exists() ) {
-            pctrlDirBackup.renameTo( pctrlDir );
+        // Restore .pcontrol
+        File pcontrolDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        FileUtils.deleteDirectory( pcontrolDir );
+        File pcontrolBackupDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" );
+        if ( pcontrolBackupDir.exists() ) {
+            pcontrolBackupDir.renameTo( pcontrolDir );
         }
     }
 

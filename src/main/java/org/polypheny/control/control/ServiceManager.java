@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -198,6 +197,9 @@ public class ServiceManager {
             }
             if ( additionalArguments.trim().length() > 0 ) {
                 pdbArguments.addAll( Arrays.asList( additionalArguments.split( " " ) ) );
+            }
+            if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "onStartup" ) ) {
+                pdbArguments.add( "-resetPlugins" );
             }
 
             if ( !new File( javaExecutable ).exists() ) {
@@ -632,31 +634,21 @@ public class ServiceManager {
             throw new RuntimeException( "JAR file does not exist!" );
         }
 
-        // Move plugins to .polypheny/plugins
-        File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
-        if ( !pluginsFolder.exists() ) {
-            if ( !pluginsFolder.mkdirs() ) {
-                if ( clientCommunicationStream != null ) {
-                    clientCommunicationStream.send( "> Unable to create plugins folder!" );
-                }
-                throw new RuntimeException( "Unable to create plugins folder!" );
-            }
-        }
-        File pluginsBuildFolder = new File( pdbBuildDir, "build" + File.separator + "plugins" );
-        File[] pluginFiles = pluginsBuildFolder.listFiles( ( dir, name ) -> name.endsWith( ".zip" ) );
-        if ( pluginFiles != null ) {
-            for ( File f : pluginFiles ) {
-                try {
-                    Files.move( f.toPath(), new File( pluginsFolder, f.getName() ).toPath(), StandardCopyOption.REPLACE_EXISTING );
-                } catch ( IOException e ) {
+        // Purge plugins dir
+        if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuild" ) ) {
+            File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
+            if ( pluginsFolder.exists() ) {
+                if ( !pluginsFolder.delete() ) {
                     if ( clientCommunicationStream != null ) {
-                        clientCommunicationStream.send( "> Unable to move plugin file!" );
+                        clientCommunicationStream.send( "> Unable to purge folder!" );
                     }
-                    throw new RuntimeException( "Unable to move plugin file!", e );
+                    throw new RuntimeException( "Unable to purge folder!" );
                 }
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
+                }
+                throw new RuntimeException( "Purged Polypheny plugins folder!" );
             }
-        } else {
-            // Ignore for now, could be a version of Polypheny prior to the introduction of the plugin support
         }
     }
 

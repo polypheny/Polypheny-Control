@@ -42,7 +42,7 @@ public class Main {
         // Check for and restore .polypheny.backup
         if ( System.getProperty( "testing" ) != null && System.getProperty( "testing" ).equals( "true" ) ) {
             restorePolyphenyBackup();
-            restorePctrlBackup();
+            restorePcontrolDirBackup();
         }
 
         // Hide dock icon on MacOS systems
@@ -88,19 +88,19 @@ public class Main {
     }
 
 
-    private static void restorePctrlBackup() {
-        File pctrlDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
-        File pctrlDirBackup = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" );
+    private static void restorePcontrolDirBackup() {
+        File pcontrolDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        File pcontrolBackupDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" );
 
         try {
-            if ( pctrlDirBackup.exists() ) {
-                FileUtils.deleteDirectory( pctrlDir );
-                pctrlDirBackup.renameTo( pctrlDir );
+            if ( pcontrolBackupDir.exists() ) {
+                FileUtils.deleteDirectory( pcontrolDir );
+                pcontrolBackupDir.renameTo( pcontrolDir );
             }
         } catch ( IOException ex ) {
             // Could not delete polyphenyDir
-            System.err.println( "Error restoring backup of pctrl directory: " + pctrlDirBackup.getAbsolutePath() + "." );
-            System.err.println( "Please restore the backup manually by renaming the folder to '.pctrl'." );
+            System.err.println( "Error restoring backup of the .pcontrol directory: " + pcontrolBackupDir.getAbsolutePath() + "." );
+            System.err.println( "Please restore the backup manually by renaming the folder to '.pcontrol'." );
             System.exit( 1 );
         }
     }
