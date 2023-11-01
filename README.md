@@ -46,59 +46,59 @@ After starting Polypheny Control, open the dashboard in your browser of choice b
 
 In order to start Polypheny-DB, we first need to trigger a build. This can be done by clicking on the :arrows_counterclockwise: button. When the build has completed, run Polypheny-DB by clicking on :arrow_forward:.
 
-You can now open the Polypheny-UI by opening `localhost:8080` in your browser. 
+You can now open the Polypheny-UI by clicking on the corresponding button on the dashboard.
 
 ### Authentication
 
-Polypheny Control now allows you to use authentication to allow only verified users to use it. Authentication is available both in the command line and in the browser.
-CLI authentication can be enabled/disabled using the `pcrtl.auth.cli` config option. It is disabled by default.
-Authentication for `localhost` can be enabled/disabled using the `pcrtl.auth.local` config option. It is also disabled by default.
-Authentication itself for be fully enabled/disabled using the `pcrtl.auth.enable` config option. It is enabled by default.
+Polypheny Control features a robust authentication system that ensures access to its functionalities—whether via the CLI, API, or user interface—is restricted to authorized users only.
 
-#### The passwd file
+- **Enable Authentication**: The authentication mechanism can be toggled on or off using `pcrtl.auth.enable=(true|false)`. By default, it's set to `true`, meaning authentication is active.
 
-Polypheny Control stores user information in a file name **passwd**. This file is NOT protected. You can protect the file against modification by setting the immutable flag using `chattr` on Linux / MacOS and `attrib` on Windows.
-But, remember to reset the flag when modifying the file using polypheny control.
+- **Local Authentication**: If you want to mandate authentication for accessing the API and UI from `localhost`, use the `pcrtl.auth.local=true` configuration. By default, it's false, allowing unauthenticated requests from the same host.
+
+- **CLI Authentication**: By setting `pcrtl.auth.cli=true`, you can enforce authentication for CLI operations, such as restarting Polypheny. However, this might be necessary only under specific scenarios or setups. By default, it is set to false, meaning no CLI authentication is required.
+
+#### The 'passwd' File
+
+The **passwd** file is where user credentials reside. Ensuring its security is paramount. First and foremost, set the correct access permissions, so only trusted users or roles can access it. Additionally, to defend against unsanctioned modifications, you can set the file as immutable using `chattr` on Linux/MacOS or `attrib` on Windows. Remember to reverse this setting if you intend to modify the file via Polypheny Control.
 
 #### Admin User
 
-Polypheny Control requires a **admin** user to create and manage other users. So, before you can create any other user you will need to create a **admin** user using the following command:
+The **admin** user plays a pivotal role in Polypheny Control, serving as the primary account for managing other users. To set up the admin user:
 
-```
+```bash
 java -jar polypheny-control.jar adduser
 ```
 
-This will prompt you to enter a name and password. Enter "admin" as the name and a strong password for the user.
-All of the user management actions need to be authorized using the admin password.
+When prompted, use "admin" as the username and choose a strong password. This admin password is essential for performing all user management operations.
 
-An example run of the user management features:
+Here's a step-by-step guide on typical user management tasks:
 
-```
-# Creating the admin user (The password is mandatory but won't be visible when you type it out)
+```bash
+# Setting up the admin user (Note: Passwords are hidden during entry)
 > java -jar polypheny-control.jar adduser
-Name: admin
+Username: admin
 Password: 
 Confirm Password: 
 
-# Creating a user
+# Adding a new user
 > java -jar polypheny-control.jar adduser
-Name: Loki
+Username: Loki
 Password: 
 Confirm Password: 
 Enter 'admin' password (Try 1/3):
 
-# Modifying a user's password
+# Changing a user's password
 > java -jar polypheny-control.jar moduser
-Name: Loki
+Username: Loki
 Password: 
 Confirm Password: 
 Enter 'admin' password (Try 1/3):
 
-# Remove a user
+# Deleting a user
 > java -jar polypheny-control.jar remuser
-Name: Loki
+Username: Loki
 Enter 'admin' password (Try 1/3):
-
 ```
 
 

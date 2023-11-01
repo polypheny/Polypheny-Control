@@ -79,15 +79,20 @@ public class Server {
             boolean loginJSRequest = ctx.path().startsWith( "/login.js" );
             boolean jqueryRequest = ctx.path().startsWith( "/jquery/3.7.1/jquery.js" );
             boolean CSSRequest = ctx.path().startsWith( "/style.css" );
+            boolean isAuthenticated = ctx.path().startsWith( "/session/is_authenticated" );
 
-            if ( GETRequest && (loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest) ) {
-                return;
+            boolean requiresNoAuth = false;
+            if ( GETRequest && (loginHTMLRequest || loginJSRequest || CSSRequest || jqueryRequest || isAuthenticated) ) {
+                requiresNoAuth = true;
             }
 
             String remoteHost = ctx.req().getRemoteHost();
             AuthenticationContext context = AuthenticationUtils.getContextForHost( remoteHost );
 
             if ( AuthenticationUtils.shouldAuthenticate( context ) ) {
+                if ( requiresNoAuth ) {
+                    return;
+                }
                 if ( ctx.basicAuthCredentials() != null ) {
                     BasicAuthCredentials credentials = ctx.basicAuthCredentials();
                     boolean clientExists = AuthenticationManager.clientExists( credentials.getUsername(), credentials.getPassword() );
@@ -107,6 +112,22 @@ public class Server {
                 if ( ctx.path().startsWith( "/login.html" ) ) {
                     ctx.redirect( "/" );
                 }
+            }
+        } );
+
+        // /session
+        javalin.get( "/session/current_user", ctx -> {
+            if ( ctx.basicAuthCredentials() != null && ctx.sessionAttribute( "authenticated" ) != null ) {
+                ctx.result( ctx.basicAuthCredentials().getUsername() );
+            } else {
+                ctx.res().sendError( 401, "Not authenticated!" );
+            }
+        } );
+        javalin.get( "/session/is_authenticated", ctx -> {
+            if ( ctx.sessionAttribute( "authenticated" ) != null ) {
+                ctx.result( "true" );
+            } else {
+                ctx.result( "false" );
             }
         } );
 

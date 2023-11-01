@@ -18,3 +18,27 @@ function login() {
     });
     return false;
 }
+
+// Function to check if already authenticated and if so, redirects to /
+function checkAuthentication() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/session/is_authenticated', true);
+
+    // Set up the onload event
+    xhr.onload = function() {
+        if (this.status === 200 && this.responseText === "true") {
+            // Redirect the user to the root ("/") if response is "true"
+            window.location.href = '/';
+        }
+    };
+
+    // Handle any errors
+    xhr.onerror = function() {
+        console.error('Request failed.');
+    };
+
+    // Send the request
+    xhr.send();
+}
+
+checkAuthentication();
