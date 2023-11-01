@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
@@ -102,21 +99,18 @@ public abstract class PolyphenyDbProcess {
     }
 
 
-    /**
-     *
-     */
     private static final class WindowsPolyphenyDbProcess extends PolyphenyDbProcess {
 
         private final WinProcess winProcess;
 
 
-        protected WindowsPolyphenyDbProcess( final int pid ) {
+        WindowsPolyphenyDbProcess( final int pid ) {
             super( null );
             winProcess = new WinProcess( pid );
         }
 
 
-        protected WindowsPolyphenyDbProcess( final Process process ) {
+        WindowsPolyphenyDbProcess( final Process process ) {
             super( process );
             winProcess = new WinProcess( process );
         }
@@ -174,43 +168,26 @@ public abstract class PolyphenyDbProcess {
     }
 
 
-    /**
-     *
-     */
     private static final class UnixPolyphenyDbProcess extends PolyphenyDbProcess {
 
         private final int pid;
 
 
-        protected UnixPolyphenyDbProcess( final int pid ) {
+        private UnixPolyphenyDbProcess( final int pid ) {
             super( null );
             this.pid = pid;
         }
 
 
-        protected UnixPolyphenyDbProcess( final Process process ) {
+        private UnixPolyphenyDbProcess( final Process process ) {
             super( process );
-
             long pid = -1;
 
             try {
-                Field pidField = process.getClass().getDeclaredField( "pid" );
-
-                AccessController.doPrivileged( (PrivilegedAction<Void>) () -> {
-                    pidField.setAccessible( true );
-                    return null;
-                } );
-
-                pid = pidField.getLong( process );
-
-                AccessController.doPrivileged( (PrivilegedAction<Void>) () -> {
-                    pidField.setAccessible( false );
-                    return null;
-                } );
-
-            } catch ( NoSuchFieldException | IllegalAccessException e ) {
+                ProcessHandle handle = process.toHandle();
+                pid = handle.pid();
+            } catch ( UnsupportedOperationException e ) {
                 log.error( "Exception while extracting the PID from java.lang.Process.", e );
-                pid = -1;
             } finally {
                 this.pid = (int) pid;
             }
