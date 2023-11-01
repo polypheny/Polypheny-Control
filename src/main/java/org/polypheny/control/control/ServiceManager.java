@@ -583,7 +583,7 @@ public class ServiceManager {
                     .setStandardOutput( null )
                     .setStandardError( System.err )
                     .forTasks( "build" )
-                    .withArguments( "-x", "test" );
+                    .withArguments( "-x", "test", "-x", "licensee" );
 
             if ( clientCommunicationStream != null ) {
                 buildLauncher.addProgressListener( event -> clientCommunicationStream.send( event.getDisplayName() ), OperationType.TASK );

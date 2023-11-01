@@ -51,10 +51,16 @@ public class ControlTest {
         // Setting the systemProperty 'testing'
         System.setProperty( "testing", "true" );
 
-        // Backup config file
-        File polyphenyDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        // Backup .pctrl folder
+        File pctrlDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        if ( pctrlDir.exists() ) {
+            pctrlDir.renameTo( new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" ) );
+        }
+
+        // Backup .polypheny folder
+        File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         if ( polyphenyDir.exists() ) {
-            polyphenyDir.renameTo( new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" ) );
+            polyphenyDir.renameTo( new File( System.getProperty( "user.home" ), ".polypheny.backup" ) );
         }
 
         // Create passwd data and an account
@@ -76,12 +82,21 @@ public class ControlTest {
     @AfterAll
     public static void shutdown() throws IOException {
         running = false;
-        // Restore config file
+
+        // Restore .polypheny
         File polyphenyDir = new File( System.getProperty( "user.home" ), ".polypheny" );
         FileUtils.deleteDirectory( polyphenyDir );
         File polyphenyDirBackup = new File( System.getProperty( "user.home" ), ".polypheny.backup" );
         if ( polyphenyDirBackup.exists() ) {
             polyphenyDirBackup.renameTo( polyphenyDir );
+        }
+
+        // Restore .pctrl
+        File pctrlDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        FileUtils.deleteDirectory( pctrlDir );
+        File pctrlDirBackup = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" );
+        if ( pctrlDirBackup.exists() ) {
+            pctrlDirBackup.renameTo( pctrlDir );
         }
     }
 

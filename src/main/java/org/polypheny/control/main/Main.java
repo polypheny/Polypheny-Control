@@ -31,6 +31,7 @@ import org.polypheny.control.authentication.AuthenticationDataManager;
 import org.polypheny.control.authentication.AuthenticationFileManager;
 import org.polypheny.control.authentication.AuthenticationManager;
 import org.polypheny.control.authentication.AuthenticationUtils;
+import org.polypheny.control.control.ConfigManager;
 import org.polypheny.control.control.ServiceManager;
 
 
@@ -41,6 +42,7 @@ public class Main {
         // Check for and restore .polypheny.backup
         if ( System.getProperty( "testing" ) != null && System.getProperty( "testing" ).equals( "true" ) ) {
             restorePolyphenyBackup();
+            restorePctrlBackup();
         }
 
         // Hide dock icon on MacOS systems
@@ -81,6 +83,24 @@ public class Main {
             // Could not delete polyphenyDir
             System.err.println( "Error restoring backup of polypheny directory: " + polyphenyDirBackup.getAbsolutePath() + "." );
             System.err.println( "Please restore the backup manually by renaming the folder to '.polypheny'." );
+            System.exit( 1 );
+        }
+    }
+
+
+    private static void restorePctrlBackup() {
+        File pctrlDir = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) );
+        File pctrlDirBackup = new File( ConfigManager.getConfig().getString( "pcrtl.workingdir" ) + ".backup" );
+
+        try {
+            if ( pctrlDirBackup.exists() ) {
+                FileUtils.deleteDirectory( pctrlDir );
+                pctrlDirBackup.renameTo( pctrlDir );
+            }
+        } catch ( IOException ex ) {
+            // Could not delete polyphenyDir
+            System.err.println( "Error restoring backup of pctrl directory: " + pctrlDirBackup.getAbsolutePath() + "." );
+            System.err.println( "Please restore the backup manually by renaming the folder to '.pctrl'." );
             System.exit( 1 );
         }
     }
