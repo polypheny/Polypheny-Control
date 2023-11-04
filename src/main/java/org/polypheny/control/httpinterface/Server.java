@@ -70,7 +70,7 @@ public class Server {
 
                 if ( difference >= sessionTimeout ) {
                     session.invalidate();
-                    ctx.res().sendError( 401, "Session Timeout" );
+                    ctx.redirect( "/login.html" );
                 }
             }
 
