@@ -652,14 +652,16 @@ public class ServiceManager {
         if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuilding" ) ) {
             File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
             if ( pluginsFolder.exists() ) {
-                if ( !pluginsFolder.delete() ) {
+                try {
+                    FileUtils.deleteDirectory( pluginsFolder );
+                    if ( clientCommunicationStream != null ) {
+                        clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
+                    }
+                } catch ( IOException e ) {
                     if ( clientCommunicationStream != null ) {
                         clientCommunicationStream.send( "> Unable to purge folder!" );
                     }
                     throw new RuntimeException( "Unable to purge folder!" );
-                }
-                if ( clientCommunicationStream != null ) {
-                    clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
                 }
             }
         }
