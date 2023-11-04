@@ -90,7 +90,6 @@ public class ServiceManager {
     /**
      * This block restores the PolyphenyDbProcess on startup by checking the PID file. It will create a PolyphenyDbProcess
      * from the PID if the file contains a PID number. Then it will check if the process is still alive.
-     *
      * TODO: This is maybe not required since we start a child process. By the termination of this process usually the child
      *  processes are terminated too. However, if later on there is another way of creating the Polypheny-DB process this
      *  static block would be more relevant (I guess).
@@ -151,7 +150,7 @@ public class ServiceManager {
 
 
     public static boolean start( final ClientCommunicationStream clientCommunicationStream, final boolean startTailers ) {
-        return start( clientCommunicationStream, true, "" );
+        return start( clientCommunicationStream, startTailers, "" );
     }
 
 
@@ -192,10 +191,10 @@ public class ServiceManager {
 
             // Build list of arguments
             List<String> pdbArguments = new LinkedList<>();
-            if ( pdbmsArgs.trim().length() > 0 ) {
+            if ( !pdbmsArgs.trim().isEmpty() ) {
                 pdbArguments.addAll( Arrays.asList( pdbmsArgs.split( " " ) ) );
             }
-            if ( additionalArguments.trim().length() > 0 ) {
+            if ( !additionalArguments.trim().isEmpty() ) {
                 pdbArguments.addAll( Arrays.asList( additionalArguments.split( " " ) ) );
             }
             if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "onStartup" ) ) {
@@ -256,21 +255,33 @@ public class ServiceManager {
                 final Logger PDB_LOGGER = LoggerFactory.getLogger( "PDB" );
 
                 if ( logTailer != null ) {
-                    logTailer.stop();
+                    logTailer.close();
                 }
                 if ( clientCommunicationStream != null ) {
-                    logTailer = new Tailer( new File( logFile ), new LogTailerListener( PDB_LOGGER::info, clientCommunicationStream::send ) );
+                    logTailer = Tailer.builder()
+                            .setFile( new File( logFile ) )
+                            .setTailerListener( new LogTailerListener( PDB_LOGGER::info, clientCommunicationStream::send ) )
+                            .get();
                 } else {
-                    logTailer = new Tailer( new File( logFile ), new LogTailerListener( PDB_LOGGER::info ) );
+                    logTailer = Tailer.builder()
+                            .setFile( new File( logFile ) )
+                            .setTailerListener( new LogTailerListener( PDB_LOGGER::info ) )
+                            .get();
                 }
 
                 if ( errTailer != null ) {
-                    errTailer.stop();
+                    errTailer.close();
                 }
                 if ( clientCommunicationStream != null ) {
-                    errTailer = new Tailer( new File( errFile ), new LogTailerListener( PDB_LOGGER::info, clientCommunicationStream::send ) );
+                    errTailer = Tailer.builder()
+                            .setFile( new File( errFile ) )
+                            .setTailerListener( new LogTailerListener( PDB_LOGGER::info, clientCommunicationStream::send ) )
+                            .get();
                 } else {
-                    errTailer = new Tailer( new File( errFile ), new LogTailerListener( PDB_LOGGER::info ) );
+                    errTailer = Tailer.builder()
+                            .setFile( new File( errFile ) )
+                            .setTailerListener( new LogTailerListener( PDB_LOGGER::info ) )
+                            .get();
                 }
 
                 if ( startTailers ) {
@@ -316,13 +327,13 @@ public class ServiceManager {
 
             polyphenyDbProcess = null;
 
-            // Stopping std out redirectors
+            // Stopping std out redirections
             if ( logTailer != null ) {
-                logTailer.stop();
+                logTailer.close();
             }
             logTailer = null;
             if ( errTailer != null ) {
-                errTailer.stop();
+                errTailer.close();
             }
             errTailer = null;
 
@@ -1031,7 +1042,7 @@ public class ServiceManager {
                     consumer.accept( "> !! The log file was not found. Stopping the Tailer. !!" );
                 }
             }
-            this.tailer.stop();
+            this.tailer.close();
         }
 
 
@@ -1062,7 +1073,7 @@ public class ServiceManager {
             for ( Consumer<String> consumer : consumers ) {
                 consumer.accept( "> !! Exception occurred: " + e.getMessage() + ". Stopping the Tailer. !!" );
             }
-            this.tailer.stop();
+            this.tailer.close();
         }
     }
 }
