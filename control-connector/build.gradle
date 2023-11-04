@@ -2,7 +2,7 @@ plugins {
     id "java-library"
     id "maven-publish"
     id "signing"
-    id "io.freefair.lombok"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group "org.polypheny"
@@ -34,7 +34,7 @@ sourceSets {
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
@@ -91,14 +91,14 @@ artifacts {
 
 publishing {
     publications {
-        shadow(MavenPublication) { publication ->
+        centralPublication(MavenPublication) { publication ->
             from components.java
             artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
             artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
             pom {
-                name = "Polypheny Control Connector"
-                description = "A library that connects to Polypheny Control and enables remote control."
-                url = "https://polypheny.org"
+                name = 'Polypheny Control Connector'
+                description = 'A library that connects to Polypheny Control and enables remote control.'
+                url = 'https://polypheny.org'
                 licenses {
                     license {
                         name = 'Apache License, Version 2.0'
@@ -148,5 +148,5 @@ signing {
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.shadow
+    sign publishing.publications.centralPublication
 }
