@@ -649,7 +649,7 @@ public class ServiceManager {
         }
 
         // Purge plugins dir
-        if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuild" ) ) {
+        if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuilding" ) ) {
             File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
             if ( pluginsFolder.exists() ) {
                 if ( !pluginsFolder.delete() ) {
