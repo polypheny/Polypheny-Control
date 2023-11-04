@@ -661,7 +661,6 @@ public class ServiceManager {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
                 }
-                throw new RuntimeException( "Purged Polypheny plugins folder!" );
             }
         }
     }
