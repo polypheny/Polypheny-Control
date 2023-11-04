@@ -131,18 +131,21 @@ $('#btn-start').click(function () {
     $('#dashboardContent').hide();
     $('#logContent').show();
     sendRequest("control/start");
+    adjustFooterPosition();
 });
 
 $('#btn-stop').click(function () {
     $('#dashboardContent').hide();
     $('#logContent').show();
     sendRequest("control/stop");
+    adjustFooterPosition();
 });
 
 $('#btn-restart').click(function () {
     $('#dashboardContent').hide();
     $('#logContent').show();
     sendRequest("control/restart");
+    adjustFooterPosition();
 });
 
 $('#btn-update').click(function () {
@@ -151,16 +154,19 @@ $('#btn-update').click(function () {
     $( '#config-loading' ).hide();
     $( '#updateContent' ).show();
     sendRequest("control/update");
+    adjustFooterPosition();
 });
 
 $('#btn-log').click(function () {
     $('#dashboardContent').hide();
     $('#logContent').show();
+    adjustFooterPosition();
 });
 
 $('#btn-polyfier').click(function () {
     $( '#dashboardContent' ).hide();
     $( '#polyfierContent' ).show();
+    adjustFooterPosition();
 });
 
 $('#btn-settings').click(function () {
@@ -171,29 +177,34 @@ $('#btn-settings').click(function () {
     // updatePdbBranchList calls updatePuiBranchList in its success method.
     // updatePuiBranchList calls updateConfigPage.
     // updateConfigPage hides the configLoading page and shows the settings page
+    adjustFooterPosition();
 });
 
 
 $('.btn-back').click(function () {
-    $('#dashboardContent').show();
     $('#updateContent').hide();
     $('#logContent').hide();
     $('#polyfierContent').hide();
     $('#settingsContent' ).hide();
     $('#config-loading' ).hide();
+    $('#dashboardContent').show();
+    adjustFooterPosition();
 });
 
 $('#saveSettings').click(function () {
     saveConfigs();
+    adjustFooterPosition();
 });
 
 $('#polyfierStart').click(function () {
     sendRequest("polyfier/start");
+    adjustFooterPosition();
 });
 
 $('#polyfierStop').click(function () {
     $('#polyfierRunningContent').hide();
     $('#polyfierStopContent').show();
+    adjustFooterPosition();
 });
 
 $('#polyfierStop-back').click(function () {
@@ -203,18 +214,21 @@ $('#polyfierStop-back').click(function () {
     } else {
         $('#dashboardContent').show();
     }
+    adjustFooterPosition();
 });
 
 $('#polyfierStopForcefully').click(function () {
     sendRequest("polyfier/stopForcefully");
     $('#polyfierStopContent').hide();
     $('#polyfierRunningContent').show();
+    adjustFooterPosition();
 });
 
 $('#polyfierStopGracefully').click(function () {
     sendRequest("polyfier/stopGracefully");
     $('#polyfierStopContent').hide();
     $('#polyfierRunningContent').show();
+    adjustFooterPosition();
 });
 
 function sendRequest(url) {
@@ -377,6 +391,23 @@ function updatePuiBranchList() {
     } );
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function adjustFooterPosition() {
+    await sleep(10); // wait 50ms for the dom to build. Otherwise, calculations are wrong.
+    var contentHeight = document.querySelector('.main').scrollHeight;
+    var viewportHeight = window.innerHeight;
+    var footerHeight = document.querySelector('.footer').offsetHeight;
+
+    if (contentHeight + footerHeight < viewportHeight) {
+        document.querySelector('.root').style.minHeight = `calc(${viewportHeight}px - calc(5vh + ${footerHeight}px))`;
+    } else {
+        document.querySelector('.root').style.minHeight = `calc(${contentHeight}px - 11vh)`;
+    }
+}
+
 $( document ).on( "mouseenter", ".circle", function () {
     $( this ).css( "background-color", "lightgray" );
 } );
@@ -407,3 +438,9 @@ $( document ).on( 'keyup', function ( e ) {
         }
     }
 });
+
+// Initial adjust on page load
+window.onload = adjustFooterPosition;
+
+// Adjust footer when window gets resized
+window.onresize = adjustFooterPosition;
