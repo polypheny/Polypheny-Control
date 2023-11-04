@@ -36,8 +36,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -70,8 +68,6 @@ public class ServiceManager {
 
     private static final Object MUTEX = new Object();
     private static PolyphenyDbProcess polyphenyDbProcess = null; // ! Shared over multiple stateless requests
-
-    private static final ExecutorService PROCESS_OUTPUT_REDIRECTOR_EXECUTOR = Executors.newFixedThreadPool( 2 );
     private static Tailer logTailer = null; // ! Shared over multiple stateless requests
     private static Tailer errTailer = null; // ! Shared over multiple stateless requests
 
@@ -282,11 +278,6 @@ public class ServiceManager {
                             .setFile( new File( errFile ) )
                             .setTailerListener( new LogTailerListener( PDB_LOGGER::info ) )
                             .get();
-                }
-
-                if ( startTailers ) {
-                    PROCESS_OUTPUT_REDIRECTOR_EXECUTOR.submit( logTailer );
-                    PROCESS_OUTPUT_REDIRECTOR_EXECUTOR.submit( errTailer );
                 }
 
                 log.info( "> ... done." );
