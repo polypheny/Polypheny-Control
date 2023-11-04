@@ -438,6 +438,14 @@ public class ServiceManager {
                     buildPdb( clientCommunicationStream, configuration, installedUI );
                 }
 
+                if ( clientCommunicationStream != null ) {
+                    log.info( "> Updating Polypheny ... finished." );
+                    clientCommunicationStream.send( "********************************************************" );
+                    clientCommunicationStream.send( "         Polypheny has successfully been built!" );
+                    clientCommunicationStream.send( "********************************************************" );
+                    NotificationManager.info( "Polypheny-DB has successfully been built!" );
+                }
+
                 // Purge plugins dir
                 if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuilding" ) ) {
                     File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
@@ -456,13 +464,6 @@ public class ServiceManager {
                     }
                 }
 
-                if ( clientCommunicationStream != null ) {
-                    log.info( "> Updating Polypheny ... finished." );
-                    clientCommunicationStream.send( "********************************************************" );
-                    clientCommunicationStream.send( "         Polypheny has successfully been built!" );
-                    clientCommunicationStream.send( "********************************************************" );
-                    NotificationManager.info( "Polypheny-DB has successfully been built!" );
-                }
                 return true;
             } finally {
                 currentlyUpdating = false;
