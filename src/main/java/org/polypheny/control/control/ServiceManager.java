@@ -438,6 +438,24 @@ public class ServiceManager {
                     buildPdb( clientCommunicationStream, configuration, installedUI );
                 }
 
+                // Purge plugins dir
+                if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuilding" ) ) {
+                    File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
+                    if ( pluginsFolder.exists() ) {
+                        try {
+                            FileUtils.deleteDirectory( pluginsFolder );
+                            if ( clientCommunicationStream != null ) {
+                                clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
+                            }
+                        } catch ( IOException e ) {
+                            if ( clientCommunicationStream != null ) {
+                                clientCommunicationStream.send( "> Unable to purge folder!" );
+                            }
+                            throw new RuntimeException( "Unable to purge folder!" );
+                        }
+                    }
+                }
+
                 if ( clientCommunicationStream != null ) {
                     log.info( "> Updating Polypheny ... finished." );
                     clientCommunicationStream.send( "********************************************************" );
@@ -646,24 +664,6 @@ public class ServiceManager {
                 clientCommunicationStream.send( "> JAR file does not exist!" );
             }
             throw new RuntimeException( "JAR file does not exist!" );
-        }
-
-        // Purge plugins dir
-        if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuilding" ) ) {
-            File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
-            if ( pluginsFolder.exists() ) {
-                try {
-                    FileUtils.deleteDirectory( pluginsFolder );
-                    if ( clientCommunicationStream != null ) {
-                        clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
-                    }
-                } catch ( IOException e ) {
-                    if ( clientCommunicationStream != null ) {
-                        clientCommunicationStream.send( "> Unable to purge folder!" );
-                    }
-                    throw new RuntimeException( "Unable to purge folder!" );
-                }
-            }
         }
     }
 
