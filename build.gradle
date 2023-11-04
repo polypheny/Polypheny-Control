@@ -3,7 +3,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'app.cash.licensee:licensee-gradle-plugin:1.8.0'
+        // license check
+        classpath group: "app.cash.licensee", name: "licensee-gradle-plugin", version: "1.8.0"
     }
 }
 
@@ -14,10 +15,10 @@ plugins {
     id "com.github.johnrengelman.shadow" version "8.1.1"
     id "io.freefair.lombok" version "8.4"
     id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
+    id "com.jaredsburrows.license" version "0.9.3"
 }
 
 apply plugin: 'app.cash.licensee'
-
 
 import org.jetbrains.gradle.ext.Application
 
@@ -207,6 +208,14 @@ test {
 }
 test.dependsOn(testWithAuth)
 
+
+licenseReport {
+    generateCsvReport = false
+    generateHtmlReport = false
+    generateJsonReport = true
+    generateTextReport = false
+    ignoredPatterns = []
+}
 
 
 //////////////
