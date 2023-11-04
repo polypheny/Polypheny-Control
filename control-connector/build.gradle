@@ -93,6 +93,7 @@ publishing {
     publications {
         centralPublication(MavenPublication) { publication ->
             from components.java
+            artifact source: jar, classifier: '', extension: 'jar'
             artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
             artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
             pom {
