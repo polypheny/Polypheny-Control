@@ -448,24 +448,6 @@ public class ServiceManager {
                     NotificationManager.info( "Polypheny-DB has successfully been built!" );
                 }
 
-                // Purge plugins dir
-                if ( configuration.getString( "pcrtl.plugins.purge" ).equals( "afterBuilding" ) ) {
-                    File pluginsFolder = new File( configuration.getString( "pcrtl.pdbms.pluginsdir" ) );
-                    if ( pluginsFolder.exists() ) {
-                        try {
-                            FileUtils.deleteDirectory( pluginsFolder );
-                            if ( clientCommunicationStream != null ) {
-                                clientCommunicationStream.send( "> Purged Polypheny plugins folder!" );
-                            }
-                        } catch ( IOException e ) {
-                            if ( clientCommunicationStream != null ) {
-                                clientCommunicationStream.send( "> Unable to purge folder!" );
-                            }
-                            throw new RuntimeException( "Unable to purge folder!" );
-                        }
-                    }
-                }
-
                 return true;
             } finally {
                 currentlyUpdating = false;
