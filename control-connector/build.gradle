@@ -91,10 +91,10 @@ jar {
 
 publishing {
     publications {
-        centralPublication(MavenPublication) { publication ->
+        shadow(MavenPublication) { publication ->
             from components.java
-            //artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
-            //artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
+            artifact source: sourcesJar, classifier: 'sources', extension: 'jar'
+            artifact source: javadocJar, classifier: 'javadoc', extension: 'jar'
             pom {
                 name = 'Polypheny Control Connector'
                 description = 'A library that connects to Polypheny Control and enables remote control.'
@@ -142,17 +142,11 @@ publishing {
 }
 //task generatePom(group: 'publishing', dependsOn: "generatePomFileFor${project.name.capitalize()}Publication")
 
-afterEvaluate {
-    publishing.publications.centralPublication.artifacts.each { artifact ->
-        println "Artifact: ${artifact.file} Classifier: ${artifact.classifier}"
-    }
-}
-
 
 signing {
     required { gradle.taskGraph.hasTask("publish") }
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.centralPublication
+    sign publishing.publications.shadow
 }
