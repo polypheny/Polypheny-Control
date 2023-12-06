@@ -23,6 +23,8 @@ html {
 
 div.root {
     max-width: 1500px;
+    margin-left: auto;
+    margin-right: auto;
     /*position: relative;
     height: auto !important;
     height: 100%;
