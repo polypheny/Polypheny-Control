@@ -866,6 +866,11 @@ public class ServiceManager {
             }
         }
 
+        log.info( "> Polypheny home folder has been purged!" );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Polypheny home folder has been purged!" );
+        }
+
         return true;
     }
 
