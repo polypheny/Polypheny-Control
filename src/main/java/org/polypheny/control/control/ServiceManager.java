@@ -828,6 +828,13 @@ public class ServiceManager {
 
 
     public static boolean purgePolyphenyFolder( ClientCommunicationStream clientCommunicationStream ) {
+        if ( polyphenyDbProcess != null && polyphenyDbProcess.isAlive() ) {
+            if ( clientCommunicationStream != null ) {
+                clientCommunicationStream.send( "> Unable to purge Polypheny home folder while Polypheny is running!" );
+            }
+            throw new RuntimeException( "Unable to purge Polypheny home folder while Polypheny is running!" );
+        }
+
         Config configuration = ConfigManager.getConfig();
         File polyphenyDir = new File( configuration.getString( "pcrtl.pdbms.polyphenyhome" ) );
         File polyphenyTestBackupDir = new File( configuration.getString( "pcrtl.pdbms.polyphenyhome" ) + "_test_backup" );
