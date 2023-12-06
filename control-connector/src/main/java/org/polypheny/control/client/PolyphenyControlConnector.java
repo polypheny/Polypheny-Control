@@ -99,6 +99,16 @@ public class PolyphenyControlConnector {
     }
 
 
+    public void purgePolyphenyFolder() {
+        setClientType(); // Set the client type (again) - does not hurt and makes sure its set
+        try {
+            httpConnector.post( controlUrl + "/control/purgePolyphenyFolder", request -> request.field( "clientId", clientId ) );
+        } catch ( UnirestException e ) {
+            log.error( "Error while purging Polypheny home folder", e );
+        }
+    }
+
+
     public void updatePolypheny() {
         // Check if in status idling
         String status = getStatus();

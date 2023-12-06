@@ -180,13 +180,32 @@ $('#btn-settings').click(function () {
     adjustFooterPosition();
 });
 
+$('#btn-purgePolyphenyHomeFolder').click(function () {
+    $( '#settingsContent' ).hide();
+    $( '#purgePolyphenyHomeFolder' ).show();
+    adjustFooterPosition();
+});
+
+$('#btn-confirmPurgePolyphenyHomeFolder').click(function () {
+    sendRequest("control/purgePolyphenyFolder");
+    $( '#purgePolyphenyHomeFolder' ).hide();
+    $( '#settingsContent' ).show();
+    adjustFooterPosition();
+});
+
+$('#btn-showSettings').click(function () {
+    $( '#purgePolyphenyHomeFolder' ).hide();
+    $( '#settingsContent' ).show();
+    adjustFooterPosition();
+});
 
 $('.btn-back').click(function () {
     $('#updateContent').hide();
     $('#logContent').hide();
     $('#polyfierContent').hide();
-    $('#settingsContent' ).hide();
-    $('#config-loading' ).hide();
+    $('#settingsContent').hide();
+    $('#config-loading').hide();
+    $('#purgePolyphenyHomeFolder').hide();
     $('#dashboardContent').show();
     adjustFooterPosition();
 });

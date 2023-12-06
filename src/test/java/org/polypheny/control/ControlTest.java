@@ -106,6 +106,9 @@ public class ControlTest {
         ClientData clientData = new ClientData( ClientType.BROWSER, "pc", "super$secret" );
         PolyphenyControlConnector controlConnector = new PolyphenyControlConnector( "localhost:8070", clientData, null );
 
+        // Purge polypheny folder
+        controlConnector.purgePolyphenyFolder();
+
         // Update and build Polypheny
         controlConnector.updatePolypheny();
 

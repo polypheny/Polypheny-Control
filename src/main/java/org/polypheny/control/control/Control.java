@@ -129,6 +129,15 @@ public class Control {
     }
 
 
+    public void purgePolyphenyFolder( Context ctx ) {
+        if ( ServiceManager.polyfierMode ) {
+            getClientCommunicationStream( ctx, "Running in Polyfier mode, all commands are ignored!" );
+            return;
+        }
+        ctx.result( gson.toJson( ServiceManager.purgePolyphenyFolder( getClientCommunicationStream( ctx, "updateOutput" ) ) ) );
+    }
+
+
     public void polyfierStart( Context ctx ) {
         ctx.result( gson.toJson( PolyfierManager.start( getClientCommunicationStream( ctx, "logOutput" ), getClientCommunicationStream( ctx, "polyfierOutput" ) ) ) );
     }

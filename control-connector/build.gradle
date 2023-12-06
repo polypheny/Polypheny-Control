@@ -142,6 +142,12 @@ publishing {
 }
 //task generatePom(group: 'publishing', dependsOn: "generatePomFileFor${project.name.capitalize()}Publication")
 
+afterEvaluate {
+    publishing.publications.centralPublication.artifacts.each { artifact ->
+        println "Artifact: ${artifact.file} Classifier: ${artifact.classifier}"
+    }
+}
+
 
 signing {
     required { gradle.taskGraph.hasTask("publish") }

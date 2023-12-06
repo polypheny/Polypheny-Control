@@ -845,6 +845,42 @@ public class ServiceManager {
     }
 
 
+    public static boolean purgePolyphenyFolder( ClientCommunicationStream clientCommunicationStream ) {
+        Config configuration = ConfigManager.getConfig();
+        File polyphenyDir = new File( configuration.getString( "pcrtl.pdbms.polyphenyhome" ) );
+        File polyphenyTestBackupDir = new File( configuration.getString( "pcrtl.pdbms.polyphenyhome" ) + "_test_backup" );
+
+        log.info( "> Purging Polypheny home folder (" + polyphenyDir.getAbsolutePath() + ")..." );
+        if ( clientCommunicationStream != null ) {
+            clientCommunicationStream.send( "> Purging Polypheny home folder (" + polyphenyDir.getAbsolutePath() + ")..." );
+        }
+        if ( polyphenyDir.exists() ) {
+            try {
+                FileUtils.deleteDirectory( polyphenyDir );
+            } catch ( IOException e ) {
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Unable to purge Polypheny home folder!" );
+                }
+                throw new RuntimeException( "Unable to purge Polypheny home folder!" );
+            }
+        }
+
+        // Check if there are any test backups of the home folder (e.g., created for integration tests). There should not be any, but if there is, delete it as this folder would be restored on startup
+        if ( polyphenyTestBackupDir.exists() ) {
+            try {
+                FileUtils.deleteDirectory( polyphenyTestBackupDir );
+            } catch ( IOException e ) {
+                if ( clientCommunicationStream != null ) {
+                    clientCommunicationStream.send( "> Unable to purge backup of Polypheny home holder!" + polyphenyTestBackupDir.getAbsolutePath() );
+                }
+                throw new RuntimeException( "Unable to purge backup of Polypheny home holder!" + polyphenyTestBackupDir.getAbsolutePath() );
+            }
+        }
+
+        return true;
+    }
+
+
     public static Map<String, String> getVersion() {
         Config configuration = ConfigManager.getConfig();
         String buildDir = configuration.getString( "pcrtl.builddir" );

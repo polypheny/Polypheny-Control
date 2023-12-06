@@ -173,6 +173,12 @@
                         <td>Polypheny-DB Arguments</td>
                         <td><input name="pcrtl.pdbms.args" value=""></td>
                     </tr>
+                    <tr>
+                        <td>Purge Polypheny home folder</td>
+                        <td>
+                            <button type="button" class="btn-red" id="btn-purgePolyphenyHomeFolder">Purge</button>
+                        </td>
+                    </tr>
                 </table>
                 <br>
                 <h2 style="text-align: left;">Polyfier</h2>
@@ -203,6 +209,13 @@
             <h1>Loading...</h1>
             <div class="lds-dual-ring"></div>
             <p>Cloning repositories. Please wait.</p>
+        </div>
+
+        <div id="purgePolyphenyHomeFolder" class="content" style="display: none;">
+            <h1>Purge Polypheny Home Folder</h1>
+            <p>Are you sure?</p>
+            <button type="button" class="btn-blue" id="btn-showSettings">Back</button>
+            <button type="button" class="btn-blue" id="btn-confirmPurgePolyphenyHomeFolder">Purge</button>
         </div>
 
     </div>
