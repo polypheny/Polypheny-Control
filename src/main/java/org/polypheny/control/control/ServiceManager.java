@@ -843,14 +843,23 @@ public class ServiceManager {
         if ( clientCommunicationStream != null ) {
             clientCommunicationStream.send( "> Purging Polypheny home folder (" + polyphenyDir.getAbsolutePath() + ")..." );
         }
-        if ( polyphenyDir.exists() ) {
-            try {
-                FileUtils.deleteDirectory( polyphenyDir );
-            } catch ( IOException e ) {
-                if ( clientCommunicationStream != null ) {
-                    clientCommunicationStream.send( "> Unable to purge Polypheny home folder!" );
+        if ( polyphenyDir.exists() && polyphenyDir.isDirectory() ) {
+            for ( File f : polyphenyDir.listFiles() ) {
+                if ( f.getName().equals( "uuid" ) ) {
+                    continue;
                 }
-                throw new RuntimeException( "Unable to purge Polypheny home folder!" );
+                try {
+                    if ( f.isDirectory() ) {
+                        FileUtils.deleteDirectory( f );
+                    } else {
+                        f.delete();
+                    }
+                } catch ( IOException e ) {
+                    if ( clientCommunicationStream != null ) {
+                        clientCommunicationStream.send( "> Unable to purge Polypheny home folder!" );
+                    }
+                    throw new RuntimeException( "Unable to purge Polypheny home folder!" );
+                }
             }
         }
 
