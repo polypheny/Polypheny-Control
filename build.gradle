@@ -230,12 +230,12 @@ idea {
             runConfigurations {
                 "Polypheny Control (headless)"(Application) {
                     mainClass = mainClassName
-                    moduleName = "polypheny-control.main"
+                    moduleName = "Polypheny-Control.main"
                     programParameters = 'control'
                 }
                 "Polypheny Control (tray)"(Application) {
                     mainClass = mainClassName
-                    moduleName = "polypheny-control.main"
+                    moduleName = "Polypheny-Control.main"
                     programParameters = 'tray'
                 }
             }
