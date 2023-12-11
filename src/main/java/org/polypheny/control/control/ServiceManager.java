@@ -862,6 +862,14 @@ public class ServiceManager {
                     throw new RuntimeException( "Unable to purge Polypheny home folder!" );
                 }
             }
+
+            // Check if everything has been deleted
+            for ( File f : polyphenyDir.listFiles() ) {
+                if ( f.getName().equals( "uuid" ) || f.getName().equals( "certs" ) ) {
+                    continue;
+                }
+                throw new RuntimeException( "Unable to delete certain files in the Polypheny home folder!" );
+            }
         }
 
         // Check if there are any test backups of the home folder (e.g., created for integration tests). There should not be any, but if there is, delete it as this folder would be restored on startup
@@ -872,6 +880,10 @@ public class ServiceManager {
                 if ( clientCommunicationStream != null ) {
                     clientCommunicationStream.send( "> Unable to purge backup of Polypheny home holder!" + polyphenyTestBackupDir.getAbsolutePath() );
                 }
+                throw new RuntimeException( "Unable to purge backup of Polypheny home holder!" + polyphenyTestBackupDir.getAbsolutePath() );
+            }
+            // Check if folder has been deleted
+            if ( polyphenyTestBackupDir.exists() ) {
                 throw new RuntimeException( "Unable to purge backup of Polypheny home holder!" + polyphenyTestBackupDir.getAbsolutePath() );
             }
         }
