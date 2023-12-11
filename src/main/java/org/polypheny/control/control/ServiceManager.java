@@ -845,7 +845,8 @@ public class ServiceManager {
         }
         if ( polyphenyDir.exists() && polyphenyDir.isDirectory() ) {
             for ( File f : polyphenyDir.listFiles() ) {
-                if ( f.getName().equals( "uuid" ) ) {
+                if ( f.getName().equals( "uuid" ) || f.getName().equals( "certs" ) ) {
+                    // Ignore certs folder (contains files created by root) and uuid (avoids warnings when connecting to docker.
                     continue;
                 }
                 try {
