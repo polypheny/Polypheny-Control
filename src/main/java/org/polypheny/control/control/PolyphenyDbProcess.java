@@ -263,7 +263,6 @@ public abstract class PolyphenyDbProcess {
                 } catch ( InterruptedException e ) {
                     log.warn( "Interrupted while waiting for kill to finish." );
                 }
-
             } else {
                 super.process.destroyForcibly();
             }

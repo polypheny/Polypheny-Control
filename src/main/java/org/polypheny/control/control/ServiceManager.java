@@ -179,10 +179,10 @@ public class ServiceManager {
             //
 
             LinkedList<String> javaOptionsFull = new LinkedList<>( javaOptions );
-            String applicationConfFileName = new File( new File( workingDir ), "config" ).getAbsolutePath() + File.separator + "application.conf";
+            /*String applicationConfFileName = new File( new File( workingDir ), "config" ).getAbsolutePath() + File.separator + "application.conf";
             if ( new File( applicationConfFileName ).exists() ) {
                 javaOptionsFull.addFirst( "-Dconfig.file=" + applicationConfFileName );
-            }
+            }*/
             javaOptionsFull.addFirst( "-Xmx" + javaMaximumHeapSize + "G" );
 
             // Build list of arguments
@@ -988,6 +988,32 @@ public class ServiceManager {
             return "updating";
         } else {
             return "idling";
+        }
+    }
+
+
+    public static List<Integer> getPidOfRunningPolyphenyInstances() {
+        if ( SystemUtils.IS_OS_WINDOWS ) {
+            throw new RuntimeException( "This operation is not supported on Windows" );
+        }
+        try {
+            List<Integer> pids = new ArrayList<>();
+            Process process = Runtime.getRuntime().exec( "ps aux|grep org.polypheny.db.PolyphenyDb|grep -v grep|awk '{print $2}'" );
+            try ( BufferedReader input = new BufferedReader( new InputStreamReader( process.getInputStream() ) ) ) {
+                String line;
+                while ( (line = input.readLine()) != null ) {
+                    int id = Integer.parseInt( line );
+                    if ( polyphenyDbProcess != null && id != polyphenyDbProcess.getPid() ) {
+                        log.warn( "There is a running Polypheny instance, but it has a unknown PID: {}", id );
+                    }
+                    pids.add( id );
+                }
+            } catch ( IOException e ) {
+                throw new RuntimeException( "IOException while checking if there are other instances of Polypheny.", e );
+            }
+            return pids;
+        } catch ( IOException e ) {
+            throw new RuntimeException( "IOException while checking if there are other instances of Polypheny.", e );
         }
     }
 

@@ -146,6 +146,7 @@ public class Server {
         javalin.get( "/control/pdbBranches", control::getAvailablePdbBranches );
         javalin.get( "/control/puiBranches", control::getAvailablePuiBranches );
         javalin.post( "/control/purgePolyphenyFolder", control::purgePolyphenyFolder );
+        javalin.get( "/control/checkAnyRunningPolyphenyInstances", control::checkAnyRunningPolyphenyInstances );
 
         // /polyfier
         javalin.post( "/polyfier/start", control::polyfierStart );

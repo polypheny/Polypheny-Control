@@ -158,6 +158,11 @@ public class Control {
     }
 
 
+    public void checkAnyRunningPolyphenyInstances( Context ctx ) {
+        ctx.result( ServiceManager.getPidOfRunningPolyphenyInstances().size() + "" );
+    }
+
+
     public void getVersion( Context ctx ) {
         ctx.result( gson.toJson( ServiceManager.getVersion() ) );
     }

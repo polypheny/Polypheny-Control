@@ -174,6 +174,11 @@ public class PolyphenyControlConnector {
     }
 
 
+    boolean checkForAnyRunningPolyphenyInstances() {
+        return Boolean.parseBoolean( executeGet( "/control/checkAnyRunningPolyphenyInstances" ) );
+    }
+
+
     private String executeGet( String command ) {
         HttpResponse<String> httpResponse;
         try {
