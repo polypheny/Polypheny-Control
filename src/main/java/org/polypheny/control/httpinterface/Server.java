@@ -171,6 +171,13 @@ public class Server {
                 5,
                 TimeUnit.SECONDS );
 
+        // For switching background color when there are other polypheny instances running on this host
+        exec.scheduleAtFixedRate(
+                () -> ClientRegistry.broadcast( "numberOfOtherRunningPolyphenyInstances", "" + control.getNumberOfOtherRunningPolyphenyInstances() ),
+                0,
+                5,
+                TimeUnit.SECONDS );
+
         // Periodically sent versions to clients
         exec.scheduleAtFixedRate(
                 () -> ClientRegistry.broadcast( "version", ServiceManager.getVersion() ),

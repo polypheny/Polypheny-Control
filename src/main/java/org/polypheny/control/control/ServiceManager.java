@@ -1018,6 +1018,18 @@ public class ServiceManager {
     }
 
 
+    public static List<Integer> getPidOfOtherRunningPolyphenyInstances() {
+        if ( SystemUtils.IS_OS_WINDOWS ) {
+            throw new RuntimeException( "This operation is not supported on Windows" );
+        }
+        List<Integer> pids = getPidOfRunningPolyphenyInstances();
+        if ( polyphenyDbProcess != null ) {
+            pids.remove( Integer.valueOf( polyphenyDbProcess.getPid() ) );
+        }
+        return pids;
+    }
+
+
     private static boolean existsLocalBranchWithName( Git git, String branchName ) throws GitAPIException {
         List<Ref> branches = git.branchList().call();
         for ( Ref ref : branches ) {

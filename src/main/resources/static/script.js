@@ -81,6 +81,14 @@ webSocket.onmessage = function (msg) {
             $( "body" ).css( "background-color", "#3B83C8" );
         }
     }
+    if ( data.hasOwnProperty( "numberOfOtherRunningPolyphenyInstances" ) ) { // Periodically sent by server to keep the connection open
+        if ( data["numberOfOtherRunningPolyphenyInstances"] > 0 ) {
+            $( '#error-header' ).show();
+            $( '#error-header' ).html( "There are other running instances of Polypheny on this host!" );
+        } else {
+            $( '#error-header' ).hide();
+        }
+    }
     if ( data.hasOwnProperty( "version" ) ) { // Periodically sent by server to keep the connection open
         var pdbString = "PDB: " + data["version"]["pdb-branch"] + " @ " + data["version"]["pdb-commit"].substring( 0, 7 );
         var puiString = "PUI: " + data["version"]["pui-branch"] + " @ " + data["version"]["pui-commit"].substring( 0, 7 );
@@ -443,20 +451,6 @@ $( document ).ready( function () {
 
 // Update version
 getControlVersion();
-
-// Change bg color
-$( document ).on( 'keyup', function ( e ) {
-    if ( debug ) {
-        console.log( $( "body" ).css( "background-color" ) );
-    }
-    if ( e.which === 112 && $( "body" ).css( "background-color" ) !== "rgb(128, 128, 128)" ) {
-        if ( $( "body" ).css( "background-color" ) === "rgb(165, 215, 210)" ) {
-            $( 'body' ).css( 'background-color', "#3B83C8" );
-        } else {
-            $('body').css('background-color', "#A5D7D2");
-        }
-    }
-});
 
 // Initial adjust on page load
 window.onload = adjustFooterPosition;

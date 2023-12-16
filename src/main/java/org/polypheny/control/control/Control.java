@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import lombok.NonNull;
+import org.apache.commons.lang3.SystemUtils;
 import org.polypheny.control.httpinterface.ClientCommunicationStream;
 
 
@@ -160,6 +161,15 @@ public class Control {
 
     public void checkAnyRunningPolyphenyInstances( Context ctx ) {
         ctx.result( ServiceManager.getPidOfRunningPolyphenyInstances().size() + "" );
+    }
+
+
+    public int getNumberOfOtherRunningPolyphenyInstances() {
+        if ( !SystemUtils.IS_OS_WINDOWS ) {
+            return ServiceManager.getPidOfOtherRunningPolyphenyInstances().size();
+        } else {
+            return -1;
+        }
     }
 
 
