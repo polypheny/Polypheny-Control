@@ -460,6 +460,9 @@ $( document ).on( 'keyup', function ( e ) {
 
 // Initial adjust on page load
 window.onload = adjustFooterPosition;
+$(document).ready(function() {
+    setTimeout(adjustFooterPosition, 500);
+});
 
 // Adjust footer when window gets resized
 window.onresize = adjustFooterPosition;
