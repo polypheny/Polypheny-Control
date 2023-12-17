@@ -174,7 +174,7 @@ public class PolyphenyControlConnector {
     }
 
 
-    int checkForAnyRunningPolyphenyInstances() {
+    public int checkForAnyRunningPolyphenyInstances() {
         return Integer.parseInt( executeGet( "/control/checkAnyRunningPolyphenyInstances" ) );
     }
 
