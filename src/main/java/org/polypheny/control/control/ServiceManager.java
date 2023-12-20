@@ -169,6 +169,8 @@ public class ServiceManager {
             String logsDir = configuration.getString( "pcrtl.logsdir" );
             String javaExecutable = configuration.getString( "pcrtl.java.executable" ) + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
             List<String> javaOptions = configuration.getStringList( "pcrtl.java.options" );
+            boolean exposeJavaDebug = configuration.getBoolean( "pcrtl.java.debug.expose" );
+            List<String> javaDebugOptions = configuration.getStringList( "pcrtl.java.debug.options" );
             String javaMaximumHeapSize = configuration.getString( "pcrtl.java.heap" );
             String pdbmsJar = configuration.getString( "pcrtl.pdbms.jarfile" );
             String pdbmsMainClass = configuration.getString( "pcrtl.pdbms.mainclass" );
@@ -184,6 +186,11 @@ public class ServiceManager {
                 javaOptionsFull.addFirst( "-Dconfig.file=" + applicationConfFileName );
             }*/
             javaOptionsFull.addFirst( "-Xmx" + javaMaximumHeapSize + "G" );
+
+            // Expose Debug
+            if ( exposeJavaDebug ) {
+                javaOptionsFull.addAll( javaDebugOptions );
+            }
 
             // Build list of arguments
             List<String> pdbArguments = new LinkedList<>();
