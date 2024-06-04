@@ -174,11 +174,6 @@ public class PolyphenyControlConnector {
     }
 
 
-    public int checkForAnyRunningPolyphenyInstances() {
-        return Integer.parseInt( executeGet( "/control/checkAnyRunningPolyphenyInstances" ) );
-    }
-
-
     private String executeGet( String command ) {
         HttpResponse<String> httpResponse;
         try {
@@ -188,15 +183,6 @@ public class PolyphenyControlConnector {
             log.error( "Exception while sending request", e );
         }
         return null;
-    }
-
-
-    private void executePost( String command, String data ) {
-        try {
-            Unirest.post( controlUrl + command ).body( data ).asString();
-        } catch ( UnirestException e ) {
-            log.error( "Exception while sending request", e );
-        }
     }
 
 

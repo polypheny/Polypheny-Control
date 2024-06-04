@@ -58,12 +58,16 @@ sourceSets {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = "UTF-8"
-    sourceCompatibility = "11"
-    targetCompatibility = "11"
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.compilerArgs += "--enable-preview"
+}
 
 configurations {
     webjars
@@ -175,7 +179,7 @@ artifacts {
 
 
 task extractWebjars(type: Copy) {
-    configurations.webjars.each {jar ->
+    configurations.webjars.each { jar ->
         from zipTree(jar)
         into "$buildDir/webjars"
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
