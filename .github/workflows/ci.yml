@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 11, 17 ]
+        java: [ 21 ]
         os: [ macos-latest, ubuntu-latest, windows-latest ]
         withAuth: [ testWithoutAuth, testWithAuth ]
     name: Java ${{ matrix.java }} @ ${{ matrix.os }}
