@@ -9,7 +9,7 @@ This section describes how to set up Polypheny Control to build and run Polyphen
 
 
 ### Requirements
-To build and start Polypheny-DB using Polypheny Control you need to have a Java JDK of version 11 or higher installed on your system.
+To build and start Polypheny-DB using Polypheny Control you need to have a Java JDK of version 21 or higher installed on your system.
 Thanks to [JGit](https://eclipse.dev/jgit/), Polypheny Control contains a pure Java implementation of Git. Therefore, it is no longer required to have Git installed on the system.
 
 
@@ -114,6 +114,7 @@ Please note that we have a [code of conduct](https://github.com/polypheny/Admin/
 
 ## Credits
 _Polypheny Control_ builds upon the great work of several other open source projects:
+
 
 #### Frontend
 * [ansi_up.js](https://github.com/drudru/ansi_up): Converting text with ANSI terminal codes into colorful HTML.
